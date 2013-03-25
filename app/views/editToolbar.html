@@ -1,0 +1,58 @@
+<div id="edit-toolbar">
+    <div class="btn-group">
+        <a class="btn btn-small" ng-class="{'btn-inverse' : status.drawPoint}" href="" ng-click="setControl('drawPoint',!status.drawPoint);"><i class="icon-remove-circle" ng-class="{'icon-white' : status.drawPoint}"></i></a>
+        <a class="btn btn-small" ng-class="{'btn-inverse' : status.drawLine}" href="" ng-click="setControl('drawLine',!status.drawLine);"><i class="icon-resize-full" ng-class="{'icon-white' : status.drawLine}"></i></a>
+        <a class="btn btn-small" ng-class="{'btn-inverse' : status.drawPoly}" href="" ng-click="setControl('drawPoly',!status.drawPoly);"><i class="icon-retweet" ng-class="{'icon-white' : status.drawPoly}"></i></a>
+
+        <a class="btn btn-small" ng-class="{'btn-inverse' : status.edit}" href="" ng-click="setControl('edit',!status.edit);"><i class="icon-edit" ng-class="{'icon-white' : status.edit}"></i></a>
+        <a class="btn btn-small" ng-class="{'btn-inverse' : status.del}" href="" ng-click="setControl('del',!status.del);"><i class="icon-remove" ng-class="{'icon-white' : status.del}"></i></a>
+        <a class="btn btn-small" href="" ng-click="save()"><i class="icon-folder-close"></i></a>
+    </div>
+
+
+</div>
+<div id="edit-side-panel">
+    <tabs>
+        <pane heading="Attribute" class="tab">
+            <ul>
+                <li ng-repeat="(attribute, value) in attributes" ng-show="attributesSettings[attribute].display">
+                    <span ng-switch on="attributesSettings[attribute].editable" >
+                        <span ng-switch-when="true">
+                            <span ng-switch on="attributesSettings[attribute].type" >
+                                <span ng-switch-when="select">{{attributesSettings[attribute].displayName}}: <select ng-model="attributes[attribute]" ng-change="setFeatureUpdate()" ng-options="a.value as a.name for a in attributesSettings[attribute].values"></select></span>
+                                <!--ToDo: Input loses focus-->
+                                <span ng-switch-when="text">{{attributesSettings[attribute].displayName}}: <input name="input" ng-model="attributes[attribute]" ng-change="setFeatureUpdate()"></span>
+                                <span ng-switch-when="date">{{attributesSettings[attribute].displayName}}: ToDo</span>
+                                <span ng-switch-default>{{attributesSettings[attribute].displayName}}: <input name="input" ng-model="attributes[attribute]" ng-change="setFeatureUpdate()"></span>
+                            </span>
+                        </span>
+                        <span ng-switch-when="false">
+                            {{attributesSettings[attribute].displayName}}: {{value}}
+                        </span>
+                    </span>
+                </li>
+            </ul>
+            <div ng-hide="attributes">Wähle ein Feature zum Editieren</div>
+
+        </pane>
+        <pane heading="Features" class="tab">
+            <ul>
+                <li ng-repeat="feature in features.points">
+                    Point (Id:{{feature.attributes.id|id}})
+                </li>
+            </ul>
+            <ul>
+                <li ng-repeat="feature in features.lines">
+                    Linie (Id:{{feature.attributes.id|id}})
+                </li>
+            </ul>
+            <ul>
+                <li ng-repeat="feature in features.polys">
+                    Polygon (Id:{{feature.attributes.id|id}})
+                </li>
+            </ul>
+
+
+        </pane>
+    </tabs>
+</div>

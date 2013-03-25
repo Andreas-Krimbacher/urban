@@ -1,0 +1,102 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/resources/css/ext-all-gray-debug.css">
+    <link rel="stylesheet" href="styles/OpenLayers/style.css">
+
+
+      <link rel="stylesheet" type="text/css" href="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/styles/graphics.css">
+      <link rel="stylesheet" type="text/css" href="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/styles/timeline.css">
+      <link rel="stylesheet" type="text/css" href="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/styles/ethers.css">
+      <link rel="stylesheet" type="text/css" href="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/styles/events.css">
+
+      <script type="text/javascript">
+          window.SimileAjax = new Object();
+          window.SimileAjax.Platform = new Object();
+          window.Timeline = new Object();
+          window.Timeline.DateTime = window.SimileAjax.DateTime; // for backward compatibility
+
+          SimileAjax.urlPrefix = 'http://localhost:9000/components/timeline_2.3.0/src/ajax/api/';
+          Timeline.urlPrefix='http://localhost:9000/components/timeline_2.3.0/src/webapp/api/';
+      </script>
+  </head>
+  <body ng-app="swaApp">
+    <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+      <script src="components/es5-shim/es5-shim.js"></script>
+      <script src="components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+
+    <!-- Add your site or application content here -->
+    <div ng-controller="MainCtrl" ng-view></div>
+
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/jquery-1.2.6.min.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/platform.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/dom.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/graphics.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/date-time.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/html.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/data-structure.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/units.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/window-manager.js"></script>
+
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/timeline.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/band.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/themes.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/ethers.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/ether-painters.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/event-utils.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/labellers.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/sources.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/original-painter.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/overview-painter.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/units.js"></script>
+
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/l10n/en/timeline.js"></script>
+    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/webapp/api/scripts/l10n/en/labellers.js"></script>
+
+
+    <script src="components/OpenLayers-2.12/OpenLayers.debug.js"></script>
+    <script src="components/angular/angular.js"></script>
+    <script src="components/angular-resource/angular-resource.js"></script>
+    <script src="components/angular-cookies/angular-cookies.js"></script>
+    <script src="components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="components/angular-bootstrap/src/tabs/tabs.js"></script>
+
+    <!-- build:js scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/main.js"></script>
+    <script src="scripts/directives/slider.js"></script>
+    <script src="scripts/controllers/mapView.js"></script>
+    <script src="scripts/directives/edittoolbar.js"></script>
+    <script src="scripts/services/layers.js"></script>
+    <script src="scripts/services/map.js"></script>
+    <script src="scripts/services/settings.js"></script>
+    <script src="scripts/services/util.js"></script>
+    <script src="scripts/filters/filter.js"></script>
+    <script src="scripts/directives/timeline.js"></script>
+    <!-- endbuild -->
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <!--<script>-->
+      <!--var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];-->
+      <!--(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];-->
+      <!--g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';-->
+      <!--s.parentNode.insertBefore(g,s)}(document,'script'));-->
+    <!--</script>-->
+  </body>
+</html>
