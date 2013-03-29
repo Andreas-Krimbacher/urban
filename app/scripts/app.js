@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('swaApp', ['ui.bootstrap.tabs','ngSanitize'])
+angular.module('swaApp', ['ui','ngSanitize'])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {

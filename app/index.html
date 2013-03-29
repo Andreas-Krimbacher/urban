@@ -11,7 +11,6 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/resources/css/ext-all-gray-debug.css">
     <link rel="stylesheet" href="styles/OpenLayers/style.css">
 
 
@@ -44,7 +43,9 @@
     <!-- Add your site or application content here -->
     <div ng-controller="MainCtrl" ng-view></div>
 
-    <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/jquery-1.2.6.min.js"></script>
+    <script src="components/jquery/jquery.js"></script>
+    <script src="components/jquery-ui/ui/jquery-ui.custom.js"></script>
+
     <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/platform.js"></script>
     <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/dom.js"></script>
     <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/graphics.js"></script>
@@ -75,7 +76,8 @@
     <script src="components/angular-resource/angular-resource.js"></script>
     <script src="components/angular-cookies/angular-cookies.js"></script>
     <script src="components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="components/angular-bootstrap/src/tabs/tabs.js"></script>
+    <script src="components/angular-ui/build/angular-ui.js"></script>
+
 
     <!-- build:js scripts/scripts.js -->
     <script src="scripts/app.js"></script>
@@ -89,6 +91,9 @@
     <script src="scripts/services/util.js"></script>
     <script src="scripts/filters/filter.js"></script>
     <script src="scripts/directives/timeline.js"></script>
+    <script src="scripts/directives/layerlist.js"></script>
+    <script src="scripts/directives/infobox.js"></script>
+    <script src="scripts/directives/layerswitcher.js"></script>
     <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->

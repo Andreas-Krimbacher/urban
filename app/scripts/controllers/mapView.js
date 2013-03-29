@@ -5,6 +5,6 @@ angular.module('swaApp')
         map.createMap('map');
         map.setCenter(-71.147, 48.472,8);
 
-        map.addLayers(layers.getLayers());
+//        map.addLayers(layers.getLayers());
 
     });
