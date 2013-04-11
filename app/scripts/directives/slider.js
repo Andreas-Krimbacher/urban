@@ -3,24 +3,18 @@
 angular.module('swaApp')
   .directive('slider', [function () {
     return {
-      template: '<div id="container"></div>{{value}}',
+      template: '<div class="slider"></div>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-          Ext.create('Ext.slider.Multi', {
-              width: 200,
-              values: [25, 75],
-              increment: 5,
-              minValue: 0,
-              maxValue: 100,
-              renderTo: 'container',
-              listeners : {
-                  change : function(slider, newValue){
-                      scope.$apply(scope.value = newValue);
-                  }
-              }
+          $( ".slider" ).slider({
+              min: 0,
+              max: 100,
+              step: 5,
+              value: 100,
+              slide: function( event, ui ) {
+                  scope.$emit('sliderChanged',ui.value/100);
+          }
           });
       }
-
-
     };
   }]);

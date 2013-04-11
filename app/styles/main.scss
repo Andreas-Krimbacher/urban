@@ -3,6 +3,8 @@
 
 body{
   font-size: 11px;
+  @include user-select(none);
+  cursor: default;
 }
 
 img { max-width: none; }
@@ -21,7 +23,14 @@ h3{
 //Variables
 
 $borderRadius: 2px;
-$panelOpacity: 0.7;
+$black : #373737;
+
+@mixin panel{
+  background-color: rgba(245,245,245,0.7);
+  z-index: 2500;
+  @include single-box-shadow;
+  @include border-radius($borderRadius);
+}
 
 //Overall classes
 
@@ -49,7 +58,7 @@ $panelOpacity: 0.7;
   @include border-radius($borderRadius);
   height: 20px;
     &:hover{
-    background: black;
+    background: $black;
   }
   i:hover{
       background-image: url("images/glyphicons-halflings-white.png");
@@ -57,15 +66,30 @@ $panelOpacity: 0.7;
   }
 }
 
+div.olControlZoom a {
+
+  background: $black !important;
+  opacity: 1;
+  &:hover{
+    background: $black !important;
+    opacity: 0.8;
+  }
+}
 
 
 #map-container{
 
 }
 
+.zminus{
+  z-index: -1 !important;
+}
+
+
+
 #top-bar{
   height: 30px;
-  background-color: grey;
+  background-color: greenyellow;
   font-size: 1.6em;
   line-height: 30px;
   padding-left: 10px;
@@ -74,14 +98,54 @@ $panelOpacity: 0.7;
 
 #map {
   width: 100%;
-  height: 550px;
+  height: 605px;
 }
+
+#layerswitcher{
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  z-index: 2500;
+  a{
+    display: inline-block;
+    cursor: pointer;
+    &:hover{
+      background: $black;
+    }
+  }
+}
+
+#image-gallery{
+  position: absolute;
+  top:100px;
+  left:100px;
+  width: 800px;
+  height: 400px;
+  @include panel;
+  img{
+    height: 400px;
+  }
+  .close-btn{
+    position: absolute;
+    right: 3px;
+    z-index: 2501;
+  }
+}
+
+
+//fix
+.dropdown-menu .disabled > a:hover {
+  background-image: none;
+  cursor: default !important;
+}
+
+
 
 #layerlist{
   width: 250px;
   height: 100px;
   position: absolute;
-  top: 50px;
+  top: 90px;
   right: 20px;
   z-index: 2500;
   li{
@@ -89,30 +153,47 @@ $panelOpacity: 0.7;
     height: 20px;
     margin-top: 5px;
     cursor: pointer;
-    background-color: #f5f5f5;
-    opacity: $panelOpacity;
-    @include single-box-shadow;
-    @include border-radius($borderRadius);
+    @include panel;
     .list-title{
-      width: 200px;
+      width: 115px;
       line-height: 20px;
+    }
+  }
+  .slider{
+    width: 70px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-left: 5px;
+    height: 2px;
+    .ui-slider-handle{
+      top: -.7em;
+      width: 3px;
+      margin-left: -.2em;
+    }
+    .ui-state-hover{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-active{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-focus{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
     }
   }
 }
 
 #infobox{
   width: 250px;
-  height: 370px;
+  height: 410px;
   position: absolute;
-  top: 180px;
+  top: 140px;
   right: 20px;
-  background-color: #f5f5f5;
-  opacity: $panelOpacity;
-  z-index: 2500;
-  @include single-box-shadow;
-  @include border-radius($borderRadius);
+  @include panel;
   .infotext{
-      height: 280px;
+      height: 320px;
   }
   .bottom{
       height: 30px;
@@ -133,10 +214,14 @@ $panelOpacity: 0.7;
 
 #timeline{
   width: 100%;
-  height: 130px;
-
+  height: 100px;
   .timeline-event-tape{
     @include border-radius($borderRadius);
+  }
+  .timeline-band-1{
+    .timeline-date-label{
+      color: $black;
+    }
   }
 }
 

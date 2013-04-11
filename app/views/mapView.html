@@ -3,7 +3,11 @@
         <div id="top-bar">Discover Urban Design History</div>
         <div id="map"></div>
         <!--<edittoolbar> </edittoolbar>-->
-        <layerlist></layerlist>
-        <infobox></infobox>
+        <layerswitcher></layerswitcher>
+        <layerlist ng-show="panelVisibility.layerlist"></layerlist>
+        <infobox ng-show="panelVisibility.info"></infobox>
         <timeline></timeline>
+        <imgslider></imgslider>
+
+
     </div>

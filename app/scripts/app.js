@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('swaApp', ['ui','ngSanitize'])
+angular.module('swaApp', ['ui','ui.bootstrap.dropdownToggle','ngSanitize'])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {

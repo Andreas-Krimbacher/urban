@@ -44,7 +44,7 @@ Timeline.ClassicTheme._Impl = function() {
     this.ether = {
         backgroundColors: [
             "white",
-            "grey",
+            "greenyellow",
             "#CCC",
             "#AAA"
         ],

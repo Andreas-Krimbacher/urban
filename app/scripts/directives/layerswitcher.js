@@ -1,12 +1,18 @@
 'use strict';
 
 angular.module('swaApp')
-  .directive('layerswitcher', function () {
+  .directive('layerswitcher', function (map,$compile) {
     return {
-      template: '<div></div>',
+      templateUrl: '../views/layerswitcher.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-        element.text('this is the layerswitcher directive');
+          scope.basemaps = map.getBasemaps();
+
+          scope.setBasemap = function(id){
+              map.setBasemap(id);
+              scope.basemaps = map.getBasemaps();
+          }
+
       }
     };
   });
