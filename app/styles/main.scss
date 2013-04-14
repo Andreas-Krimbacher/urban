@@ -98,7 +98,7 @@ div.olControlZoom a {
 
 #map {
   width: 100%;
-  height: 605px;
+  height: 550px;
 }
 
 #layerswitcher{
@@ -210,6 +210,40 @@ div.olControlZoom a {
       }
   }
 }
+
+georeference{
+  width: 250px;
+  height: 480px;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  @include panel;
+  .slider{
+    width: 70px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-left: 5px;
+    height: 2px;
+    .ui-slider-handle{
+      top: -.7em;
+      width: 3px;
+      margin-left: -.2em;
+    }
+    .ui-state-hover{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-active{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-focus{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+  }
+}
+
 
 
 #timeline{

@@ -134,4 +134,12 @@ angular.module('swaApp')
             $scope.panelVisibility.imgslider = false;
         });
 
+        $scope.$on('showImgOverlay', function(e,img) {
+            map.showImageOverlay(img);
+        });
+
+        $scope.$on('redrawImgOverlay', function(e,img) {
+            map.redrawImageOverlay(img);
+        });
+
     });

@@ -4,6 +4,7 @@ angular.module('swaApp')
   .factory('map', function ($rootScope) {
     // Service logic
     var map = null;
+    var imgLayer = null;
 
     var _basemaps = {};
     var _currentBasempas = null;
@@ -194,7 +195,33 @@ angular.module('swaApp')
 
 
             return selectControl
-      }
+      },
+      showImageOverlay: function(img){
+
+            var styleMap = new OpenLayers.Style({
+                externalGraphic: "${text}",
+                graphicWidth: "${width}",
+                graphicHeight: "${height}",
+                rotation:"${rot}"
+            });
+            imgLayer = new OpenLayers.Layer.Vector("My Image Overlay", {
+                styleMap: styleMap
+            });
+
+
+            var newPoint = new OpenLayers.Geometry.Point(map.getCenter().lon,map.getCenter().lat);
+            var pointFeature = new OpenLayers.Feature.Vector(newPoint);
+            pointFeature.attributes = img;
+
+            imgLayer.addFeatures([pointFeature]);
+            map.addLayers([imgLayer]);
+
+        },
+        redrawImageOverlay: function(img){
+
+            imgLayer.redraw();
+
+        }
 
 
     };

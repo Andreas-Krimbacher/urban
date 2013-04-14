@@ -61,7 +61,10 @@ angular.module('swaApp')
             $rootScope.$broadcast('featureadded', e.feature);
         });
 
+
         var layers = [wfsPoint,wfsPoly,wfsLine];
+
+
 
     // Public API here
     return {

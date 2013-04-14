@@ -8,11 +8,11 @@ angular.module('swaApp')
       link: function postLink(scope, element, attrs) {
           $( ".slider" ).slider({
               min: 0,
-              max: 100,
+              max: 360,
               step: 5,
               value: 100,
               slide: function( event, ui ) {
-                  scope.$emit('sliderChanged',ui.value/100);
+                  scope.$emit('sliderChanged',ui.value);
           }
           });
       }
