@@ -91,7 +91,7 @@ module.exports = function (grunt) {
                     bases: [yeomanConfig.app,'.tmp',imgDirGeoserver],
                     server: path.resolve('app/server/server.js'),
                     watchChanges: true,
-                    debug:true
+                    //debug:true
                 }
             }
         },

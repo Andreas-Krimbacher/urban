@@ -212,17 +212,58 @@ div.olControlZoom a {
 }
 
 georeference{
-  width: 250px;
-  height: 480px;
+  width: 230px;
+  height: 460px;
   position: absolute;
   top: 60px;
   right: 20px;
+  padding: 10px;
   @include panel;
+  select{
+    width: 200px;
+  }
+  ul{
+    margin-left: 10px;
+  }
+  .label{
+    width: 100px;
+    display: inline-block;
+  }
+  .cpTable{
+    overflow: auto;
+    width: 240px;
+    max-height: 240px;
+    margin-bottom: 10px;
+  }
+  tr{
+    background-color: #d3d3d3;
+    @include border-radius($borderRadius);
+    border-top: solid ;
+    border-bottom: solid ;
+  }
+  .infotext{
+    font-weight: 700;
+    font-size: 1.2em;
+    width: 30px;
+  }
+  .coord{
+    font-weight: 700;
+  }
+  .world{
+    color: #00b000;
+    width: 90px;
+  }
+  .image{
+    color: #1267bb;
+    width: 55px;
+  }
+  .button-icon{
+    margin-right: 5px;
+  }
   .slider{
     width: 70px;
     display: inline-block;
-    margin-right: 5px;
-    margin-left: 5px;
+    margin-left: 10px;
     height: 2px;
     .ui-slider-handle{
       top: -.7em;
