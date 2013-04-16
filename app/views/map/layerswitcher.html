@@ -1,0 +1,11 @@
+<div class="btn-group" id="layerswitcher">
+    <a class="btn dropdown-toggle btn-small btn-inverse" data-toggle="dropdown" href="">
+        Karte
+        <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li ng-repeat="(key, map) in basemaps" ng-class="{'disabled' : map.active}" ng-click="setBasemap(key)">
+            <a>{{map.name}}</a><i class="icon-ok" ng-show="map.active"></i>
+        </li>
+    </ul>
+</div>

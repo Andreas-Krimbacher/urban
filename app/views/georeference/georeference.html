@@ -1,0 +1,48 @@
+<div id="georeference">
+
+    <h4>1. Bild auswählen</h4>
+    <select ui-select2 ng-model="selectedId" data-placeholder="-- Select One --" ng-change="change()" style="width:220px" ng-disabled="CPProcess">
+        <option></option>
+        <option ng-repeat="item in items" value="{{item.id}}">{{item.text}}</option>
+    </select>
+
+    <div ng-show="currentImg">
+        <h4>2. Bild anpassen</h4>
+
+        <ul>
+            <li ng-show="!CPProcess">
+                <span class="label label-info">Breite: </span><slider min='50' max='2000' step='1' name='width' value='{{currentImg.width}}'></slider>
+            </li>
+            <li ng-show="!CPProcess">
+                <span class="label label-info">Höhe: </span><slider min='50' max='1000' step='1' name='height' value='{{currentImg.height}}'></slider>
+            </li>
+            <li ng-show="!CPProcess">
+                <span class="label label-info">Rotation: </span><slider min='0' max='360' step='1' name='rot' value='{{currentImg.rot}}'></slider>
+            </li>
+            <li>
+                <span class="label label-info">Transparenz: </span><slider min='0' max='100' step='1' name='opacity' value='{{currentImg.opacity*100}}'></slider>
+            </li>
+        </ul>
+
+    </div>
+
+    <div ng-show="currentImg">
+        <h4>3. Passpunkte</h4>
+
+        <div class="button-icon" ng-click="addCP()"><i class="icon-plus"></i></div>
+
+        <div class="cpTable">
+            <table>
+                <tr ng-repeat="point in CP">
+                    <td><div class="infotext">CP {{$index+1}}</div></td>
+                    <td><div class="coord image">Pixel: {{point.imgPoint.pixel}}</div><div class="coord image">Line: {{point.imgPoint.line}}</div></td>
+                    <td><div class="coord world">Länge: {{point.worldPoint.lon|number:0}}</div><div class="coord world">Breite: {{point.worldPoint.lat|number:0}}</div></td>
+                    <td><div class="button-icon" ng-click="deleteCP($index)"><i class="icon-trash"></i></div></td>
+                </tr>
+            </table>
+        </div>
+
+        <button class="btn btn-small btn-success" type="button" ng-show="CP.length > 0" ng-click="send()">Georeferenzieren</button>
+    </div>
+
+</div>
