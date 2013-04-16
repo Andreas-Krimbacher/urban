@@ -30,7 +30,7 @@
           Timeline.urlPrefix='http://localhost:9000/components/timeline_2.3.0/src/webapp/api/';
       </script>
   </head>
-  <body ng-app="swaApp">
+  <body ng-app="udm">
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
     <![endif]-->
@@ -44,8 +44,9 @@
     <!-- Add your site or application content here -->
     <div ng-controller="MainCtrl" ng-view></div>
 
-    <script src="components/jquery/jquery.js"></script>
+    <script src="components/jquery/jquery.min.js"></script>
     <script src="components/jquery-ui/ui/jquery-ui.custom.js"></script>
+    <script src="components/select2/select2.js"></script>
 
     <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/platform.js"></script>
     <script type="text/javascript" src="http://localhost:9000/components/timeline_2.3.0/src/ajax/api/scripts/dom.js"></script>
@@ -80,25 +81,37 @@
     <script src="components/angular-ui/build/angular-ui.js"></script>
     <script src="components/angular-ui-bootstrap/src/dropdownToggle/dropdownToggle.js"></script>
     <script src="components/wmuSlider-master/jquery.wmuslider.js"></script>
-    <script src="components/select2/select2.js"></script>
+
     <!-- build:js scripts/scripts.js -->
-    <script src="scripts/app.js"></script>
-    <script src="scripts/controllers/main.js"></script>
-    <script src="scripts/directives/slider.js"></script>
-    <script src="scripts/controllers/mapView.js"></script>
-    <script src="scripts/directives/edittoolbar.js"></script>
-    <script src="scripts/services/layers.js"></script>
-    <script src="scripts/services/map.js"></script>
-    <script src="scripts/services/settings.js"></script>
-    <script src="scripts/services/util.js"></script>
-    <script src="scripts/filters/filter.js"></script>
-    <script src="scripts/directives/timeline.js"></script>
-    <script src="scripts/directives/layerlist.js"></script>
-    <script src="scripts/directives/infobox.js"></script>
-    <script src="scripts/directives/layerswitcher.js"></script>
-    <script src="scripts/directives/imgslider.js"></script>
-    <script src="scripts/directives/georeference.js"></script>
-    <script src="scripts/services/georeference.js"></script>
+    <script src="scripts/main/module.js"></script>
+    <script src="scripts/main/controllers/main.js"></script>
+    <script src="scripts/main/controllers/openWorld.js"></script>
+
+    <script src="scripts/util/module.js"></script>
+    <script src="scripts/util/directives/slider.js"></script>
+    <script src="scripts/util/services/util.js"></script>
+
+    <script src="scripts/map/module.js"></script>
+    <script src="scripts/map/controllers/map.js"></script>
+    <script src="scripts/map/services/layers.js"></script>
+    <script src="scripts/map/services/map.js"></script>
+    <script src="scripts/map/directives/map.js"></script>
+    <script src="scripts/map/directives/layerswitcher.js"></script>
+
+    <script src="scripts/timeline/module.js"></script>
+    <script src="scripts/timeline/directives/timeline.js"></script>
+
+    <script src="scripts/infoElement/module.js"></script>
+    <script src="scripts/infoElement/controllers/infoElement.js"></script>
+    <script src="scripts/infoElement/directives/infoElement.js"></script>
+    <script src="scripts/infoElement/directives/layerlist.js"></script>
+    <script src="scripts/infoElement/directives/infobox.js"></script>
+    <script src="scripts/infoElement/directives/imgslider.js"></script>
+
+    <script src="scripts/georeference/module.js"></script>
+    <script src="scripts/georeference/controllers/georeference.js"></script>
+    <script src="scripts/georeference/directives/georeference.js"></script>
+    <script src="scripts/georeference/services/georeference.js"></script>
     <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
