@@ -40,7 +40,7 @@ module.exports = function(req, res) {
             console.log(stdout);
             console.log(stderr);
 
-            cmd = 'gdalwarp -t_srs EPSG:4326 ';
+            cmd = 'gdalwarp -t_srs EPSG:900913 -r lanczos ';
             cmd += '.' + rasterTmpDir + '/' + fileName + ' ';
             cmd += '.' + rasterDir + '/' + fileName;
 

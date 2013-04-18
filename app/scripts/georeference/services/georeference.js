@@ -245,7 +245,7 @@ angular.module('udm.georeference')
                 CPlayer.addFeatures(CPline);
                 CPlayer.redraw();
 
-                var worldPoint = secondPoint.geometry.clone().transform(map.getProjectionObject(),new OpenLayers.Projection("EPSG:4326"));
+                var worldPoint = secondPoint.geometry.clone();
 
                 var point = {id:CPId,imgPoint:{line:line,pixel:pixel},worldPoint:{lon:worldPoint.x,lat:worldPoint.y}};
                 CP.push({id:CPId,imgPoint:firstPoint,worldPoint:secondPoint,line:CPline});

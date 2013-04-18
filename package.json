@@ -1,5 +1,5 @@
 {
-  "name": "swa",
+  "name": "urban",
   "version": "0.0.0",
   "dependencies": {},
   "devDependencies": {
@@ -29,6 +29,6 @@
       "express": "3.x"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": "0.11.0"
   }
 }
