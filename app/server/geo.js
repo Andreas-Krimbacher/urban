@@ -1,12 +1,14 @@
 var url = require('url');
 var fs = require('fs');
-var sys = require('sys')
+var sys = require('sys');
+var path = require('path');
 var exec = require('child_process').exec;
+var rimraf = require('rimraf');
 
-var dataDir = '/usr/share/opengeo-suite-data/geoserver_data/data/urban';
-var tiffDir = '/imgServer/tiff';
-var rasterTmpDir = '/geoserverData/tmp';
-var rasterDir = '/geoserverData';
+var filePaths = require('./filePaths');
+
+
+
 
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
@@ -26,12 +28,18 @@ module.exports = function(req, res) {
 
         var fileName = queryData.fileName.replace(' ','\\ ');
 
-        cmd += '.' + tiffDir + '/' + fileName + ' ';
-        cmd += '.' + rasterTmpDir + '/' + fileName;
+        cmd += filePaths.uploadTiffFolder + '/' + fileName + ' ';
 
-        console.log(dataDir);
+        fileName = queryData.fileName.replace(' ','_');
+
+        cmd += filePaths.rasterTmpFolder + '/' + fileName;
+
+        if (path.existsSync(filePaths.rasterTmpFolder + '/' + fileName)) { // or fs.existsSync
+            fs.unlink(filePaths.rasterTmpFolder + '/' + fileName);
+        }
+
         console.log(cmd);
-        exec(cmd,{cwd:dataDir}, function (err, stdout, stderr) {
+        exec(cmd, function (err, stdout, stderr) {
             if(err){
                 res.end(err);
                 return
@@ -40,14 +48,16 @@ module.exports = function(req, res) {
             console.log(stdout);
             console.log(stderr);
 
-            cmd = 'gdalwarp -t_srs EPSG:900913 -r lanczos ';
-            cmd += '.' + rasterTmpDir + '/' + fileName + ' ';
-            cmd += '.' + rasterDir + '/' + fileName;
+            cmd = 'gdalwarp -t_srs EPSG:900913 -srcnodata 0 -dstalpha ';
+            cmd += filePaths.rasterTmpFolder + '/' + fileName + ' ';
+            cmd += filePaths.rasterFolder + '/' + fileName;
 
+            if (path.existsSync(filePaths.rasterFolder + '/' + fileName)) { // or fs.existsSync
+                fs.unlink(filePaths.rasterFolder + '/' + fileName);
+            }
 
-            console.log(dataDir);
             console.log(cmd);
-            exec(cmd,{cwd:dataDir}, function (err, stdout, stderr) {
+            exec(cmd, function (err, stdout, stderr) {
                 if(err){
                     res.end(err);
                     return
@@ -56,12 +66,68 @@ module.exports = function(req, res) {
                 console.log(stdout);
                 console.log(stderr);
 
-                fs.unlink(dataDir + rasterTmpDir + '/' + queryData.fileName);
+                fs.unlink(filePaths.rasterTmpFolder + '/' + fileName);
 
-                res.writeHead(200, {'Content-Type': 'text/plain'});
-                res.end('success');
+                makeTiles(fileName);
                 });
         });
+
+        function makeTiles(fileName){
+
+            cmd = 'gdal2tiles.py -z 7-15 --s_srs EPSG:900913 ';
+            cmd += filePaths.rasterFolder + '/' + fileName + ' ';
+
+            fileName = path.basename(fileName.replace(' ','_'),path.extname(fileName));
+            console.log(fileName)
+
+            cmd += filePaths.tilesTmpFolder + '/' + fileName;
+
+            if (path.existsSync(filePaths.tilesTmpFolder + '/' + fileName)) { // or fs.existsSync
+                rimraf(filePaths.tilesTmpFolder + '/' + fileName,function(){});
+            }
+
+            console.log(cmd);
+            exec(cmd, function (err, stdout, stderr) {
+                if(err){
+                    res.end(err);
+                    return
+                }
+
+                console.log(stdout);
+                console.log(stderr);
+
+                cmd = 'mb-util --scheme=tms --image_format=png ';
+                cmd += filePaths.tilesTmpFolder + '/' + fileName + ' ';
+
+                fileName = fileName.replace(' ','_');
+
+                cmd += filePaths.tilesFolder + '/' + fileName + '.mbtiles';
+
+                if (path.existsSync(filePaths.tilesFolder + '/' + fileName + '.mbtiles')) { // or fs.existsSync
+                    fs.unlink(filePaths.tilesFolder + '/' + fileName + '.mbtiles');
+                }
+
+
+                console.log(cmd);
+                exec(cmd, function (err, stdout, stderr) {
+                    if(err){
+                        res.end(err);
+                        return
+                    }
+
+                    console.log(stdout);
+                    console.log(stderr);
+
+                    rimraf(filePaths.tilesTmpFolder + '/' + fileName,function(){});
+
+                    res.writeHead(200, {'Content-Type': 'text/plain'});
+                    res.end(JSON.stringify({name:fileName}));
+                    console.log('responds sent');
+                });
+            });
+        }
     }
     //todo: send error
 };
+
+

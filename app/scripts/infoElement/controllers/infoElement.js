@@ -23,9 +23,9 @@ angular.module('udm.infoElement')
 //            })
 //        });
 
-        var wms = new OpenLayers.Layer.WMS("NASA Global Mosaic",
-            "http://localhost:9000/geoserver/urban/wms",
-            {layers: "urban:yes",transparent: true},{isBaseLayer:false});
+        var wms = new OpenLayers.Layer.TileStream( "Tiles",
+            "http://localhost:8888/", {layername: 'B-109-Haussmann-Paris-1842-Plan', type:'png',isBaseLayer:false,serviceVersion:'v2'} );
+        wms.opacity = 0.6
 
         $scope.$on('showInfoElement', function(e,infoElement) {
 
@@ -124,7 +124,8 @@ angular.module('udm.infoElement')
 
 
         $scope.$on('sliderChanged', function(e,value) {
-            wms.setOpacity(value/100);
+            wms.opacity = value/100;
+            wms.redraw();
         });
 
         $scope.setVisibilityImgSlider = function(state){

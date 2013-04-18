@@ -5,7 +5,7 @@
 //  return connect.static(require('path').resolve(dir));
 //};
 
-var imgDirGeoserver = '/usr/share/opengeo-suite-data/geoserver_data/data/urban';
+var FileServer = '/home/nd/ooo/Urban/FileServer';
 
 var path = require('path');
 
@@ -88,7 +88,7 @@ module.exports = function (grunt) {
                     port: 9000,
                     // Change this to '0.0.0.0' to access the server from outside.
                     hostname: 'localhost',
-                    bases: [yeomanConfig.app,'.tmp',imgDirGeoserver],
+                    bases: [yeomanConfig.app,'.tmp',FileServer],
                     server: path.resolve('app/server/server.js'),
                     watchChanges: true
                     //debug:true

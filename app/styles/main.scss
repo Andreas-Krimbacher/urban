@@ -245,7 +245,7 @@ div.olControlZoom a {
     border-bottom: solid ;
   }
   .deleteAll{
-    margin-left: 167px;
+    margin-left: 152px;
   }
   .buttonFix{
     margin-left: 45px;
@@ -253,9 +253,15 @@ div.olControlZoom a {
   .heading2{
     display: inline-block;
   }
-  #cancelButtonPlace{
+  .placeholder{
     display: inline-block;
-    width: 20px;
+    width: 16px;
+  }
+  .selected{
+        background: $black;
+      i{
+        background-image: url("images/glyphicons-halflings-white.png");
+      }
   }
   .infotext{
     font-weight: 700;
@@ -300,6 +306,7 @@ div.olControlZoom a {
     }
   }
 }
+
 
 
 

@@ -1,8 +1,9 @@
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
-
 var gm = require('gm');
+
+var filePaths = require('./filePaths');
 
 
 
@@ -11,17 +12,12 @@ var sys = require('sys')
 var exec = require('child_process').exec;
 var child;
 
-var dataDir = '/usr/share/opengeo-suite-data/geoserver_data/data/urban/imgServer/jpeg';
-
-var rasterImgJpegDir = 'imgServer/jpeg';
-
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
     if(queryData.action == 'imgFileList'){
 
         var counter = 1;
-
-        fs.readdir(dataDir,function(err,files){
+        fs.readdir(filePaths.uploadJpegFolder + '/',function(err,files){
             if(err){
                 res.end(err);
                 return
@@ -30,7 +26,7 @@ module.exports = function(req, res) {
             var respond = [];
 
             for(var x in files){
-                if(path.extname(files[x]) == '.jpeg') respond.push({name: files[x], path:rasterImgJpegDir + '/' + files[x]});
+                if(path.extname(files[x]) == '.jpeg') respond.push({name: files[x], path:filePaths.jpegServer + '/' + files[x]});
                 getImgSize(respond,x);
             }
             finish(respond);
@@ -45,7 +41,7 @@ module.exports = function(req, res) {
 
         function getImgSize(respond,index){
             counter++;
-            gm(dataDir + '/' + respond[index].name).size(function (err, size) {
+            gm(filePaths.uploadJpegFolder + '/' + respond[index].name).size(function (err, size) {
                 if(err){
                     res.end(err);
                     return

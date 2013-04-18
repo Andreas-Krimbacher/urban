@@ -16,6 +16,8 @@ angular.module('udm.georeference')
         var firstPoint = null;
         var secondPoint = null;
 
+        var resultLayer = null;
+
         var fixState = false;
         var currentZoom = 999;
 
@@ -116,7 +118,6 @@ angular.module('udm.georeference')
 
         },
         imgFix: function(state){
-
             if(state && !fixState){
                 removeMoveEvent();
                 map.events.remove('move');
@@ -276,7 +277,18 @@ angular.module('udm.georeference')
         clearCP: function(id){
             if(CPControl) CPControl.deactivate();
             if(CPlayer) CPlayer.removeAllFeatures();
+        },
+        hideLayers: function(){
+            if(CPlayer) CPlayer.setVisibility(false);
+            if(imgLayer) imgLayer.setVisibility(false);
+            if(resultLayer) resultLayer.setVisibility(false);
+        },
+        showResultLayer: function(name){
+            resultLayer = new OpenLayers.Layer.TileStream( "Tiles",
+                "http://localhost:8888/", {layername: name, type:'png',isBaseLayer:false,serviceVersion:'v2'} );
+            map.addLayer(resultLayer);
         }
+
 
 
     };
