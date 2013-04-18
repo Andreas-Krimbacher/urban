@@ -1,4 +1,7 @@
-node_modules
+node_modules/*
+!node_modules/jquery-file-upload-middleware
+node_modules/jquery-file-upload-middleware/*
+!node_modules/jquery-file-upload-middleware/lib
 dist
 .tmp
 .sass-cache

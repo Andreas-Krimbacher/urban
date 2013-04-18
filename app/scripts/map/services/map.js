@@ -4,6 +4,7 @@ angular.module('udm.map')
     .factory('map', function ($rootScope) {
         // Service logic
         var map = null;
+        var offline = false;
 
         var _basemaps = {};
         var _currentBasempas = null;
@@ -44,31 +45,37 @@ angular.module('udm.map')
                 var osm = new OpenLayers.Layer.OSM('Simple OSM Map');
                 _basemaps.osm = {name:'OpenStreet Map',map:osm,active:false};
 
-                var gphy = new OpenLayers.Layer.Google(
-                    "Google Physical",
-                    {type: google.maps.MapTypeId.TERRAIN}
-                );
-                _basemaps.gphy = {name:'Google Gelände',map:gphy,active:false};
+                if(!offline){
+                    var gphy = new OpenLayers.Layer.Google(
+                        "Google Physical",
+                        {type: google.maps.MapTypeId.TERRAIN}
+                    );
+                    _basemaps.gphy = {name:'Google Gelände',map:gphy,active:false};
 
-                var gmap = new OpenLayers.Layer.Google(
-                    "Google Streets",
-                    {numZoomLevels: 20}
-                );
-                _basemaps.gmap = {name:'Google Streets',map:gmap,active:false};
+                    var gmap = new OpenLayers.Layer.Google(
+                        "Google Streets",
+                        {numZoomLevels: 20}
+                    );
+                    _basemaps.gmap = {name:'Google Streets',map:gmap,active:false};
 
-                var ghyb = new OpenLayers.Layer.Google(
-                    "Google Hybrid",
-                    {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
-                );
-                _basemaps.ghyb = {name:'Google Hybrid',map:ghyb,active:false};
+                    var ghyb = new OpenLayers.Layer.Google(
+                        "Google Hybrid",
+                        {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+                    );
+                    _basemaps.ghyb = {name:'Google Hybrid',map:ghyb,active:false};
 
-                var gsat = new OpenLayers.Layer.Google(
-                    "Google Satellite",
-                    {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
-                );
-                _basemaps.gsat = {name:'Google Luftbild',map:gsat,active:false};
+                    var gsat = new OpenLayers.Layer.Google(
+                        "Google Satellite",
+                        {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+                    );
+                    _basemaps.gsat = {name:'Google Luftbild',map:gsat,active:false};
 
-                _setBasemap('gsat');
+                    _setBasemap('gsat');
+                }
+                else{
+                    _setBasemap('osm');
+                }
+
             },
             setCenter: function(Lon,Lat,Zoom){
                 map.setCenter(

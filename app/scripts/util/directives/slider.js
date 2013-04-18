@@ -55,10 +55,15 @@ angular.module('udm.util')
               scope.$on('disableSlider-'+name, function(e,value) {
                   $( "#slider-"+name ).slider( "option", "disabled", value );
               });
+
+              sliderCreated = true;
           }
 
           function updateSlider(){
-              $( "#slider-"+name ).option({
+
+              var name = scope.name;
+
+              $( "#slider-"+name ).slider('option',{
                   min: +scope.min,
                   max: +scope.max,
                   step: +scope.step,

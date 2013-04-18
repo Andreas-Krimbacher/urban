@@ -20,6 +20,8 @@ h3{
   line-height: 20px;
 }
 
+
+
 //Variables
 
 $borderRadius: 2px;
@@ -105,7 +107,7 @@ div.olControlZoom a {
   position: absolute;
   top: 40px;
   left: 50px;
-  z-index: 2500;
+  z-index: 2400;
   a{
     display: inline-block;
     cursor: pointer;
@@ -211,7 +213,7 @@ div.olControlZoom a {
   }
 }
 
-georeference{
+#georeference{
   width: 230px;
   height: 460px;
   position: absolute;
@@ -226,8 +228,9 @@ georeference{
     margin-left: 10px;
   }
   .label{
-    width: 100px;
+    width: 95px;
     display: inline-block;
+    margin-right: 20px;
   }
   .cpTable{
     overflow: auto;
@@ -240,6 +243,19 @@ georeference{
     @include border-radius($borderRadius);
     border-top: solid ;
     border-bottom: solid ;
+  }
+  .deleteAll{
+    margin-left: 167px;
+  }
+  .buttonFix{
+    margin-left: 45px;
+  }
+  .heading2{
+    display: inline-block;
+  }
+  #cancelButtonPlace{
+    display: inline-block;
+    width: 20px;
   }
   .infotext{
     font-weight: 700;
@@ -255,9 +271,9 @@ georeference{
   }
   .image{
     color: #1267bb;
-    width: 55px;
+    width: 60px;
   }
-  .button-icon{
+  .delete{
     margin-right: 5px;
   }
   .slider{
@@ -284,6 +300,25 @@ georeference{
     }
   }
 }
+
+
+
+.fileUpload{
+
+  margin-top: 0px;
+  .modal{
+    z-index: 3000;
+    width: 800px;
+    margin: -250px 0 0 -360px;
+  }
+}
+
+
+.modal-backdrop{
+  z-index: 2501;
+}
+
+
 
 
 

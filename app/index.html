@@ -12,6 +12,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/OpenLayers/style.css">
+      <link rel="stylesheet" type="text/css" href="components/jquery-file-upload/css/jquery.fileupload-ui.css">
       <link rel="stylesheet" type="text/css" href="components/wmuSlider-master/demo/css/demo.css">
       <link rel="stylesheet" type="text/css" href="components/jquery-ui/themes/ui-darkness/jquery-ui.css">
       <link rel="stylesheet" type="text/css" href="components/select2/select2.css">
@@ -44,7 +45,7 @@
     <!-- Add your site or application content here -->
     <div ng-controller="MainCtrl" ng-view></div>
 
-    <script src="components/jquery/jquery.min.js"></script>
+    <script src="components/jquery/jquery.js"></script>
     <script src="components/jquery-ui/ui/jquery-ui.custom.js"></script>
     <script src="components/select2/select2.js"></script>
 
@@ -80,7 +81,26 @@
     <script src="components/angular-sanitize/angular-sanitize.js"></script>
     <script src="components/angular-ui/build/angular-ui.js"></script>
     <script src="components/angular-ui-bootstrap/src/dropdownToggle/dropdownToggle.js"></script>
+    <script src="components/angular-ui-bootstrap/src/dialog/dialog.js"></script>
+    <script src="components/angular-ui-bootstrap/src/transition/transition.js"></script>
+    <script src="components/bootstrap-js/bootstrap.js"></script>
     <script src="components/wmuSlider-master/jquery.wmuslider.js"></script>
+
+
+    <!-- The Templates plugin is included to render the upload/download listings -->
+    <script src="components/jquery-file-upload/js/tmpl.min.js"></script>
+    <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+    <script src="components/jquery-file-upload/js/load-image.min.js"></script>
+    <!-- The Canvas to Blob plugin is included for image resizing functionality -->
+    <script src="components/jquery-file-upload/js/canvas-to-blob.min.js"></script>
+
+    <!--[if gte IE 8]><script src="components/jquery-file-upload/js/cors/jquery.xdr-transport.js"></script><![endif]-->
+
+    <script src="components/jquery-file-upload/js/jquery.iframe-transport.js"></script>
+    <script src="components/jquery-file-upload/js/jquery.fileupload.js"></script>
+    <script src="components/jquery-file-upload/js/jquery.fileupload-fp.js"></script>
+    <script src="components/jquery-file-upload/js/jquery.fileupload-ui.js"></script>
+
 
     <!-- build:js scripts/scripts.js -->
     <script src="scripts/main/module.js"></script>
@@ -112,6 +132,12 @@
     <script src="scripts/georeference/controllers/georeference.js"></script>
     <script src="scripts/georeference/directives/georeference.js"></script>
     <script src="scripts/georeference/services/georeference.js"></script>
+
+    <script src="scripts/fileUpload/module.js"></script>
+    <script src="scripts/fileUpload/controllers/fileUpload.js"></script>
+    <script src="scripts/fileUpload/directives/fileUpload.js"></script>
+    <script src="scripts/fileUpload/services/fileUpload.js"></script>
+
     <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
