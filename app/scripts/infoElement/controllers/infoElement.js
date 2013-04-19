@@ -22,10 +22,25 @@ angular.module('udm.infoElement')
 //                featureType: "features"
 //            })
 //        });
+        $scope.sliderValue = 100;
+        var bounds = new OpenLayers.Bounds(252933,6245001,268870,6255644);
+
 
         var wms = new OpenLayers.Layer.TileStream( "Tiles",
-            "http://localhost:8888/", {layername: 'B-109-Haussmann-Paris-1842-Plan', type:'png',isBaseLayer:false,serviceVersion:'v2'} );
-        wms.opacity = 0.6
+            "http://localhost:8888/",
+            {maxExtent:bounds,layername: 'B-109-Haussmann-Paris-1842-Plan', type:'png',isBaseLayer:false,serviceVersion:'v2',transitionEffect:'resize',buffer:3} );
+        wms.opacity = 0;
+        var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
+        wms.events.register('loadend',this, function(value){
+            wms.events.remove('loadend');
+            var callbacks =  {
+                eachStep: function(value) {
+                    wms.setOpacity(value.opacity/100);
+                }
+            }
+            tween.start({opacity:0}, {opacity:200}, 150, {callbacks: callbacks});
+        });
+
 
         $scope.$on('showInfoElement', function(e,infoElement) {
 
@@ -85,7 +100,14 @@ angular.module('udm.infoElement')
                 new OpenLayers.Geometry.Point(point.lon,point.lat ));
             vectorLayer.addFeatures(feature);
 
+
+
             map.addLayers([wms,vectorLayer]);
+
+
+
+
+
 
             var hoverControl = new OpenLayers.Control.SelectFeature(vectorLayer,{hover: true,
                 highlightOnly: true,
@@ -124,8 +146,7 @@ angular.module('udm.infoElement')
 
 
         $scope.$on('sliderChanged', function(e,value) {
-            wms.opacity = value/100;
-            wms.redraw();
+            wms.setOpacity(value.value/100);
         });
 
         $scope.setVisibilityImgSlider = function(state){
