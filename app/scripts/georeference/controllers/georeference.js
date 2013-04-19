@@ -9,7 +9,7 @@ angular.module('udm.georeference')
 
         var url = '/fs';
         function getImgList(){
-            $http.get(url,{params: {action:'imgFileList'}}).
+            $http.get(url,{params: {action:'georeferenceFileList'}}).
                 success(function(data, status, headers, config) {
                     $scope.items = [{id:-1,text:'Upload'}];
                     for(var x in data){

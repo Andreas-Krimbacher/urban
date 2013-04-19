@@ -13,6 +13,10 @@ var filePaths = require('./filePaths');
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
     if(queryData.action == 'georefImg'){
+
+        var tmpPath = filePaths.georeference.tilesDir + '/tmp';
+
+
         var cmd = 'gdal_translate ';
 
         var gcp = queryData.gcp.split('|');
@@ -28,14 +32,18 @@ module.exports = function(req, res) {
 
         var fileName = queryData.fileName.replace(' ','\\ ');
 
-        cmd += filePaths.uploadTiffFolder + '/' + fileName + ' ';
+        cmd += filePaths.georeference.tiffDir + '/' + fileName + ' ';
 
         fileName = queryData.fileName.replace(' ','_');
 
-        cmd += filePaths.rasterTmpFolder + '/' + fileName;
+        cmd += tmpPath + '/' + fileName;
 
-        if (path.existsSync(filePaths.rasterTmpFolder + '/' + fileName)) { // or fs.existsSync
-            fs.unlink(filePaths.rasterTmpFolder + '/' + fileName);
+        // creating tmp directory recursive
+        if (!fs.existsSync(tmpPath))
+            mkdirp.sync(tmpPath);
+
+        if (fs.existsSync(tmpPath + '/' + fileName)) { // or fs.existsSync
+            fs.unlink(tmpPath + '/' + fileName);
         }
 
         console.log(cmd);
@@ -49,11 +57,11 @@ module.exports = function(req, res) {
             console.log(stderr);
 
             cmd = 'gdalwarp -t_srs EPSG:900913 -srcnodata 0 -dstalpha ';
-            cmd += filePaths.rasterTmpFolder + '/' + fileName + ' ';
-            cmd += filePaths.rasterFolder + '/' + fileName;
+            cmd += tmpPath + '/' + fileName + ' ';
+            cmd += tmpPath + '/' + fileName + '_geotiff';
 
-            if (path.existsSync(filePaths.rasterFolder + '/' + fileName)) { // or fs.existsSync
-                fs.unlink(filePaths.rasterFolder + '/' + fileName);
+            if (fs.existsSync(tmpPath + '/' + fileName + '_geotiff')) { // or fs.existsSync
+                fs.unlink(tmpPath + '/' + fileName + '_geotiff');
             }
 
             console.log(cmd);
@@ -66,7 +74,7 @@ module.exports = function(req, res) {
                 console.log(stdout);
                 console.log(stderr);
 
-                fs.unlink(filePaths.rasterTmpFolder + '/' + fileName);
+                fs.unlink(tmpPath + '/' + fileName);
 
                 makeTiles(fileName);
                 });
@@ -74,16 +82,16 @@ module.exports = function(req, res) {
 
         function makeTiles(fileName){
 
-            cmd = 'gdal2tiles.py -z 7-15 --s_srs EPSG:900913 ';
-            cmd += filePaths.rasterFolder + '/' + fileName + ' ';
+            cmd = 'gdal2tiles.py -z 7-8 --s_srs EPSG:900913 ';
+            cmd += tmpPath + '/' + fileName + '_geotiff' + ' ';
 
             fileName = path.basename(fileName.replace(' ','_'),path.extname(fileName));
             console.log(fileName)
 
-            cmd += filePaths.tilesTmpFolder + '/' + fileName;
+            cmd += tmpPath + '/' + fileName ;
 
-            if (path.existsSync(filePaths.tilesTmpFolder + '/' + fileName)) { // or fs.existsSync
-                rimraf(filePaths.tilesTmpFolder + '/' + fileName,function(){});
+            if (fs.existsSync(tmpPath + '/' + fileName)) { // or fs.existsSync
+                rimraf(tmpPath + '/' + fileName,function(){});
             }
 
             console.log(cmd);
@@ -97,14 +105,14 @@ module.exports = function(req, res) {
                 console.log(stderr);
 
                 cmd = 'mb-util --scheme=tms --image_format=png ';
-                cmd += filePaths.tilesTmpFolder + '/' + fileName + ' ';
+                cmd += tmpPath + '/' + fileName + ' ';
 
                 fileName = fileName.replace(' ','_');
 
-                cmd += filePaths.tilesFolder + '/' + fileName + '.mbtiles';
+                cmd += filePaths.georeference.tilesDir + '/' + fileName + '.mbtiles';
 
-                if (path.existsSync(filePaths.tilesFolder + '/' + fileName + '.mbtiles')) { // or fs.existsSync
-                    fs.unlink(filePaths.tilesFolder + '/' + fileName + '.mbtiles');
+                if (fs.existsSync(filePaths.georeference.tilesDir + '/' + fileName + '.mbtiles')) { // or fs.existsSync
+                    fs.unlink(filePaths.georeference.tilesDir + '/' + fileName + '.mbtiles');
                 }
 
 
@@ -118,7 +126,7 @@ module.exports = function(req, res) {
                     console.log(stdout);
                     console.log(stderr);
 
-                    rimraf(filePaths.tilesTmpFolder + '/' + fileName,function(){});
+                    rimraf(tmpPath + '/' + fileName,function(){});
 
                     res.writeHead(200, {'Content-Type': 'text/plain'});
                     res.end(JSON.stringify({name:fileName}));

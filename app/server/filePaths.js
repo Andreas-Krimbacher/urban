@@ -1,21 +1,17 @@
 var fileServerPath = '/home/nd/ooo/Urban/FileServer';
 
 module.exports = {
-    fileServerFolder : fileServerPath,
+    georeference:{
+        uploadDir : fileServerPath + '/georeferenceData',
+        jpegDir : fileServerPath + '/georeferenceData/jpeg',
+        tiffDir : fileServerPath + '/georeferenceData/tiff',
+        thumbDir : fileServerPath + '/georeferenceData/thumbnail',
 
-    uploadBaseFolder : fileServerPath + '/uploadData',
-    uploadJpegFolder : fileServerPath + '/uploadData/jpeg',
-    uploadTiffFolder : fileServerPath + '/uploadData/tiff',
-    uploadUpFolder : fileServerPath + '/uploadData/upload',
-    uploadThumbFolder : fileServerPath + '/uploadData/thumbnail',
-    uploadTmpFolder : fileServerPath + '/uploadData/tmp',
+        tilesDir : fileServerPath + '/georeferenceData/tiles',
 
-    rasterFolder : fileServerPath + '/rasterData',
-    rasterTmpFolder : fileServerPath + '/rasterData/tmp',
-
-    tilesFolder : fileServerPath + '/tilesData',
-    tilesTmpFolder : fileServerPath + '/tilesData/tmp',
-
-    jpegServer : '/uploadData/jpeg',
-    imgServer : '/uploadData'
+        serverUrl : '/georeferenceData',
+        serverJpegUrl : '/georeferenceData/jpeg',
+        serverTiffUrl : '/georeferenceData/tiff',
+        serverThumbUrl : '/georeferenceData/thumbnail'
+    }
 }

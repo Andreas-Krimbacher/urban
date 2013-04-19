@@ -14,10 +14,10 @@ var child;
 
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
-    if(queryData.action == 'imgFileList'){
+    if(queryData.action == 'georeferenceFileList'){
 
         var counter = 1;
-        fs.readdir(filePaths.uploadJpegFolder + '/',function(err,files){
+        fs.readdir(filePaths.georeference.jpegDir + '/',function(err,files){
             if(err){
                 res.end(err);
                 return
@@ -26,7 +26,7 @@ module.exports = function(req, res) {
             var respond = [];
 
             for(var x in files){
-                if(path.extname(files[x]) == '.jpeg') respond.push({name: files[x], path:filePaths.jpegServer + '/' + files[x]});
+                if(path.extname(files[x]) == '.jpeg') respond.push({name: files[x], path:filePaths.georeference.serverJpegUrl + '/' + files[x]});
                 getImgSize(respond,x);
             }
             finish(respond);
@@ -41,7 +41,7 @@ module.exports = function(req, res) {
 
         function getImgSize(respond,index){
             counter++;
-            gm(filePaths.uploadJpegFolder + '/' + respond[index].name).size(function (err, size) {
+            gm(filePaths.georeference.jpegDir + '/' + respond[index].name).size(function (err, size) {
                 if(err){
                     res.end(err);
                     return

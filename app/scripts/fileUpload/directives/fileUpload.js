@@ -30,7 +30,7 @@ angular.module('udm.fileUpload')
                         // Uncomment the following to send cross-domain cookies:
                         //xhrFields: {withCredentials: true},
                         dataType: 'json',
-                        url: 'http://localhost:9000/uploadRaster',
+                        url: 'http://localhost:9000/georeferenceUpload',
                         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|tif?f)$/i
                     });
 

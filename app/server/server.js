@@ -18,7 +18,7 @@ app.get('/pg/InfoElement/:id', db.InfoElement);
 app.get('/geo', geo);
 
 //Upload
-app.use('/uploadRaster', up);
+app.use('/georeferenceUpload', up.georeference);
 
 
 //export module
