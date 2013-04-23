@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('udm.georeference')
+angular.module('udm.edit')
   .factory('georeference', function (map) {
         var imgLayer = null;
         var imgPoint = null;

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('udm.georeference')
+angular.module('udm.edit')
     .controller('GeoreferenceCtrl', function ($scope,$http,georeference) {
 
         $scope.items = [];
@@ -45,7 +45,7 @@ angular.module('udm.georeference')
             if($scope.selectedId == -1){
                 setProcessState(false);
                 $scope.currentImg = false;
-                $scope.$broadcast('showRasterImgUpload');
+                $scope.showRasterImgUpload('showRasterImgUpload');
             }
             else if($scope.selectedId >= 0 && $scope.selectedId != ''){
                 if($scope.items[$scope.selectedId]){

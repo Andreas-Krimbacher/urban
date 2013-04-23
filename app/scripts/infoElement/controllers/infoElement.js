@@ -28,7 +28,7 @@ angular.module('udm.infoElement')
 
         var wms = new OpenLayers.Layer.TileStream( "Tiles",
             "http://localhost:8888/",
-            {maxExtent:bounds,layername: 'B-109-Haussmann-Paris-1842-Plan', type:'png',isBaseLayer:false,serviceVersion:'v2',transitionEffect:'resize',buffer:3} );
+            {maxExtent:bounds,layername: 'haussmanngood', type:'png',isBaseLayer:false,serviceVersion:'v2',transitionEffect:'resize',buffer:3} );
         wms.opacity = 0;
         var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
         wms.events.register('loadend',this, function(value){

@@ -43,7 +43,11 @@
 
 
     <!-- Add your site or application content here -->
-    <div ng-controller="MainCtrl" ng-view></div>
+    <div id="container">
+        <div id="top-bar">Discover Urban Design History</div>
+        <map></map>
+        <div ng-controller="MainCtrl" ng-view></div>
+    </div>
 
     <script src="components/jquery/jquery.js"></script>
     <script src="components/jquery-ui/ui/jquery-ui.custom.js"></script>
@@ -128,17 +132,18 @@
     <script src="scripts/infoElement/directives/infobox.js"></script>
     <script src="scripts/infoElement/directives/imgslider.js"></script>
 
-    <script src="scripts/georeference/TileStream.js"></script>
-    <script src="scripts/georeference/ExternalGraphicFix.js"></script>
-    <script src="scripts/georeference/module.js"></script>
-    <script src="scripts/georeference/controllers/georeference.js"></script>
-    <script src="scripts/georeference/directives/georeference.js"></script>
-    <script src="scripts/georeference/services/georeference.js"></script>
-
     <script src="scripts/fileUpload/module.js"></script>
     <script src="scripts/fileUpload/controllers/fileUpload.js"></script>
     <script src="scripts/fileUpload/directives/fileUpload.js"></script>
     <script src="scripts/fileUpload/services/fileUpload.js"></script>
+
+    <script src="scripts/edit/module.js"></script>
+    <script src="scripts/edit/controllers/edit.js"></script>
+    <script src="scripts/edit/controllers/editInfoEinheit.js"></script>
+    <script src="scripts/edit/TileStream.js"></script>
+    <script src="scripts/edit/ExternalGraphicFix.js"></script>
+    <script src="scripts/edit/controllers/georeference.js"></script>
+    <script src="scripts/edit/services/georeference.js"></script>
 
     <!-- endbuild -->
 

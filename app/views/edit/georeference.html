@@ -1,6 +1,6 @@
-<div id="georeference">
+<div id="georeference" ng-controller="GeoreferenceCtrl">
     <h4>1. Bild auswählen</h4>
-    <select ui-select2 ng-model="selectedId" data-placeholder="-- Select One --" ng-change="change()" style="width:220px" ng-disabled="CPProcess">
+    <select ui-select2 ng-model="selectedId" data-placeholder="-- Select One --" ng-change="change()" style="width:250px" ng-disabled="CPProcess">
         <option></option>
         <option ng-repeat="item in items" value="{{item.id}}">{{item.text}}</option>
     </select>
@@ -29,7 +29,7 @@
     <div ng-show="currentImg">
         <h4>3. Passpunkte</h4>
 
-        <div class="button-icon" ng-click="addCP()"><i class="icon-plus"></i></div>
+        <div class="button-icon addGCP" ng-click="addCP()"><i class="icon-plus"></i></div>
         <div class="placeholder"><div class="button-icon" ng-class="{'selected' : continousEditing}" ng-click="continousEditing = !continousEditing"><i class="icon-pencil"></i></div></div>
         <div class="placeholder"><div class="button-icon" ng-click="cancelCP()" ng-show="addCPProcess"><i class="icon-ban-circle"></i></div></div>
         <div class="button-icon deleteAll" ng-click="deleteAllCP()" ng-show="CP.length > 1"><i class="icon-trash"></i></div>
@@ -45,8 +45,7 @@
             </table>
         </div>
 
-        <button class="btn btn-small btn-success" type="button" ng-show="CP.length > 0" ng-click="send()">Georeferenzieren</button>
+        <button class="btn btn-small btn-success send" type="button" ng-show="CP.length > 0" ng-click="send()">Georeferenzieren</button>
     </div>
-
 </div>
 <fileupload></fileupload>

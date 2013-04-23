@@ -7,6 +7,12 @@ body{
   cursor: default;
 }
 
+form input[type='number']::-webkit-outer-spin-button,
+form input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 img { max-width: none; }
 
 ul{
@@ -18,6 +24,10 @@ h3{
   font-size: 1.5em;
   margin-left: 10px;
   line-height: 20px;
+}
+
+textarea {
+  font-size: 1em;
 }
 
 
@@ -99,7 +109,7 @@ div.olControlZoom a {
 
 #map {
   width: 100%;
-  height: 550px;
+  height: 700px;
 }
 
 #layerswitcher{
@@ -115,6 +125,228 @@ div.olControlZoom a {
     }
   }
 }
+
+#editNav{
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  z-index: 2500;
+}
+
+#editInfoEinheit{
+  @include panel;
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 2500;
+  width: 283px;
+  height: 600px;
+  .back{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  .infoEinheitTable{
+    font-weight: 700;
+    overflow: auto;
+    input{
+      margin-bottom: 0px;
+      height: 16px;
+    }
+  }
+  #editInfoEinheitForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .label{
+      margin-right: 10px;
+      width: 40px;
+      display: inline-block;
+    }
+    .featuresHeading{
+      width: 250px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .title{
+      width: 180px;
+    }
+    .start{
+      width: 40px;
+      margin-right: 20px;
+    }
+    .end{
+      width: 40px;
+    }
+    .info{
+      width: 180px;
+      height: 150px;
+    }
+    .rank{
+      width: 60px;
+    }
+    .featureTable{
+      font-weight: 700;
+      width: 272px;
+      max-height: 180px;
+      overflow: auto;
+      table{
+        width: 257px;
+      }
+      td{
+        line-height: 16px;
+        padding: 3px;
+      }
+      input{
+       width:205px;
+        margin-bottom: 0px;
+      }
+      .icon{
+        margin-top: 7px;
+        margin-left: 5px;
+      }
+      .new{
+        margin-top: 5px;
+      }
+      .button-icon{
+        margin-right: 5px;
+      }
+    }
+  }
+  .infotext{
+    overflow: hidden;
+    width: 150px;
+    padding: 0px;
+  }
+  .date{
+    display: inline-block;
+  }
+  .edit{
+    margin-top: 10px;
+  }
+  #editInfoEinheitTop{
+    height: 40px;
+    border-bottom: solid;
+  }
+  .send{
+    float: right;
+    margin-right: 15px;
+    margin-top: 10px;
+  }
+
+}
+
+
+#editLernEinheit{
+  @include panel;
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 2500;
+  width: 283px;
+  height: 460px;
+}
+
+
+#georeference{
+  width: 263px;
+  height: 440px;
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  padding: 10px;
+  @include panel;
+  select{
+    width: 200px;
+  }
+  ul{
+    margin-left: 10px;
+  }
+  .label{
+    width: 95px;
+    display: inline-block;
+    margin-right: 20px;
+  }
+  .cpTable{
+    overflow: auto;
+    width: 262px;
+    max-height: 210px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
+  tr{
+    background-color: #d3d3d3;
+    @include border-radius($borderRadius);
+    border-top: solid ;
+    border-bottom: solid ;
+  }
+  .addGCP{
+    margin-left: 5px;
+  }
+  .send{
+    margin-left: 5px;
+  }
+  .deleteAll{
+    margin-left: 172px;
+  }
+  .buttonFix{
+    margin-left: 45px;
+  }
+  .heading2{
+    display: inline-block;
+  }
+  .placeholder{
+    display: inline-block;
+    width: 16px;
+  }
+  .selected{
+    background: $black;
+    i{
+      background-image: url("images/glyphicons-halflings-white.png");
+    }
+  }
+  .infotext{
+    font-weight: 700;
+    font-size: 1.2em;
+    width: 30px;
+  }
+  .coord{
+    font-weight: 700;
+  }
+  .world{
+    color: #00b000;
+    width: 100px;
+  }
+  .image{
+    color: #1267bb;
+    width: 70px;
+  }
+  .delete{
+    margin-right: 5px;
+  }
+  .slider{
+    width: 110px;
+    display: inline-block;
+    margin-left: 5px;
+    height: 2px;
+    .ui-slider-handle{
+      top: -.7em;
+      width: 3px;
+      margin-left: -.2em;
+    }
+    .ui-state-hover{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-active{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-focus{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+  }
+}
+
 
 #image-gallery{
   position: absolute;
@@ -212,99 +444,6 @@ div.olControlZoom a {
   }
 }
 
-#georeference{
-  width: 230px;
-  height: 460px;
-  position: absolute;
-  top: 60px;
-  right: 20px;
-  padding: 10px;
-  @include panel;
-  select{
-    width: 200px;
-  }
-  ul{
-    margin-left: 10px;
-  }
-  .label{
-    width: 95px;
-    display: inline-block;
-    margin-right: 20px;
-  }
-  .cpTable{
-    overflow: auto;
-    width: 240px;
-    max-height: 240px;
-    margin-bottom: 10px;
-  }
-  tr{
-    background-color: #d3d3d3;
-    @include border-radius($borderRadius);
-    border-top: solid ;
-    border-bottom: solid ;
-  }
-  .deleteAll{
-    margin-left: 152px;
-  }
-  .buttonFix{
-    margin-left: 45px;
-  }
-  .heading2{
-    display: inline-block;
-  }
-  .placeholder{
-    display: inline-block;
-    width: 16px;
-  }
-  .selected{
-        background: $black;
-      i{
-        background-image: url("images/glyphicons-halflings-white.png");
-      }
-  }
-  .infotext{
-    font-weight: 700;
-    font-size: 1.2em;
-    width: 30px;
-  }
-  .coord{
-    font-weight: 700;
-  }
-  .world{
-    color: #00b000;
-    width: 90px;
-  }
-  .image{
-    color: #1267bb;
-    width: 60px;
-  }
-  .delete{
-    margin-right: 5px;
-  }
-  .slider{
-    width: 70px;
-    display: inline-block;
-    margin-left: 10px;
-    height: 2px;
-    .ui-slider-handle{
-      top: -.7em;
-      width: 3px;
-      margin-left: -.2em;
-    }
-    .ui-state-hover{
-      border: 1px solid #666666;
-      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
-    }
-    .ui-state-active{
-      border: 1px solid #666666;
-      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
-    }
-    .ui-state-focus{
-      border: 1px solid #666666;
-      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
-    }
-  }
-}
 
 
 

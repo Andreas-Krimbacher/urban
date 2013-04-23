@@ -13,6 +13,7 @@ app.get('/fs', fs);
 
 //Database
 app.get('/pg/InfoElement/:id', db.InfoElement);
+app.get('/pg/getInfoEinheitenList', db.InfoEinheitenList);
 
 //Geoservices
 app.get('/geo', geo);
