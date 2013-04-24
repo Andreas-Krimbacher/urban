@@ -1,0 +1,14 @@
+<!--<timeline></timeline>-->
+<!--<georeference></georeference>-->
+
+<div id="editNav">
+    <button class="btn btn-small" type="button" ng-click="editView='infoEinheit'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='infoEinheit']">Info-Einheit</button>
+    <button class="btn btn-small" type="button" ng-click="editView='lernEinheit'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='lernEinheit']">Lern-Einheit</button>
+    <button class="btn btn-small" type="button" ng-click="editView='georef'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='georef']">Georefernzieren</button>
+</div>
+
+    <div ng-switch="editView">
+        <div ng-switch-when="infoEinheit" ng-include="'views/edit/infoEinheit.html'"></div>
+        <div ng-switch-when="lernEinheit" ng-include="'views/edit/lernEinheit.html'"></div>
+        <div ng-switch-when="georef" ng-include="'views/edit/georeference.html'"></div>
+    </div>

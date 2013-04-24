@@ -1,51 +1,61 @@
 <div id="georeference" ng-controller="GeoreferenceCtrl">
     <h4>1. Bild auswählen</h4>
-    <select ui-select2 ng-model="selectedId" data-placeholder="-- Select One --" ng-change="change()" style="width:250px" ng-disabled="CPProcess">
-        <option></option>
-        <option ng-repeat="item in items" value="{{item.id}}">{{item.text}}</option>
-    </select>
+
+    <div ng-class="{'disabled':resultDisplayed || CPProcess}">
+        <select id="select2" ui-select2 ng-model="selectedId" data-placeholder="-- Select One --" ng-change="change()" style="width:235px" ng-disabled="CPProcess">
+            <option></option>
+            <option ng-repeat="item in items" value="{{item.id}}">{{item.text}}</option>
+        </select>
+        <div class="button-icon resize" ng-class="{'disabled':resultDisplayed}" ng-click="resizeImg()"><i class="icon-fullscreen"></i></div>
+    </div>
 
     <div ng-show="currentImg">
         <h4 class="heading2">2. Bild anpassen</h4>
-        <button class="btn btn-mini buttonFix" ng-class="{'btn-warning' : imgFixed}" type="button" ng-click="imgFix(!imgFixed)">Fix</button>
 
-        <ul>
-            <li ng-show="!CPProcess">
-                <span class="label label-info">Breite: </span><slider min='50' max='{{currentImg.width*2}}' step='1' name='width' value='{{currentImg.width}}'></slider>
-            </li>
-            <li ng-show="!CPProcess">
-                <span class="label label-info">Höhe: </span><slider min='50' max='{{currentImg.height*2}}' step='1' name='height' value='{{currentImg.height}}'></slider>
-            </li>
-            <li ng-show="!CPProcess">
-                <span class="label label-info">Rotation: </span><slider min='0' max='360' step='1' name='rot' value='{{currentImg.rot}}'></slider>
-            </li>
-            <li>
-                <span class="label label-info">Transparenz: </span><slider min='0' max='100' step='1' name='opacity' value='{{currentImg.opacity*100}}'></slider>
-            </li>
-        </ul>
-
+        <button class="btn btn-mini buttonFix" ng-class="{'btn-warning' : imgFixed,'disabled':resultDisplayed || CPProcess}" type="button" ng-click="imgFix(!imgFixed) ">Fix</button>
+        <div>
+            <ul>
+                <li ng-class="{'disabled':resultDisplayed}">
+                    <span class="label label-info">Breite: </span><slider min='50' max='{{currentImg.width*2}}' step='1' name='width' value='{{currentImg.width}}'></slider>
+                </li>
+                <li ng-class="{'disabled':resultDisplayed}">
+                    <span class="label label-info">Höhe: </span><slider min='50' max='{{currentImg.height*2}}' step='1' name='height' value='{{currentImg.height}}'></slider>
+                </li>
+                <li ng-class="{'disabled':resultDisplayed}">
+                    <span class="label label-info">Rotation: </span><slider min='0' max='360' step='1' name='rot' value='{{currentImg.rot}}'></slider>
+                </li>
+                <li>
+                    <span class="label label-info">Transparenz: </span><slider min='0' max='100' step='1' name='opacity' value='{{currentImg.opacity*100}}'></slider>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <div ng-show="currentImg">
         <h4>3. Passpunkte</h4>
 
-        <div class="button-icon addGCP" ng-click="addCP()"><i class="icon-plus"></i></div>
-        <div class="placeholder"><div class="button-icon" ng-class="{'selected' : continousEditing}" ng-click="continousEditing = !continousEditing"><i class="icon-pencil"></i></div></div>
-        <div class="placeholder"><div class="button-icon" ng-click="cancelCP()" ng-show="addCPProcess"><i class="icon-ban-circle"></i></div></div>
-        <div class="button-icon deleteAll" ng-click="deleteAllCP()" ng-show="CP.length > 1"><i class="icon-trash"></i></div>
+        <div ng-class="{'disabled':resultDisplayed}">
+            <div class="button-icon addGCP" ng-class="{'disabled':resultDisplayed}" ng-click="addCP()"><i class="icon-plus"></i></div>
+            <div class="placeholder"><div class="button-icon" ng-class="{'selected' : continousEditing, 'disabled':resultDisplayed}" ng-click="toggleContinousEditing()"><i class="icon-pencil"></i></div></div>
+            <div class="placeholder"><div class="button-icon" ng-class="{'disabled':resultDisplayed}" ng-click="cancelCP()" ng-show="addCPProcess"><i class="icon-ban-circle"></i></div></div>
+            <div class="button-icon deleteAll" ng-class="{'disabled':resultDisplayed}" ng-click="deleteAllCP()" ng-show="CP.length > 1"><i class="icon-trash"></i></div>
 
-        <div class="cpTable">
-            <table>
-                <tr ng-repeat="point in CP">
-                    <td><div class="infotext">CP {{$index+1}}</div></td>
-                    <td><div class="coord image">Pixel: {{point.imgPoint.pixel}}</div><div class="coord image">Line: {{point.imgPoint.line}}</div></td>
-                    <td><div class="coord world">Länge: {{point.worldPoint.lon|number:0}}</div><div class="coord world">Breite: {{point.worldPoint.lat|number:0}}</div></td>
-                    <td><div class="button-icon delete" ng-click="deleteCP($index)"><i class="icon-trash"></i></div></td>
-                </tr>
-            </table>
+            <div class="cpTable">
+                <table>
+                    <tr ng-repeat="point in CP">
+                        <td><div class="infotext">CP {{$index+1}}</div></td>
+                        <td><div class="coord image">Pixel: {{point.imgPoint.pixel}}</div><div class="coord image">Line: {{point.imgPoint.line}}</div></td>
+                        <td><div class="coord world">Länge: {{point.worldPoint.lon|number:0}}</div><div class="coord world">Breite: {{point.worldPoint.lat|number:0}}</div></td>
+                        <td><div class="button-icon delete" ng-class="{'disabled':resultDisplayed}" ng-click="deleteCP($index)"><i class="icon-trash"></i></div></td>
+                    </tr>
+                </table>
+            </div>
+
+            <button class="btn btn-small btn-success send" type="button" ng-show="CP.length > 0 && !resultDisplayed" ng-click="send()">Georeferenzieren</button>
         </div>
-
-        <button class="btn btn-small btn-success send" type="button" ng-show="CP.length > 0" ng-click="send()">Georeferenzieren</button>
     </div>
+
+    <button class="btn btn-small btn-warning back" type="button" ng-show="resultDisplayed" ng-click="back()">Zurück</button>
+    <button class="btn btn-small btn-success save" type="button" ng-show="resultDisplayed" ng-click="save()">Speichern</button>
 </div>
 <fileupload></fileupload>

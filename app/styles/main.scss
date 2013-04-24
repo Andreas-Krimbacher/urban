@@ -30,6 +30,16 @@ textarea {
   font-size: 1em;
 }
 
+.disabled{
+  opacity: 0.7;
+  cursor: default !important;
+  &:hover{
+    background: none !important;
+  }
+  i:hover{
+    background-image: url("images/glyphicons-halflings.png") !important;
+  }
+}
 
 //Variables
 
@@ -68,7 +78,7 @@ $black : #373737;
   cursor: pointer;
   @include border-radius($borderRadius);
   height: 20px;
-    &:hover{
+  &:hover{
     background: $black;
   }
   i:hover{
@@ -245,17 +255,21 @@ div.olControlZoom a {
   height: 460px;
 }
 
-
 #georeference{
   width: 263px;
-  height: 440px;
+  height: 600px;
   position: absolute;
   top: 80px;
   right: 20px;
   padding: 10px;
   @include panel;
-  select{
-    width: 200px;
+  #select2{
+    width: 160px;
+    display: none;
+  }
+  .resize{
+    display: inline-block;
+    margin-left: 5px;
   }
   ul{
     margin-left: 10px;
@@ -268,7 +282,7 @@ div.olControlZoom a {
   .cpTable{
     overflow: auto;
     width: 262px;
-    max-height: 210px;
+    max-height: 300px;
     margin-bottom: 10px;
     margin-left: 5px;
   }
@@ -288,7 +302,7 @@ div.olControlZoom a {
     margin-left: 172px;
   }
   .buttonFix{
-    margin-left: 45px;
+    margin-left: 75px;
   }
   .heading2{
     display: inline-block;

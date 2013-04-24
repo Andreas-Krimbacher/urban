@@ -109,8 +109,14 @@ angular.module('udm.edit')
 
         },
         redrawImageOverlay: function(){
-            imgLayer.redraw();
-
+            if(imgLayer) imgLayer.redraw();
+        },
+        centerImg: function(){
+            if(imgPoint){
+                imgPoint.x = map.getCenter().lon;
+                imgPoint.y = map.getCenter().lat;
+                if(imgLayer) imgLayer.redraw();
+            }
         },
         clearImgOverlay: function(){
             if(imgPointFeature) imgPointFeature.destroy();
@@ -278,17 +284,49 @@ angular.module('udm.edit')
             if(CPControl) CPControl.deactivate();
             if(CPlayer) CPlayer.removeAllFeatures();
         },
-        hideLayers: function(){
+        hideEditLayers: function(){
             if(CPlayer) CPlayer.setVisibility(false);
             if(imgLayer) imgLayer.setVisibility(false);
-            if(resultLayer) resultLayer.setVisibility(false);
         },
-        showResultLayer: function(name){
-            resultLayer = new OpenLayers.Layer.TileStream( "Tiles",
-                "http://localhost:8888/", {layername: name, type:'png',isBaseLayer:false,serviceVersion:'v2'} );
-            map.addLayer(resultLayer);
-        }
+        showEditLayers: function(){
+            if(CPlayer) CPlayer.setVisibility(true);
+            if(imgLayer) imgLayer.setVisibility(true);
+        },
+        destroyEditLayers: function(){
+            if(CPlayer) map.removeLayer(CPlayer);
+            CPlayer = null;
+            if(imgLayer) map.removeLayer(imgLayer);
+            imgLayer = null;
+        },
+        showResultLayer: function(metaData){
+            var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
+                metaData.BoundingBox.minx,
+                metaData.BoundingBox.maxy,
+                metaData.BoundingBox.maxx).transform(new OpenLayers.Projection("EPSG:4326"),new OpenLayers.Projection("EPSG:900913"));
 
+            resultLayer = new OpenLayers.Layer.TileStream( "Tiles",
+                "http://localhost:8888/", {layername: 'tmp_' + metaData.tileDB,
+                    minResolution:metaData.TileSet.minRes,
+                    maxResolution:metaData.TileSet.maxRes,
+                    maxExtent:bounds,
+                    type:'png',
+                    isBaseLayer:false,
+                    serviceVersion:'v2',
+                    transitionEffect:'resize',
+                    buffer:3});
+            map.addLayer(resultLayer);
+
+            if(map.getZoom() > metaData.TileSet.maxZoom){
+                map.zoomTo(metaData.TileSet.maxZoom);
+            }
+        },
+        destroyResultLayer: function(metaData){
+            if(resultLayer)  map.removeLayer(resultLayer);
+            resultLayer = null;
+        },
+        setOpacityResult: function(value){
+            resultLayer.setOpacity(value);
+        }
 
 
     };

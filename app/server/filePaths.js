@@ -15,6 +15,8 @@ module.exports = {
         serverThumbUrl : '/georeferenceData/thumbnail'
     },
     tiles:{
-        baseDir : fileServerPath + '/tilesData'
+        baseDir : fileServerPath + '/tilesData',
+        tiffDir : fileServerPath + '/tilesData/tiff',
+        thumbDir : fileServerPath + '/tilesData/thumbnail'
     }
 }

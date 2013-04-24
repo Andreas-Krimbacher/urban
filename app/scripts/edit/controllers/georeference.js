@@ -6,6 +6,14 @@ angular.module('udm.edit')
         $scope.items = [];
         $scope.currentImg = false;
         $scope.continousEditing = false;
+        $scope.resultDisplayed = false;
+        $scope.CP = [];
+        $scope.CPProcess = false;
+        $scope.addCPProcess = false;
+
+        $scope.$on('$viewContentLoaded', function() {
+            $('#select2').css({ width: '0px' });
+        });
 
         var url = '/fs';
         function getImgList(){
@@ -30,13 +38,24 @@ angular.module('udm.edit')
         });
 
         $scope.imgFix = function(state){
+            if($scope.resultDisplayed) return;
             if($scope.CPProcess && !state){
                 alert('CPProcess');
                 return;
             }
             georeference.imgFix(state);
             $scope.imgFixed = state;
-        }
+        };
+
+        $scope.resizeImg = function(){
+            $scope.currentImg.width = 1000;
+            $scope.currentImg.height = 500;
+            $scope.currentImg.scale = 1;
+
+            georeference.centerImg();
+
+            if(!$scope.$$phase) $scope.$digest();
+        };
 
         $scope.change = function(){
             georeference.clearImgOverlay();
@@ -53,7 +72,7 @@ angular.module('udm.edit')
                 }
                 $scope.currentImg = $scope.items[$scope.selectedId];
                 georeference.showImageOverlay($scope.currentImg,function(){
-                    $scope.$digest()
+                    if(!$scope.$$phase) $scope.$digest();
                 });
             }
         };
@@ -61,16 +80,20 @@ angular.module('udm.edit')
         $scope.$on('sliderChanged', function(e,value) {
             if($scope.items[$scope.selectedId]){
                 if(value.name == 'opacity') value.value = value.value/100 +0.01;
-                $scope.currentImg[value.name] = value.value;
-                georeference.redrawImageOverlay();
+                if(!$scope.resultDisplayed ){
+                    $scope.currentImg[value.name] = value.value;
+                    georeference.redrawImageOverlay();
+                }
+                else{
+                    $scope.currentImg[value.name] = value.value;
+                    georeference.setOpacityResult(value.value);
+                }
+
             }
         });
 
-        $scope.CP = [];
-        $scope.CPProcess = false;
-        $scope.addCPProcess = false;
-
         $scope.addCP = function(){
+            if($scope.resultDisplayed) return;
             if(!$scope.CPProcess){
                 setProcessState(true);
             }
@@ -78,10 +101,13 @@ angular.module('udm.edit')
             georeference.redrawImageOverlay();
             $scope.addCPProcess = true;
             georeference.createCP($scope.currentImg,function(point){
-                $scope.$apply($scope.CP.push(point),$scope.addCPProcess = false);
+                if(!$scope.$$phase) $scope.$apply($scope.CP.push(point));
                 if($scope.continousEditing) $scope.addCP();
+                else{
+                    if(!$scope.$$phase) $scope.$apply($scope.addCPProcess = false);
+                }
             },function(){
-                $scope.$digest()
+                if(!$scope.$$phase) $scope.$digest();
             });
         };
 
@@ -102,19 +128,27 @@ angular.module('udm.edit')
         }
 
         $scope.cancelCP = function(index){
+            if($scope.resultDisplayed) return;
             georeference.cancelCP();
             $scope.addCPProcess = false;
             if($scope.CP.length == 0) setProcessState(false);
         };
         $scope.deleteCP = function(index){
+            if($scope.resultDisplayed) return;
             georeference.removeCP( $scope.CP[index].id);
             $scope.CP.splice(index,1);
             if($scope.CP.length == 0) setProcessState(false);
         };
         $scope.deleteAllCP = function(){
+            if($scope.resultDisplayed) return;
             for(var x = $scope.CP.length-1;x>=0; x--){
                 $scope.deleteCP(x);
             }
+        };
+        $scope.toggleContinousEditing = function(){
+            if($scope.resultDisplayed) return;
+            $scope.continousEditing = !$scope.continousEditing;
+            if(!$scope.addCPProcess) $scope.addCP();
         };
 
         $scope.send = function(){
@@ -123,6 +157,10 @@ angular.module('udm.edit')
                 alert('min 3 punkte');
                 return;
             }
+
+            $scope.continousEditing = false;
+            georeference.cancelCP();
+            $scope.addCPProcess = false;
 
             var gcp = '';
             for(var x in $scope.CP){
@@ -137,7 +175,7 @@ angular.module('udm.edit')
             var url = '/geo';
             $http.get(url,{params: params}).
                 success(function(data, status, headers, config) {
-                    $scope.showResult(data.name);
+                    $scope.showResult(data);
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
@@ -145,10 +183,61 @@ angular.module('udm.edit')
                 });
         };
 
-        $scope.showResult = function(name){
-            var resultMode = true;
-            georeference.hideLayers();
-            georeference.showResultLayer(name);
-        }
+        var metaData = null;
+
+        $scope.showResult = function(data){
+            metaData = data;
+            georeference.hideEditLayers();
+
+            $scope.currentImg.opacity = 1;
+            if(!$scope.$$phase) $scope.$digest()
+            georeference.showResultLayer(metaData);
+
+            $scope.resultDisplayed = true;
+        };
+
+        $scope.back = function(){
+            georeference.destroyResultLayer();
+            georeference.showEditLayers();
+            georeference.redrawImageOverlay();
+
+            $scope.$broadcast('disableSlider-opacity',false);
+            $scope.resultDisplayed = false;
+
+            var url = '/geo';
+            $http.get(url,{params: {action:'deleteTmp',tileDB:metaData.tileDB}}).
+                success(function(data, status, headers, config) {
+
+                }).
+                error(function(data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+        };
+
+        $scope.save = function(){
+            var url = '/geo';
+            $http.get(url,{params: {action:'save',tileDB:metaData.tileDB}}).
+                success(function(data, status, headers, config) {
+                    $scope.reset();
+                }).
+                error(function(data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+        };
+
+
+        $scope.reset = function(metaData){
+            georeference.destroyResultLayer();
+            georeference.destroyEditLayers();
+            setProcessState(false);
+            $scope.currentImg = false;
+            $scope.continousEditing = false;
+            $scope.resultDisplayed = false;
+            $scope.CP = [];
+            $scope.CPProcess = false;
+            $scope.addCPProcess = false;
+        };
 
     });
