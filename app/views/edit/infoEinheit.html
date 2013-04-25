@@ -1,17 +1,18 @@
 <div id="editInfoEinheit" ng-controller="EditInfoEinheitCtrl">
 
     <div id="editInfoEinheitTop">
-        <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left"></i></div>
+        <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
 
     </div>
 
     <table class="table table-striped infoEinheitTable" ng-show="mode=='list'">
         <tr>
-            <td><input type="text" name="input" placeholder="Neue Info-Einheit …" ng-model="editInfoEinheit.title" required></td><td><div class="button-icon" ng-click="newInfoEinheit()"><i class="icon-plus"></i></div></td>
+            <td colspan="2"><input type="text" name="input" placeholder="Neue Info-Einheit …" ng-model="newInfoEinheitTitle" required></td><td><div class="button-icon" ng-click="editInfoEinheitMode(-1)"><i class="icon-plus"></i></div></td>
         </tr>
         <tr ng-repeat="item in infoEinheiten">
             <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
-            <td><div class="button-icon edit" ng-click="editInfoEinheit($index)"><i class="icon-pencil"></i></div></td>
+            <td class="noPadding"><div class="button-icon edit" ng-click="editInfoEinheitMode($index)"><i class="icon-pencil"></i></div></td>
+            <td><div class="button-icon trash" ng-click="deleteInfoEinheit($index)"><i class="icon-trash"></i></div></td>
         </tr>
     </table>
 
@@ -35,27 +36,79 @@
             <option value="3">3</option>
         </select>
 
-        <span class="label label-inverse featuresHeading">Features</span>
+        <span class="label label-inverse heading">Elemente</span>
 
         <div class="featureTable">
             <table class="table table-striped">
                 <tr>
-                    <td colspan="2"><input type="text" name="input" placeholder="Neues Feature …" ng-model="editInfoEinheit.newFeature"></td>
-                    <td><div class="button-icon new" ng-click="newFeature()"><i class="icon-plus"></i></div></td>
+                    <td colspan="3"><input type="text" name="input" placeholder="Neues Feature …" ng-model="newFeatureTitle"></td>
+                    <td><div class="button-icon new" ng-click="editFeatureMode(-1)"><i class="icon-plus"></i></div></td>
                 </tr>
-                <tr ng-repeat="item in editInfoEinheit.features">
-                    <td ng-switch="item.type">
-                        <i ng-switch-when="base" class="icon-th-large icon"></i>
-                        <i ng-switch-when="feature" class="icon-map-marker icon"></i>
+                <tr ng-repeat="item in features">
+                    <td ng-switch="item.typ">
+                        <i ng-switch-when="plan" class="icon-th icon"></i>
+                        <i ng-switch-when="planOverlay" class="icon-th-large icon"></i>
+                        <i ng-switch-when="point" class="icon-map-marker icon"></i>
+                        <i ng-switch-when="line" class="icon-map-marker icon"></i>
+                        <i ng-switch-when="poly" class="icon-map-marker icon"></i>
                     </td>
                     <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
-                    <td><div class="button-icon edit" ng-click="editFeature($index)"><i class="icon-pencil"></i></div></td>
+                    <td><div class="button-icon edit" ng-click="editFeatureMode($index)"><i class="icon-pencil"></i></div></td>
+                    <td><div class="button-icon trash" ng-click="deleteFeature($index)"><i class="icon-trash"></i></div></td>
                 </tr>
             </table>
         </div>
 
-        <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editInfoEinheitForm.$invalid" ng-class="{true:'btn-danger', false:'btn-success'}[editInfoEinheitForm.$invalid]">Speichern</button>
+        <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editInfoEinheitForm.$invalid ||features.length == 0" ng-class="{true:'btn-danger', false:'btn-success'}[editInfoEinheitForm.$invalid ||features.length == 0]">Speichern</button>
     </form>
 
+    <form name="editFeatureForm" id="editFeatureForm" ng-show="mode=='editFeature'">
+        <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.title.$invalid]">Title:</span>
+        <input type="text" class="title" name="title" ng-model="editFeature.title" required>
+
+        <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.typ.$invalid]">Typ:</span>
+        <select class="typ" name="typ"  ng-model="editFeature.typ" ng-change="typChange()" required>
+            <option value="" disabled selected>-- Select One --</option>
+            <option value="plan">Plan Hintergrund</option>
+            <option value="planOverlay">Plan im Plan</option>
+            <option value="point">Punkt-Element</option>
+            <option value="line">Linien-Element</option>
+            <option value="poly">Flächen-Element</option>
+        </select>
+
+        <div class="editPlan" ng-show="editFeature.typ == 'plan' || editFeature.typ == 'planOverlay'">
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeature.plan == '']">Plan:</span>
+            <select id="select2" ui-select2 ng-model="editFeature.plan" data-placeholder="-- Select One --" ng-change="changePlan()" style="width:150px">
+                <option></option>
+                <option ng-repeat="item in editFeature.planList" value="{{item.tileDB}}">{{item.name}}</option>
+            </select>
+        </div>
+
+
+        <div class="editControls" ng-show="editFeature.typ == 'point' || editFeature.typ == 'line' || editFeature.typ == 'poly'">
+            <span class="label label-inverse heading">Element:</span>
+
+            <div class="button-icon addFeature" ng-click="drawFeature()" ng-show="!editFeature.feature"><i class="icon-plus"></i></div>
+            <div class="button-icon addFeature" ng-click="modifyFeature()" ng-class="{'selected' : modifyProcess}"  ng-show="editFeature.feature"><i class="icon-pencil"></i></div>
+            <div class="button-icon" ng-class="{'disabled':!addProcess && !modifyProcess}" ng-click="cancel()"><i class="icon-ban-circle"></i></div>
+            <div class="button-icon trash" ng-class="{'disabled':!editFeature.feature}" ng-click="removeFeature()"><i class="icon-trash"></i></div>
+            <colorpicker name="addFeature" color="{{editFeature.color}}"></colorpicker>
+        </div>
+
+        <div ng-show="editFeature.typ == 'point' || editFeature.typ == 'line' || editFeature.typ == 'poly' || editFeature.typ == 'planOverlay'">
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.start.$invalid]">Von:</span>
+            <input type="number" class="start" name="start" ng-model="editFeature.start" min="-9999" max="9999"/>
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.end.$invalid]">Bis:</span>
+            <input type="number" class="end" name="end" ng-model="editFeature.end" min="-9999" max="9999"/>
+
+            <span class="label label-success">Info:</span>
+            <textarea type="text" rows="8" cols="50" class="info" name="info" ng-model="editFeature.info"></textarea>
+        </div>
+
+
+
+
+        <button class="btn btn-small send" type="button" ng-click="saveFeature()" ng-disabled="editFeatureForm.$invalid || (!editFeature.feature && editFeature.plan == '')" ng-class="{true:'btn-danger', false:'btn-success'}[editFeatureForm.$invalid || (!editFeature.feature && editFeature.plan == '')]">Speichern</button>
+    </form>
 
 </div>

@@ -15,9 +15,8 @@ angular.module('udm.edit')
             $('#select2').css({ width: '0px' });
         });
 
-        var url = '/fs';
         function getImgList(){
-            $http.get(url,{params: {action:'georeferenceFileList'}}).
+            $http.get('/fs',{params: {action:'georeferenceFileList'}}).
                 success(function(data, status, headers, config) {
                     $scope.items = [{id:-1,text:'Upload'}];
                     for(var x in data){
@@ -172,8 +171,8 @@ angular.module('udm.edit')
                 fileName:$scope.currentImg.text.substr(0, $scope.currentImg.text.lastIndexOf('.')) + '.tiff',
                 gcp:gcp};
 
-            var url = '/geo';
-            $http.get(url,{params: params}).
+
+            $http.get('/geo',{params: params}).
                 success(function(data, status, headers, config) {
                     $scope.showResult(data);
                 }).
@@ -204,8 +203,7 @@ angular.module('udm.edit')
             $scope.$broadcast('disableSlider-opacity',false);
             $scope.resultDisplayed = false;
 
-            var url = '/geo';
-            $http.get(url,{params: {action:'deleteTmp',tileDB:metaData.tileDB}}).
+            $http.get('/geo',{params: {action:'deleteTmp',tileDB:metaData.tileDB}}).
                 success(function(data, status, headers, config) {
 
                 }).
@@ -216,8 +214,7 @@ angular.module('udm.edit')
         };
 
         $scope.save = function(){
-            var url = '/geo';
-            $http.get(url,{params: {action:'save',tileDB:metaData.tileDB}}).
+            $http.get('/geo',{params: {action:'save',tileDB:metaData.tileDB}}).
                 success(function(data, status, headers, config) {
                     $scope.reset();
                 }).

@@ -2,7 +2,7 @@
 
 angular.module('udm.edit')
     .controller('EditCtrl', function ($scope,$dialog) {
-        $scope.editView = 'georef'
+        $scope.editView = 'infoEinheit'
 
         $scope.showRasterImgUpload = function() {
             $scope.$broadcast('showRasterImgUpload');

@@ -17,6 +17,7 @@ module.exports = function(req, res) {
     if(queryData.action == 'georeferenceFileList'){
 
         var counter = 1;
+
         fs.readdir(filePaths.georeference.jpegDir + '/',function(err,files){
             if(err){
                 res.end(err);
@@ -32,14 +33,14 @@ module.exports = function(req, res) {
             finish(respond);
         });
 
-        function finish(respond){
+        var finish = function(respond){
             if (!--counter) {
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end(JSON.stringify(respond));
             }
         }
 
-        function getImgSize(respond,index){
+        var getImgSize = function(respond,index){
             counter++;
             gm(filePaths.georeference.jpegDir + '/' + respond[index].name).size(function (err, size) {
                 if(err){
@@ -51,6 +52,47 @@ module.exports = function(req, res) {
                 respond[index].height = size.height;
 
                 finish(respond);
+            });
+        }
+    }
+    if(queryData.action == 'planList'){
+
+        var counter = 1;
+        var respond = [];
+
+        fs.readdir(filePaths.tiles.baseDir + '/',function(err,files){
+            if(err){
+                res.end(err);
+                return
+            }
+
+            var respond = [];
+
+            for(var x in files){
+                if(path.extname(files[x]) == '.mbtiles') getMetaData(files[x]);
+            }
+            finish();
+        });
+
+        var finish = function(){
+            if (!--counter) {
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.end(JSON.stringify(respond));
+            }
+        };
+
+        var getMetaData = function(name){
+            counter++;
+            var file = filePaths.tiles.baseDir + '/' + path.basename(name,path.extname(name)) + '.json';
+
+            fs.readFile(file,{encoding : 'utf8'},function (err, data) {
+                if(err){
+                    res.end(err);
+                    return
+                }
+
+                respond.push(JSON.parse(data));
+                finish();
             });
         }
     }

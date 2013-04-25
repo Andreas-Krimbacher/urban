@@ -106,6 +106,7 @@ module.exports = function(req, res) {
                         rimraf(fileSrc,function(){});
 
                         jsonData.timeId = timeId;
+                        jsonData.name = path.basename(origFileName,path.extname(origFileName));
 
                         var layerName = path.basename(fileSrc);
                         jsonData.tileDB = layerName;

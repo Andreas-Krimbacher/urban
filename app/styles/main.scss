@@ -30,6 +30,10 @@ textarea {
   font-size: 1em;
 }
 
+.noPadding{
+  padding: 0px !important;
+}
+
 .disabled{
   opacity: 0.7;
   cursor: default !important;
@@ -87,6 +91,13 @@ $black : #373737;
   }
 }
 
+.selected{
+  background: $black;
+  i{
+    background-image: url("images/glyphicons-halflings-white.png");
+  }
+}
+
 div.olControlZoom a {
 
   background: $black !important;
@@ -136,12 +147,14 @@ div.olControlZoom a {
   }
 }
 
+
 #editNav{
   position: absolute;
   top: 40px;
   right: 20px;
   z-index: 2500;
 }
+
 
 #editInfoEinheit{
   @include panel;
@@ -162,36 +175,95 @@ div.olControlZoom a {
       margin-bottom: 0px;
       height: 16px;
     }
+    .trash{
+      margin-top: 10px;
+    }
+    .edit{
+      margin-top: 18px;
+    }
+  }
+  .label{
+    margin-right: 10px;
+    width: 40px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+  .heading{
+    width: 250px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .elementLabel{
+    width: 60px;
+    margin-top: 7px !important;
+  }
+  .title{
+    width: 180px;
+  }
+  .imgGallery{
+    margin-left: 10px;
+  }
+  .start{
+    width: 40px;
+    margin-right: 20px;
+  }
+  .end{
+    width: 40px;
+  }
+  .info{
+    width: 180px;
+    height: 150px;
+  }
+  .typ{
+    width: 150px;
+    &:focus{
+      color: black;
+    }
+  }
+  .editPlan{
+    margin-bottom: 10px;
+  }
+  .editControls{
+    width: 258px;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: solid;
+  }
+  .colorpickerInput{
+    width: 60px;
+  }
+  colorpicker{
+    float: right;
+    margin-right: 10px;
+  }
+  #editFeatureForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .trash{
+      margin-top: 5px;
+    }
+    .addFeature{
+      margin-left: 20px;
+    }
+    .heading{
+      margin-bottom: 10px;
+    }
+    #select2{
+      width: 160px;
+      display: none;
+    }
+
   }
   #editInfoEinheitForm{
     margin-left: 10px;
     margin-top: 10px;
-    .label{
-      margin-right: 10px;
-      width: 40px;
-      display: inline-block;
-    }
-    .featuresHeading{
-      width: 250px;
-      text-align: center;
-      margin-top: 10px;
-    }
-    .title{
-      width: 180px;
-    }
-    .start{
-      width: 40px;
-      margin-right: 20px;
-    }
-    .end{
-      width: 40px;
-    }
-    .info{
-      width: 180px;
-      height: 150px;
-    }
     .rank{
       width: 60px;
+    }
+    .edit{
+      margin-top: 10px;
     }
     .featureTable{
       font-weight: 700;
@@ -200,6 +272,9 @@ div.olControlZoom a {
       overflow: auto;
       table{
         width: 257px;
+      }
+      .trash{
+        margin-top: 10px;
       }
       td{
         line-height: 16px;
@@ -229,9 +304,6 @@ div.olControlZoom a {
   .date{
     display: inline-block;
   }
-  .edit{
-    margin-top: 10px;
-  }
   #editInfoEinheitTop{
     height: 40px;
     border-bottom: solid;
@@ -243,6 +315,7 @@ div.olControlZoom a {
   }
 
 }
+
 
 
 #editLernEinheit{
@@ -310,12 +383,6 @@ div.olControlZoom a {
   .placeholder{
     display: inline-block;
     width: 16px;
-  }
-  .selected{
-    background: $black;
-    i{
-      background-image: url("images/glyphicons-halflings-white.png");
-    }
   }
   .infotext{
     font-weight: 700;
