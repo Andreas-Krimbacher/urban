@@ -7,7 +7,9 @@ var up = require('./upload');
 
 //Server
 var app = express();
-app.use(express.bodyParser());
+
+//Upload
+app.use('/georeferenceUpload', up.georeference);
 
 //Filesystem
 app.get('/fs', fs);
@@ -17,13 +19,11 @@ app.get('/pg/getInfoEinheit/:id', db.getInfoEinheit);
 app.get('/pg/deleteFeature/:id', db.deleteFeature);
 app.get('/pg/deleteInfoEinheit/:id', db.deleteInfoEinheit);
 app.get('/pg/getInfoEinheitenList', db.InfoEinheitenList);
-app.post('/pg/saveInfoEinheit', db.saveInfoEinheit);
+app.post('/pg/saveInfoEinheit',express.bodyParser(), db.saveInfoEinheit);
 
 //Geoservices
 app.get('/geo', geo);
 
-//Upload
-app.use('/georeferenceUpload', up.georeference);
 
 
 //export module

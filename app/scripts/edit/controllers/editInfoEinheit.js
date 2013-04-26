@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.edit')
-    .controller('EditInfoEinheitCtrl', function ($scope,$http,feature) {
+    .controller('EditInfoEinheitCtrl', function ($scope,$http,feature, util) {
         $scope.mode = 'list';
 
         $scope.nextInfoEinheitId = null;
@@ -48,7 +48,7 @@ angular.module('udm.edit')
                 $scope.editInfoEinheit = {};
                 $scope.editInfoEinheit.id = $scope.nextInfoEinheitId;
                 $scope.nextInfoEinheitId++;
-                $scope.editInfoEinheit.rank = 1;
+                $scope.editInfoEinheit.rank = 3;
                 $scope.editInfoEinheit.title = $scope.newInfoEinheitTitle;
                 $scope.features = [];
                 $scope.creatingNewInfoEinheit = true;
@@ -77,7 +77,7 @@ angular.module('udm.edit')
                                 feature.addOverlayLayer($scope.features[x].feature);
                             }
                             else{
-                                $scope.features[x].feature = feature.WKTToFeature($scope.features[x].feature);
+                                $scope.features[x].feature = util.WKTToFeature($scope.features[x].feature);
                                 feature.addFeature($scope.features[x].feature);
                             }
 
@@ -322,7 +322,7 @@ angular.module('udm.edit')
             $scope.editInfoEinheit.features =  $scope.features;
             for(var x in $scope.editInfoEinheit.features){
                 if($scope.editInfoEinheit.features[x].typ != 'plan' && $scope.editInfoEinheit.features[x].typ != 'planOverlay'){
-                    $scope.editInfoEinheit.features[x].feature = feature.featureToWKT($scope.editInfoEinheit.features[x].feature,$scope.editInfoEinheit.features[x].typ);
+                    $scope.editInfoEinheit.features[x].feature = util.featureToWKT($scope.editInfoEinheit.features[x].feature,$scope.editInfoEinheit.features[x].typ);
                 }
             }
             if($scope.creatingNewInfoEinheit) $scope.infoEinheiten.push($scope.editInfoEinheit);

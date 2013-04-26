@@ -2,6 +2,7 @@ var filePaths = require('./filePaths');
 var easyimg = require('easyimage');
 var fs = require('fs');
 var path = require('path');
+var exec = require('child_process').exec;
 
 var uploadGeoreference = require('jquery-file-upload-middleware');
 
@@ -68,30 +69,21 @@ uploadGeoreference.configure({
 
         var opts = options.imageVersions.jpeg;
 
-        var quality;
-        if(opts.quality == 'auto'){
-            var stats = fs.lstatSync(options.uploadDir() + '/' + fileInfo.name);
-            if(stats.size > 100000000) quality = 20;
-            else if(stats.size > 50000000) quality = 30;
-            else if(stats.size > 40000000) quality = 40;
-            else if(stats.size > 30000000) quality = 50;
-            else if(stats.size > 20000000) quality = 60;
-            else if(stats.size > 10000000) quality = 70;
-            else if(stats.size > 5000000) quality = 80;
-            else quality = 90;
-        }
-        else{
-            quality = opts.quality;
-        }
-        console.log('quality set to: '+quality);
-        easyimg.convert({src:options.uploadDir() + '/' + fileInfo.name,
-                dst:opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + opts.extname,
-                quality:quality},
-            function(err, stdout, stderr) {
-                if (err) throw err;
-                console.log('Converted to jpeg');
-                callback();
-            });
+        var fileSrc = options.uploadDir() + '/' + fileInfo.name.replace(' ','\\ ');
+        var fileDst = opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(' ','\\ ') + '.' + opts.extname;
+
+        var cmd =  'convert '+fileSrc+' -define jpeg:extent=1500kb '+fileDst;
+
+        console.log(cmd)
+        exec(cmd, function (err, stdout, stderr) {
+            if (err) throw err;
+
+            console.log(stdout);
+            console.log(stderr);
+
+            console.log('Converted to jpeg');
+            callback();
+        });
 
     }
 //    getFileList: function(options,callback){

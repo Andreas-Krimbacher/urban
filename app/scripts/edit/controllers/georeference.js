@@ -36,6 +36,11 @@ angular.module('udm.edit')
             getImgList();
         });
 
+        $scope.$on('clearGeoref', function(e,value) {
+            georeference.clearAllLayers();
+        });
+
+
         $scope.imgFix = function(state){
             if($scope.resultDisplayed) return;
             if($scope.CPProcess && !state){

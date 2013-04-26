@@ -1,10 +1,10 @@
 <!--<timeline></timeline>-->
-<!--<georeference></georeference>-->
+<map></map>
 
 <div id="editNav">
-    <button class="btn btn-small" type="button" ng-click="editView='infoEinheit'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='infoEinheit']">Info-Einheit</button>
-    <button class="btn btn-small" type="button" ng-click="editView='lernEinheit'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='lernEinheit']">Lern-Einheit</button>
-    <button class="btn btn-small" type="button" ng-click="editView='georef'" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='georef']">Georefernzieren</button>
+    <button class="btn btn-small" type="button" ng-click="setMode('infoEinheit')" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='infoEinheit']">Info-Einheit</button>
+    <button class="btn btn-small" type="button" ng-click="setMode('lernEinheit')" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='lernEinheit']">Lern-Einheit</button>
+    <button class="btn btn-small" type="button" ng-click="setMode('georef')" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='georef']">Georefernzieren</button>
 </div>
 
     <div ng-switch="editView">

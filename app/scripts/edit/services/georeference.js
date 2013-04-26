@@ -326,8 +326,19 @@ angular.module('udm.edit')
         },
         setOpacityResult: function(value){
             resultLayer.setOpacity(value);
-        }
+        },
+        clearAllLayers : function(){
+            if(resultLayer)  map.removeLayer(resultLayer);
+            resultLayer = null;
+            if(CPlayer) map.removeLayer(CPlayer);
+            CPlayer = null;
+            if(imgLayer) map.removeLayer(imgLayer);
+            imgLayer = null;
 
+            map.events.remove('movestart');
+            map.events.remove('move');
+            map.events.remove('zoomend');
+        }
 
     };
   });

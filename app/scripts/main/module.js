@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module('udm', ['ui','ui.bootstrap.dropdownToggle','ngSanitize','udm.map','udm.infoElement','udm.timeline','udm.edit'])
+angular.module('udm', ['ui','ngSanitize','udm.map','udm.openWorld','udm.edit'])
   .config(function ($routeProvider) {
     $routeProvider
-      .when('/', {
+      .when('/edit', {
         templateUrl: 'views/edit.html',
         controller: 'EditCtrl'
       })
@@ -12,6 +12,6 @@ angular.module('udm', ['ui','ui.bootstrap.dropdownToggle','ngSanitize','udm.map'
             controller: 'OpenWorldCtrl'
         })
       .otherwise({
-        redirectTo: '/'
+        redirectTo: '/open'
       });
   });

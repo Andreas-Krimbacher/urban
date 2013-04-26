@@ -105,7 +105,7 @@ Timeline.DefaultEventSource.prototype.loadJSON = function(data, url) {
             var instant = event.isDuration || (event.durationEvent != null && !event.durationEvent);
 
             var evt = new Timeline.DefaultEventSource.Event({
-                          id: ("id" in event) ? event.id : undefined,
+                         // id: ("id" in event) ? event.id : undefined,
                        start: parseDateTimeFunction(event.start),
                          end: parseDateTimeFunction(event.end),
                  latestStart: parseDateTimeFunction(event.latestStart),

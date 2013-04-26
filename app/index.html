@@ -46,8 +46,11 @@
 
     <!-- Add your site or application content here -->
     <div id="container">
-        <div id="top-bar">Discover Urban Design History</div>
-        <map></map>
+        <div id="top-bar">Discover Urban Design History
+            <a class="button-icon" href="#/learn"><i class="icon-th-list"></i></a>
+            <a  class="button-icon" href="#/edit"><i class="icon-pencil"></i></a>
+            <a  class="button-icon" href="#/world"><i class="icon-heart"></i></a>
+        </div>
         <div ng-controller="MainCtrl" ng-view></div>
     </div>
 
@@ -112,29 +115,25 @@
     <!-- build:js scripts/scripts.js -->
     <script src="scripts/main/module.js"></script>
     <script src="scripts/main/controllers/main.js"></script>
-    <script src="scripts/main/controllers/openWorld.js"></script>
 
     <script src="scripts/util/module.js"></script>
     <script src="scripts/util/directives/slider.js"></script>
     <script src="scripts/util/directives/colorpicker.js"></script>
+    <script src="scripts/util/directives/timeline.js"></script>
+    <script src="scripts/util/directives/layerlist.js"></script>
+    <script src="scripts/util/directives/infobox.js"></script>
+    <script src="scripts/util/directives/imgslider.js"></script>
     <script src="scripts/util/services/util.js"></script>
 
     <script src="scripts/map/module.js"></script>
     <script src="scripts/map/controllers/map.js"></script>
-    <script src="scripts/map/services/layers.js"></script>
     <script src="scripts/map/services/map.js"></script>
     <script src="scripts/map/directives/map.js"></script>
     <script src="scripts/map/directives/layerswitcher.js"></script>
 
-    <script src="scripts/timeline/module.js"></script>
-    <script src="scripts/timeline/directives/timeline.js"></script>
-
-    <script src="scripts/infoElement/module.js"></script>
-    <script src="scripts/infoElement/controllers/infoElement.js"></script>
-    <script src="scripts/infoElement/directives/infoElement.js"></script>
-    <script src="scripts/infoElement/directives/layerlist.js"></script>
-    <script src="scripts/infoElement/directives/infobox.js"></script>
-    <script src="scripts/infoElement/directives/imgslider.js"></script>
+    <script src="scripts/openWorld/module.js"></script>
+    <script src="scripts/openWorld/controllers/openWorld.js"></script>
+    <script src="scripts/openWorld/services/layers.js"></script>
 
     <script src="scripts/fileUpload/module.js"></script>
     <script src="scripts/fileUpload/controllers/fileUpload.js"></script>

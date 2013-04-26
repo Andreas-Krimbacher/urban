@@ -32,15 +32,8 @@ angular.module('udm.map')
                 };
                 map = new OpenLayers.Map(divId,options);
 
-//
-//          var mousePositionCtrl = new OpenLayers.Control.MousePosition({
-//                  suffix: '<a target="_blank" ' +
-//                      'href="http://spatialreference.org/ref/epsg/4326/">' +
-//                      'EPSG:4326asssssssssssss</a> coordinates: '
-//              }
-//          );
-//
-//          map.addControl(mousePositionCtrl);
+                _basemaps = {};
+                _currentBasempas = null;
 
                 var osm = new OpenLayers.Layer.OSM('Simple OSM Map');
                 _basemaps.osm = {name:'OpenStreet Map',map:osm,active:false};

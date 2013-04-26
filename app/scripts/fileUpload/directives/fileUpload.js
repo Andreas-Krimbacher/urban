@@ -13,7 +13,7 @@ angular.module('udm.fileUpload')
                         backdrop : 'static'
                     })
                     $('#myModal').on('hidden', function () {
-                        scope.$emit('fileUploadFinished');
+                        scope.fileUploadFinished();
                     })
                     $('#myModal').modal('show');
                 });

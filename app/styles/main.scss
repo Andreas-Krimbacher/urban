@@ -117,8 +117,6 @@ div.olControlZoom a {
   z-index: -1 !important;
 }
 
-
-
 #top-bar{
   height: 30px;
   background-color: greenyellow;
@@ -126,11 +124,25 @@ div.olControlZoom a {
   line-height: 30px;
   padding-left: 10px;
   font-weight: 700;
+  .button-icon{
+    display: inline-block;
+    float: right;
+    margin-right: 10px;
+    margin-top: 3px;
+  }
 }
 
 #map {
   width: 100%;
   height: 700px;
+}
+map{
+  .all{
+    height: 700px !important;
+  }
+  .withTimeline{
+    height: 600px !important;
+  }
 }
 
 #layerswitcher{
@@ -456,13 +468,32 @@ div.olControlZoom a {
 
 
 #layerlist{
+  .selectedItem{
+    border: solid 2px #008000;
+  }
   width: 250px;
   height: 100px;
   position: absolute;
-  top: 90px;
+  top: 70px;
   right: 20px;
   z-index: 2500;
-  li{
+  .overlay{
+    .layerListItem{
+      width: 210px;
+      margin-left: 30px;
+      height: 16px;
+      line-height: 16px;
+      .list-title{
+        width: 110px;
+        line-height: 16px;
+        font-size: 0.95em;
+      }
+      .ui-slider-handle{
+        height: 1em;
+      }
+    }
+  }
+  .layerListItem{
     width: 250px;
     height: 20px;
     margin-top: 5px;
@@ -471,6 +502,10 @@ div.olControlZoom a {
     .list-title{
       width: 115px;
       line-height: 20px;
+    }
+    .placeholder{
+      display: inline-block;
+      width: 16px;
     }
   }
   .slider{
@@ -501,13 +536,21 @@ div.olControlZoom a {
 
 #infobox{
   width: 250px;
-  height: 410px;
+  height: 370px;
   position: absolute;
-  top: 140px;
+  top: 210px;
   right: 20px;
   @include panel;
   .infotext{
-      height: 320px;
+    height: 280px;
+  }
+  .year{
+    display: inline-block;
+    font-weight: 700;
+  }
+  h3{
+    display: inline-block;
+    width: 170px;
   }
   .bottom{
       height: 30px;
@@ -524,7 +567,6 @@ div.olControlZoom a {
       }
   }
 }
-
 
 
 
@@ -561,23 +603,3 @@ div.olControlZoom a {
   }
 }
 
-
-//#edit-toolbar{
-//  position: absolute;
-//  top: 100px;
-//  left: 500px;
-//  z-index: 2500;
-//}
-//
-//#edit-side-panel{
-//  width: 250px;
-//  height: 400px;
-//  position: absolute;
-//  top: 100px;
-//  right: 50px;
-//  background-color: #f5f5f5;
-//  opacity: 0.7;
-//  z-index: 2500;
-//  @include single-box-shadow;
-//  @include border-radius($borderRadius);
-//}
