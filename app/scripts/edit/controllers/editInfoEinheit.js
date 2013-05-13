@@ -125,6 +125,7 @@ angular.module('udm.edit')
                 $scope.mode = 'editFeature';
             }
             else{
+
                 if($scope.features[index].typ == 'plan') $scope.editingBaseLayerFeature = true;
 
                 if( $scope.features[index].typ == 'plan' || $scope.features[index].typ == 'planOverlay'){
@@ -337,7 +338,7 @@ angular.module('udm.edit')
                 });
 
             for(var x in $scope.featuresToDelete){
-                $http.get('/pg/deleteFeature/'+$scope.featuresToDelete[x]).
+                $http.get('/pg/deleteFeature/' + $scope.editInfoEinheit.id + '/' +$scope.featuresToDelete[x]).
                     success(function(data, status, headers, config) {
 
                     }).
@@ -376,6 +377,12 @@ angular.module('udm.edit')
 
             $scope.mode = 'editInfoEinheit';
         };
+
+        $scope.uploadImg = function(){
+            if($scope.mode == 'editInfoEinheit') $scope.setFileUploadTarget({name : 'imageUpload', target : 'imageUpload/' + $scope.editInfoEinheit.id});
+            if($scope.mode == 'editFeature') $scope.setFileUploadTarget({name : 'imageUpload', target : 'imageUpload/' + $scope.editInfoEinheit.id + '/' + $scope.editFeature.id});
+            $scope.showFileUpload('imageUpload');
+        }
 
 
 

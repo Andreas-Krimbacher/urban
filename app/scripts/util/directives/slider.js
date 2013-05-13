@@ -17,16 +17,16 @@ angular.module('udm.util')
           var sliderCreated = false;
 
           attrs.$observe('value', function(changedValue){
-              processChange()
+              processChange();
           });
           attrs.$observe('name', function(changedValue){
-              processChange()
+              processChange();
           });
           attrs.$observe('max', function(changedValue){
-              processChange()
+              processChange();
           });
           attrs.$observe('step', function(changedValue){
-              processChange()
+              processChange();
           });
 
           function processChange(){

@@ -9,10 +9,11 @@ angular.module('udm.util')
 
           scope.$on('showInfo', function(e,value) {
               scope.info.title = value.title;
-              if(value.info = 'null') value.info = '';
+              if(value.info == 'null') value.info = '';
               scope.info.desc = value.info;
               scope.info.end = value.end;
               scope.info.start = value.start;
+              scope.info.img = value.img;
 
               if(!scope.$$phase) scope.$digest();
 
@@ -22,7 +23,8 @@ angular.module('udm.util')
                             desc: ''}
 
           scope.showImgSlider = function(){
-              scope.setVisibilityImgSlider(true);
+              if(scope.info.img.length == 0) return;
+              scope.showImageSlider(scope.info.img);
           }
       }
     };

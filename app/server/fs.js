@@ -38,7 +38,7 @@ module.exports = function(req, res) {
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end(JSON.stringify(respond));
             }
-        }
+        };
 
         var getImgSize = function(respond,index){
             counter++;
@@ -53,7 +53,7 @@ module.exports = function(req, res) {
 
                 finish(respond);
             });
-        }
+        };
     }
     if(queryData.action == 'planList'){
 

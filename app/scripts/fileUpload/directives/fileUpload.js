@@ -1,36 +1,53 @@
 'use strict';
 
 angular.module('udm.fileUpload')
-    .directive('fileupload', function ( $dialog) {
+    .directive('fileupload', function ( $dialog, $rootScope) {
         return {
             templateUrl: '../views/fileUpload/fileUploadModal.html',
             restrict: 'E',
+            scope:{
+                name: '@'
+            },
             link: function postLink(scope, element, attrs) {
+                var initialized = false;
+                var target = false;
 
-                scope.$on('showRasterImgUpload', function(e,value) {
-                    $('#myModal').modal({
+                scope.$on('setFileUploadTarget', function(e,value) {
+                    if(value.name != scope.name) return;
+
+                    target = value.target;
+
+                    if(initialized) setFileUpload();
+                });
+
+                scope.$on('showFileUpload', function(e,value) {
+                    if(value != scope.name) return;
+
+                    if(!initialized && target != false) setFileUpload();
+
+                    $('#fu-modal-' + scope.name).modal({
                         keyboard: false,
                         backdrop : 'static'
                     })
-                    $('#myModal').on('hidden', function () {
-                        scope.fileUploadFinished();
+                    $('#fu-modal-' + scope.name).on('hidden', function () {
+                        $rootScope.$broadcast('fileUploadFinished',scope.name);
                     })
-                    $('#myModal').modal('show');
+                    $('#fu-modal-' + scope.name).modal('show');
                 });
 
                 scope.close = function(){
-                    $('#myModal').modal('hide');
-                }
+                    $('#fu-modal-' + scope.name).modal('hide');
+                };
 
-                setUpFileUpload();
+                function setFileUpload(){
+                    if(initialized) $('#fileupload-' + scope.name + ' table tbody tr.template-download').remove();
 
-                function setUpFileUpload(){
                     // Initialize the jQuery File Upload widget:
-                    $('#fileupload').fileupload({
+                    $('#fileupload-' + scope.name).fileupload({
                         // Uncomment the following to send cross-domain cookies:
                         //xhrFields: {withCredentials: true},
                         dataType: 'json',
-                        url: 'http://localhost:9000/georeferenceUpload',
+                        url: 'http://localhost:9000/' + target,
                         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|tif?f)$/i
                     });
 
@@ -38,13 +55,14 @@ angular.module('udm.fileUpload')
                     $.ajax({
                         // Uncomment the following to send cross-domain cookies:
                         //xhrFields: {withCredentials: true},
-                        url: $('#fileupload').fileupload('option', 'url'),
+                        url: $('#fileupload-' + scope.name).fileupload('option', 'url'),
                         dataType: 'json',
-                        context: $('#fileupload')[0]
+                        context: $('#fileupload-' + scope.name)[0]
                     }).done(function (result) {
                             $(this).fileupload('option', 'done')
                                 .call(this, null, {result: result});
                         });
+                    initialized = true;
                 }
 
             }

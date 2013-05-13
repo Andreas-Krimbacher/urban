@@ -4,7 +4,10 @@ var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
 
-var uploadGeoreference = require('jquery-file-upload-middleware');
+var jQueryFileUploadMiddleware = require('jquery-file-upload-middleware');
+
+var uploadGeoreference = new jQueryFileUploadMiddleware();
+var uploadImage = new jQueryFileUploadMiddleware();
 
 uploadGeoreference.configure({
     uploadDir:filePaths.georeference.uploadDir,
@@ -93,6 +96,43 @@ uploadGeoreference.configure({
 //    }
 });
 
+uploadImage.configure({
+    uploadDir:filePaths.image.uploadDir,
+    uploadUrl: filePaths.image.serverUrl,
+    tmpDir:'/tmp',
+    hostname: 'localhost:9000',
+    imageTypes: /\.(gif|jpe?g|png|tif?f)$/i,
+    imageVersions: {
+        thumbnail: {
+            width: 80,
+            height: 80
+        }
+    }
+//    getFileList: function(options,callback){
+//        console.log('getFileList');
+//
+//
+//    }
+});
+
+var uploadImageFunc = function (req, res, next) {
+    console.log(req.params.infoEinheit);
+    console.log(req.params.feature);
+
+    var folder = '/' + req.params.infoEinheit;
+    if(req.params.feature) folder += '/' + req.params.feature;
+
+    uploadImage.fileHandler({
+        uploadDir: function () {
+            return filePaths.image.uploadDir + folder;
+        },
+        uploadUrl: function () {
+            return filePaths.image.serverUrl + folder;
+        }
+    })(req, res, next);
+};
+
 module.exports = {
-    georeference: uploadGeoreference.fileHandler()
+    georeference: uploadGeoreference.fileHandler(),
+    image: uploadImageFunc
 };

@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('udm.openWorld')
-    .factory('layers', function (map) {
+    .factory('layers', function (OpenLayersMap) {
 
         var layerPackages = {};
 
         var nextZindexTop = 1000;
 
-        var OLmap = map.getMap();
+        var OLmap = OpenLayersMap.getMap();
 
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
@@ -99,7 +99,7 @@ angular.module('udm.openWorld')
 
             tileLayer.setZIndex(zIndex);
 
-            if(!OLmap) OLmap = map.getMap();
+            if(!OLmap) OLmap = OpenLayersMap.getMap();
             OLmap.addLayer(tileLayer);
 
             return tileLayer;
@@ -126,7 +126,7 @@ angular.module('udm.openWorld')
             });
 
 
-            if(!OLmap) OLmap = map.getMap();
+            if(!OLmap) OLmap = OpenLayersMap.getMap();
 
             var hoverControl = new OpenLayers.Control.SelectFeature(featureLayer,{hover: true,
                 highlightOnly: true,

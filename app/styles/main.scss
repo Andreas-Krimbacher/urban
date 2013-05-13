@@ -113,9 +113,10 @@ div.olControlZoom a {
 
 }
 
-.zminus{
-  z-index: -1 !important;
+.outOfView{
+  left: -2000px !important;
 }
+
 
 #top-bar{
   height: 30px;
@@ -168,6 +169,7 @@ map{
 }
 
 
+
 #editInfoEinheit{
   @include panel;
   position: absolute;
@@ -179,6 +181,11 @@ map{
   .back{
     margin-left: 10px;
     margin-top: 10px;
+  }
+  .img{
+    float: right;
+    margin-top: 10px;
+    margin-right: 20px;
   }
   .infoEinheitTable{
     font-weight: 700;
@@ -266,7 +273,6 @@ map{
       width: 160px;
       display: none;
     }
-
   }
   #editInfoEinheitForm{
     margin-left: 10px;
@@ -329,7 +335,6 @@ map{
 }
 
 
-
 #editLernEinheit{
   @include panel;
   position: absolute;
@@ -337,8 +342,203 @@ map{
   right: 20px;
   z-index: 2500;
   width: 283px;
-  height: 460px;
+  height: 600px;
+  .back{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  #editLernEinheitTop{
+    height: 40px;
+    border-bottom: solid;
+  }
+  .lernEinheitTable{
+    font-weight: 700;
+    overflow: auto;
+    input{
+      margin-bottom: 0px;
+      height: 16px;
+    }
+    .trash{
+      margin-top: 10px;
+    }
+    .edit{
+      margin-top: 13px;
+    }
+    .date{
+      display: inline-block;
+    }
+    td{
+      padding: 3px;
+      padding-left: 10px;
+    }
+    .infotext{
+      padding: 0px;
+      width: 150px;
+      overflow: hidden;
+    }
+    .icon-book{
+      margin-top: 10px;
+    }
+
+  }
+  .label{
+    margin-right: 10px;
+    width: 40px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+  .heading{
+    width: 250px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .title{
+    width: 180px;
+  }
+  .info{
+    width: 180px;
+    height: 150px;
+  }
+  #editLernEinheitForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .lektionenTable{
+      font-weight: 700;
+      width: 272px;
+      max-height: 180px;
+      overflow: auto;
+      table{
+        width: 257px;
+      }
+      .trash{
+        margin-top: 10px;
+      }
+      .edit{
+        margin-top: 10px;
+      }
+      td{
+        line-height: 16px;
+        padding: 3px;
+      }
+      input{
+        width:205px;
+        margin-bottom: 0px;
+      }
+      .icon{
+        margin-top: 7px;
+        margin-left: 5px;
+      }
+      .new{
+        margin-top: 5px;
+      }
+      .button-icon{
+        margin-right: 5px;
+      }
+      .date{
+        display: inline-block;
+      }
+      .infotext{
+        padding: 0px;
+        width: 150px;
+        overflow: hidden;
+      }
+    }
+  }
+  .editLernLektion{
+    margin-left: 10px;
+    .heading{
+      margin-bottom: 10px;
+    }
+  }
+  #editLernLektionForm{
+    margin-bottom: 0px;
+    margin-top: 10px;
+    .sendLektion{
+      position: absolute;
+      top: 550px;
+      right: 0px;
+    }
+  }
+  .addLernFeature{
+    margin-bottom: 10px;
+    margin-left: 20px;
+    .button-icon{
+      margin-right: 5px;
+    }
+    i{
+      margin-top: -2px;
+    }
+    span{
+      font-weight: 700;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  }
+  #editLernFeatureForm{
+    .heading{
+      margin-top: 0px;
+    }
+    .info{
+      width: 184px;
+      height: 80px;
+    }
+    .select2Label{
+      width: 70px;
+      margin-top: 5px;
+    }
+    .select2-container{
+      margin-top: 5px;
+    }
+    .send{
+      margin-bottom: 10px;
+    }
+  }
+  .featureTable{
+    border-top: solid;
+    border-bottom: solid;
+    width: 255px;
+    max-height: 140px;
+    overflow: auto;
+    clear: right;
+    .noFeature{
+      font-weight: 700;
+      font-size: 1.2em;
+      padding: 10px;
+      display: inline-block;
+    }
+    td{
+      padding: 2px;
+    }
+    .infotext{
+      padding: 0px;
+      font-weight: 700;
+      overflow: hidden;
+      width: 140px;
+    }
+    .typIcon{
+      margin-left: 5px;
+    }
+    .table{
+      margin-bottom: 0px;
+      min-height: 30px;
+    }
+  }
+  .typ{
+    width: 198px;
+    &:focus{
+      color: black;
+    }
+  }
+  .send{
+    float: right;
+    margin-right: 15px;
+    margin-top: 10px;
+  }
 }
+
+
+
 
 #georeference{
   width: 263px;
@@ -543,6 +743,7 @@ map{
   @include panel;
   .infotext{
     height: 280px;
+
   }
   .year{
     display: inline-block;

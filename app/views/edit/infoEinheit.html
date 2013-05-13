@@ -2,7 +2,7 @@
 
     <div id="editInfoEinheitTop">
         <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
-
+        <div class="button-icon img" ng-click="uploadImg()"><i class="icon-picture" ng-show="mode != 'list'"></i></div>
     </div>
 
     <table class="table table-striped infoEinheitTable" ng-show="mode=='list'">
@@ -112,3 +112,4 @@
     </form>
 
 </div>
+<fileupload name="imageUpload"></fileupload>

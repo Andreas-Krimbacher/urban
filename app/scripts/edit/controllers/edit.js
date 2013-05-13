@@ -2,17 +2,18 @@
 
 angular.module('udm.edit')
     .controller('EditCtrl', function ($scope,$dialog,georeference) {
-        $scope.editView = 'infoEinheit'
+        $scope.editView = 'lernEinheit';
 
-        $scope.showRasterImgUpload = function() {
-            $scope.$broadcast('showRasterImgUpload');
+        $scope.showFileUpload = function(type) {
+            $scope.$broadcast('showFileUpload',type);
         };
 
-        $scope.fileUploadFinished = function(){
-            $scope.$broadcast('fileUploadFinished');
-        }
+        $scope.setFileUploadTarget = function(data) {
+            $scope.$broadcast('setFileUploadTarget',data);
+        };
 
         $scope.setMode = function(mode){
+		georeference.fetchMap();
             if($scope.editView == 'georef') $scope.$broadcast('clearGeoref');
 
             $scope.editView = mode;

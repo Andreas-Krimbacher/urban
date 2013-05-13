@@ -18,5 +18,12 @@ module.exports = {
         baseDir : fileServerPath + '/tilesData',
         tiffDir : fileServerPath + '/tilesData/tiff',
         thumbDir : fileServerPath + '/tilesData/thumbnail'
+    },
+    image:{
+        uploadDir : fileServerPath + '/imgData',
+        thumbDir : fileServerPath + '/imgData/thumbnail',
+
+        serverUrl : '/imgData',
+        serverThumbUrl : '/imgData/thumbnail'
     }
 }

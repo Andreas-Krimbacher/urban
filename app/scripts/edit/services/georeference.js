@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.edit')
-  .factory('georeference', function (map) {
+  .factory('georeference', function (OpenLayersMap) {
         var imgLayer = null;
         var imgPoint = null;
         var imgPixelPoint = null;
@@ -21,7 +21,7 @@ angular.module('udm.edit')
         var fixState = false;
         var currentZoom = 999;
 
-        var map = map.getMap();
+        var map = OpenLayersMap.getMap();
         var moveEventCurrentZoom = 999;
 
         var addMoveEvent = function(){
@@ -110,6 +110,9 @@ angular.module('udm.edit')
         },
         redrawImageOverlay: function(){
             if(imgLayer) imgLayer.redraw();
+        },
+	fetchMap: function(){
+            map = OpenLayersMap.getMap();
         },
         centerImg: function(){
             if(imgPoint){

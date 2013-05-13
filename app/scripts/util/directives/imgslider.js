@@ -6,21 +6,19 @@ angular.module('udm.util')
             templateUrl: '../views/util/imgslider.html',
             restrict: 'E',
             link: function postLink(scope, element, attrs) {
-                scope.images =  [{src:"/data/images/street.jpeg"},{src:"/data/images/arc.jpeg"},{src:"/data/images/head.jpeg"}];
 
-                for(var img in scope.images){
-                    $('#image-gallery-content').append('<article><img src="'+scope.images[img].src+'" /></article>');
-                }
-
-                $('.wmuSlider').wmuSlider({slideshow:false});
-
-                $(".wmuSlider").bind('slideLoaded',function(e,data){
-//                    alert(data);
+                scope.$on('setImg', function(e,value) {
+                    $('.wmuSlider').html('<div class="wmuSliderWrapper" id="image-gallery-content"></div>');
+                    for(var img in value){
+                        $('#image-gallery-content').append('<article><img src="'+value[img]+'" /></article>');
+                    }
+                    $('.wmuSlider').wmuSlider({slideshow:false});
                 });
+                //$('#image-gallery-content').append('<article><img src="/imgData/2/sdf.png" /></article>');
 
 
                 scope.close = function(){
-                    scope.setVisibilityImgSlider(false);
+                    scope.hideImageSlider(false);
                 }
 
             }

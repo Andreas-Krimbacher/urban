@@ -221,7 +221,7 @@ var createGeoTiff = function(fileSrc,fileDst,res,callback){
 };
 
 var createTiles = function(fileSrc,fileDst,res,callback){
-    var cmd = 'gdal2tiles.py -z 10-17 --s_srs EPSG:900913 -a 0 -w none ';
+    var cmd = 'gdal2tiles.py -z 10-14 --s_srs EPSG:900913 -a 0 -w none ';
     cmd += fileSrc + ' ';
     cmd += fileDst;
 

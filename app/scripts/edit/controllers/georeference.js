@@ -11,6 +11,8 @@ angular.module('udm.edit')
         $scope.CPProcess = false;
         $scope.addCPProcess = false;
 
+        $scope.setFileUploadTarget({name : 'georeferenceUpload', target : 'georeferenceUpload'});
+
         $scope.$on('$viewContentLoaded', function() {
             $('#select2').css({ width: '0px' });
         });
@@ -33,7 +35,7 @@ angular.module('udm.edit')
         getImgList();
 
         $scope.$on('fileUploadFinished', function(e,value) {
-            getImgList();
+            if(value == 'georeferenceUpload') getImgList();
         });
 
         $scope.$on('clearGeoref', function(e,value) {
@@ -68,7 +70,7 @@ angular.module('udm.edit')
             if($scope.selectedId == -1){
                 setProcessState(false);
                 $scope.currentImg = false;
-                $scope.showRasterImgUpload('showRasterImgUpload');
+                $scope.showFileUpload('georeferenceUpload');
             }
             else if($scope.selectedId >= 0 && $scope.selectedId != ''){
                 if($scope.items[$scope.selectedId]){

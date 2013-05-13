@@ -28,7 +28,7 @@ angular.module('udm.util')
                 bandInfos[1].highlight = true;
 
                 var tl = Timeline.create(document.getElementById("timeline"), bandInfos);
-                tl.getBand(0).scrollToCenter(SimileAjax.DateTime.parseGregorianDateTime(1779));
+                tl.getBand(0).scrollToCenter(SimileAjax.DateTime.parseGregorianDateTime(1800));
 
 
                 scope.$on('addInfoElements', function(e,infoElements) {

@@ -145,24 +145,16 @@ angular.module('udm.openWorld')
             $scope.panelVisibility.info = false;
         });
 
-//        $scope.$on('showInfoEinheitFeature', function(e,info) {
-//            var isInMap = false;
-//            for(var x in infoEinheitenInMap){
-//                if(infoEinheitenInMap[x] == info.infoEinheit){
-//
-//                }
-//            }
-//            if(!isInMap){
-//                $scope.showInfoEinheit({id:info.infoEinheit});
-//            }
-//        });
+        $scope.$on('showInfoEinheitFeature', function(e,info) {
+            var isInMap = false;
+            for(var x in infoEinheitenInMap){
+                if(infoEinheitenInMap[x] == info.infoEinheit){
 
-         $scope.showImageSlider = function(img){
-             $scope.$broadcast('setImg',img);
-             $scope.panelVisibility.imgslider = true;
-         }
-        $scope.hideImageSlider = function(){
-            $scope.panelVisibility.imgslider = false;
-        }
+                }
+            }
+            if(!isInMap){
+                $scope.showInfoEinheit({id:info.infoEinheit});
+            }
+        });
 
     });

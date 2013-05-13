@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.map')
-    .factory('map', function ($rootScope) {
+    .factory('OpenLayersMap', function ($rootScope) {
         // Service logic
         var map = null;
         var offline = false;

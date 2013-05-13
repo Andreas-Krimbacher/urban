@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.edit')
-  .factory('feature', function (map) {
+  .factory('feature', function (OpenLayersMap) {
 
         var baseLayer = null;
         var overlayLayers = [];
@@ -19,7 +19,7 @@ angular.module('udm.edit')
         };
         var featureAddedCallback = null;
 
-        var map = map.getMap();
+        var map = OpenLayersMap.getMap();
 
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
