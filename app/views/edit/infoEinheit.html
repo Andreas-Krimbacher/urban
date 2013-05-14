@@ -49,6 +49,7 @@
                         <i ng-switch-when="plan" class="icon-th icon"></i>
                         <i ng-switch-when="planOverlay" class="icon-th-large icon"></i>
                         <i ng-switch-when="point" class="icon-map-marker icon"></i>
+                        <i ng-switch-when="pointOri" class="icon-map-marker icon"></i>
                         <i ng-switch-when="line" class="icon-map-marker icon"></i>
                         <i ng-switch-when="poly" class="icon-map-marker icon"></i>
                     </td>
@@ -72,6 +73,7 @@
             <option value="plan">Plan Hintergrund</option>
             <option value="planOverlay">Plan im Plan</option>
             <option value="point">Punkt-Element</option>
+            <option value="pointOri">Punkt mit Richtung</option>
             <option value="line">Linien-Element</option>
             <option value="poly">Flächen-Element</option>
         </select>
@@ -85,17 +87,18 @@
         </div>
 
 
-        <div class="editControls" ng-show="editFeature.typ == 'point' || editFeature.typ == 'line' || editFeature.typ == 'poly'">
+        <div class="editControls" ng-show="editFeature.typ == 'point' || editFeature.typ == 'pointOri' || editFeature.typ == 'line' || editFeature.typ == 'poly'">
             <span class="label label-inverse heading">Element:</span>
 
             <div class="button-icon addFeature" ng-click="drawFeature()" ng-show="!editFeature.feature"><i class="icon-plus"></i></div>
             <div class="button-icon addFeature" ng-click="modifyFeature()" ng-class="{'selected' : modifyProcess}"  ng-show="editFeature.feature"><i class="icon-pencil"></i></div>
             <div class="button-icon" ng-class="{'disabled':!addProcess && !modifyProcess}" ng-click="cancel()"><i class="icon-ban-circle"></i></div>
             <div class="button-icon trash" ng-class="{'disabled':!editFeature.feature}" ng-click="removeFeature()"><i class="icon-trash"></i></div>
-            <colorpicker name="addFeature" color="{{editFeature.color}}"></colorpicker>
+            <div ng-show="editFeature.typ != 'pointOri'"  class="colorDiv"><colorpicker name="addFeature" color="{{editFeature.color}}"></colorpicker></div>
+            <div ng-show="editFeature.typ == 'pointOri'"  class="sliderDiv"><slider min='0' max='360' step='1' name='rot' value='{{editFeature.rot}}'></slider></div>
         </div>
 
-        <div ng-show="editFeature.typ == 'point' || editFeature.typ == 'line' || editFeature.typ == 'poly' || editFeature.typ == 'planOverlay'">
+        <div ng-show="editFeature.typ == 'point' || editFeature.typ == 'pointOri' || editFeature.typ == 'line' || editFeature.typ == 'poly' || editFeature.typ == 'planOverlay'">
             <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.start.$invalid]">Von:</span>
             <input type="number" class="start" name="start" ng-model="editFeature.start" min="-9999" max="9999"/>
             <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.end.$invalid]">Bis:</span>

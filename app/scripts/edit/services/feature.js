@@ -21,17 +21,53 @@ angular.module('udm.edit')
 
         var map = OpenLayersMap.getMap();
 
+
         var featureStyle = new OpenLayers.StyleMap({
-            "default": new OpenLayers.Style({
+            "default": new OpenLayers.Style(),
+            "temporary": new OpenLayers.Style(),
+            "select": new OpenLayers.Style()
+        });
+
+        var lookupDefault = {
+            "point": {
                 strokeColor:'${color}',
                 strokeOpacity: .7,
                 strokeWidth: 8,
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}'
-            }),
-            "temporary": new OpenLayers.Style({
+                graphicZIndex: '${zIndex}',
+            },
+            "poly": {
+                strokeColor:'${color}',
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                pointRadius: 6,
+                fillColor:'${color}',
+                fillOpacity: 0.4,
+                graphicZIndex: '${zIndex}',
+            },
+            "line" : {
+                strokeColor:'${color}',
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                pointRadius: 6,
+                fillColor:'${color}',
+                fillOpacity: 0.4,
+                graphicZIndex: '${zIndex}',
+            },
+            "pointOri" : {
+                fillOpacity: 0.8,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("default", "typ", lookupDefault);
+
+        var lookupTemporary = {
+            "point": {
                 strokeColor: "#E16E0F",
                 strokeOpacity: .9,
                 strokeWidth: 8,
@@ -40,8 +76,39 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
-            }),
-            "select": new OpenLayers.Style({
+            },
+            "poly": {
+                strokeColor: "#E16E0F",
+                strokeOpacity: .9,
+                strokeWidth: 8,
+                fillColor: "#E16E0F",
+                fillOpacity: 0.4,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "line" : {
+                strokeColor: "#E16E0F",
+                strokeOpacity: .9,
+                strokeWidth: 8,
+                fillColor: "#E16E0F",
+                fillOpacity: 0.4,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "pointOri" : {
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("temporary", "typ", lookupTemporary);
+
+        var lookupSelect = {
+            "point": {
                 strokeColor: "#E16E0F",
                 strokeOpacity: .7,
                 strokeWidth: 8,
@@ -50,8 +117,36 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
-            })
-        });
+            },
+            "poly": {
+                strokeColor: "#E16E0F",
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                fillColor: "#E16E0F",
+                fillOpacity: 0.4,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "line" : {
+                strokeColor: "#E16E0F",
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                fillColor: "#E16E0F",
+                fillOpacity: 0.4,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "pointOri" : {
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("select", "typ", lookupSelect);
 
         var featureEditStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
@@ -82,6 +177,27 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
+            })
+        });
+
+        var featureEditStyleOri = new OpenLayers.StyleMap({
+            "default": new OpenLayers.Style({
+                fillOpacity: 0.8,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }),
+            "temporary": new OpenLayers.Style({
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }),
+            "select": new OpenLayers.Style({
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
             })
         });
 
@@ -254,15 +370,23 @@ angular.module('udm.edit')
         },
         addEditFeature : function(feature){
 
-            if(editLayer) editLayer.addFeatures(feature);
+            if(feature.typ == 'pointOri') editLayer.styleMap = featureEditStyleOri;
+            else editLayer.styleMap = featureEditStyle;
+
+            if(editLayer) editLayer.addFeatures(feature.feature);
 
         },
         drawFeature : function(type,callback){
 
             featureAddedCallback = callback;
 
+            if(type == 'pointOri') editLayer.styleMap = featureEditStyleOri;
+            else editLayer.styleMap = featureEditStyle;
+
             switch (type) {
                 case "point": drawControl.point.activate();
+                    break;
+                case "pointOri": drawControl.point.activate();
                     break;
                 case "line": drawControl.line.activate();
                     break;
@@ -276,6 +400,8 @@ angular.module('udm.edit')
         stopDrawFeature : function(type){
             switch (type) {
                 case "point": drawControl.point.deactivate();
+                    break;
+                case "pointOri": drawControl.point.deactivate();
                     break;
                 case "line": drawControl.line.deactivate();
                     break;

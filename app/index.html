@@ -46,13 +46,12 @@
 
     <!-- Add your site or application content here -->
     <div id="container">
-        <div id="top-bar">Discover Urban Design History
-            <a class="button-icon" href="#/learn"><i class="icon-th-list"></i></a>
-            <a  class="button-icon" href="#/edit"><i class="icon-pencil"></i></a>
-            <a  class="button-icon" href="#/world"><i class="icon-heart"></i></a>
-        </div>
-
         <div ng-controller="MainCtrl">
+            <div id="top-bar">Discover Urban Design History
+                <a class="button-icon lastIcon" ng-click="setRoute('/lern')"><i class="icon-th-list"></i></a>
+                <a class="button-icon" ng-click="setRoute('/edit')"><i class="icon-pencil"></i></a>
+                <a class="button-icon" ng-click="setRoute('/world')"><i class="icon-heart"></i></a>
+            </div>
             <map></map>
             <div ng-view></div>
         </div>
@@ -119,6 +118,7 @@
     <!-- build:js scripts/scripts.js -->
     <script src="scripts/main/module.js"></script>
     <script src="scripts/main/controllers/main.js"></script>
+    <script src="scripts/main/controllers/start.js"></script>
 
     <script src="scripts/util/module.js"></script>
     <script src="scripts/util/directives/slider.js"></script>
@@ -138,6 +138,9 @@
     <script src="scripts/openWorld/module.js"></script>
     <script src="scripts/openWorld/controllers/openWorld.js"></script>
     <script src="scripts/openWorld/services/layers.js"></script>
+
+    <script src="scripts/lern/module.js"></script>
+    <script src="scripts/lern/controllers/lern.js"></script>
 
     <script src="scripts/fileUpload/module.js"></script>
     <script src="scripts/fileUpload/directives/fileUpload.js"></script>

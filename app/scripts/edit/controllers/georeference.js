@@ -3,6 +3,8 @@
 angular.module('udm.edit')
     .controller('GeoreferenceCtrl', function ($scope,$http,georeference) {
 
+        $scope.$emit('$clearMap');
+
         $scope.items = [];
         $scope.currentImg = false;
         $scope.continousEditing = false;

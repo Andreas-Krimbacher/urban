@@ -172,7 +172,8 @@ module.exports.getInfoEinheit =  function(req, res) {
                 id:result.rows[x].Id,
                 link:result.rows[x].Link_InfoElement,
                 typ:result.rows[x].Typ,
-                color:result.rows[x].Color
+                color:result.rows[x].Color,
+                rot:result.rows[x].Rot
             });
 
             if(result.rows[x].Typ == 'plan' || result.rows[x].Typ == 'planOverlay'){
@@ -194,6 +195,8 @@ module.exports.getInfoEinheit =  function(req, res) {
     });
 
     var getGeom = function(id,typ,feature){
+
+        if(typ == 'pointOri') typ = 'point';
 
         client.query('SELECT ST_AsText("geom_'+typ+'") FROM "Feature" WHERE "Id"='+id+';', function(err, result) {
             if(err) {
@@ -309,6 +312,10 @@ module.exports.saveInfoEinheit =  function(req, res) {
 
         if(infoEinheit.features[x].typ == 'plan' || infoEinheit.features[x].typ == 'planOverlay'){
             values['TileDB'] = {value: infoEinheit.features[x].feature.tileDB, type : 'string'};
+        }
+        else if(infoEinheit.features[x].typ == 'pointOri'){
+            values['Rot'] = {value: infoEinheit.features[x].rot || null, type : 'integer'};
+            values['geom_point'] = {value : infoEinheit.features[x].feature.geom, type : 'geom'};
         }
         else{
             values['Color'] = {value: infoEinheit.features[x].color, type : 'string'};
@@ -437,7 +444,7 @@ module.exports.saveLernEinheit =  function(req, res) {
             values = {};
 
             values['Id'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].id, type : 'integer'};
-            values['LernLektion'] = {value: lernEinheit.lernLektionen[y].id, type : 'integer'};
+            values['LernLektion'] = {value: lernEinheit.lernLektionen[x].id, type : 'integer'};
             values['Desc'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].info || null, type : 'string'};
             values['Typ'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].typ, type : 'string'};
             values['StartYear'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].start, type : 'integer'};

@@ -3,9 +3,8 @@
 angular.module('udm.openWorld')
     .controller('OpenWorldCtrl', function ($scope,$http,layers, util) {
 
-        $scope.mapClass = 'withTimeline';
+        $scope.$emit('$clearMap');
         layers.fetchMap();
-        layers.resetMap();
 
         $scope.panelVisibility = {info : false,
             layerlist : false,
@@ -54,6 +53,8 @@ angular.module('udm.openWorld')
                             infoEinheit.features[x].feature.attributes.id = infoEinheit.features[x].id;
                             infoEinheit.features[x].feature.attributes.infoEinheit = infoEinheit.id;
                             infoEinheit.features[x].feature.attributes.element = infoEinheit.features[x];
+                            infoEinheit.features[x].feature.attributes.typ = infoEinheit.features[x].typ;
+                            infoEinheit.features[x].feature.attributes.rot = infoEinheit.features[x].rot;
                             infoEinheit.features[x].feature.attributes.onSelect = function(feature){
                                 featureSelected(feature);
                             }

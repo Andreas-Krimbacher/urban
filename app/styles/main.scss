@@ -86,8 +86,8 @@ $black : #373737;
     background: $black;
   }
   i:hover{
-      background-image: url("images/glyphicons-halflings-white.png");
-      height: 20px;
+    background-image: url("images/glyphicons-halflings-white.png");
+    height: 20px;
   }
 }
 
@@ -120,7 +120,7 @@ div.olControlZoom a {
 
 #top-bar{
   height: 30px;
-  background-color: greenyellow;
+  background-color: #5bb75b;
   font-size: 1.6em;
   line-height: 30px;
   padding-left: 10px;
@@ -131,6 +131,9 @@ div.olControlZoom a {
     margin-right: 10px;
     margin-top: 3px;
   }
+  .lastIcon{
+    margin-right: 21px;
+  }
 }
 
 #map {
@@ -139,12 +142,157 @@ div.olControlZoom a {
 }
 map{
   .all{
-    height: 700px !important;
+    height: 680px !important;
   }
   .withTimeline{
-    height: 600px !important;
+    height: 580px !important;
   }
 }
+
+
+#startDialog{
+  z-index: 3000;
+  h3{
+    width:100%;
+    text-align: center;
+  }
+  .world{
+    margin-left:90px;
+    margin-right:80px;
+  }
+}
+
+#lernEinheitDialog{
+  z-index: 3000;
+  h3{
+    width:100%;
+    text-align: center;
+  }
+  .icon-book{
+    margin-top: 8px;
+  }
+  .date{
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.1em;
+  }
+  td{
+    padding: 5px;
+  }
+  .title{
+    font-weight: 700;
+    font-size: 1.3em;
+    width: 160px;
+    overflow: hidden;
+
+  }
+  .info{
+    font-size: 1.1em;
+    font-weight: 700;
+    width: 170px;
+    margin-top:5px;
+    overflow: hidden;
+  }
+  button{
+    margin-top: 8px;
+  }
+
+}
+
+#lernEinheitInfoDialog{
+  z-index: 3000;
+  .modal-body{
+    font-weight: 700;
+    font-size: 1.3em;
+  }
+}
+
+#lernNavigation{
+  position: absolute;
+  bottom: 130px;
+  left: 580px;
+  z-index: 2500;
+  .disabledWithBackground{
+    opacity: 0.7;
+    cursor: default !important;
+    &hover{
+      background-color: #373737 !important;
+    }
+    &active{
+      background-color: #373737 !important;
+    }
+  }
+}
+
+
+#lernInfo{
+  @include panel;
+  width:350px;
+  height: 100px;
+  position: absolute;
+  bottom: 150px;
+  left:20px;
+  font-weight: 700;
+  font-size: 1.3em;
+  padding: 5px;
+  overflow: auto;
+}
+
+#lernLine{
+  width: 100%;
+  height: 100px;
+  background: #d3d3d3;
+  .lektion{
+    display: inline-block;
+    width: 160px;
+    margin-top: 10px;
+    margin-left: 10px;
+    height: 90px;
+  }
+  .lektionBox{
+    border: solid 4px;
+    height: 50px;
+    width: 100px;
+    @include border-radius(10px);
+    overflow: hidden;
+
+  }
+  .lektionTitle{
+    font-weight: 700;
+    font-size: 1.3em;
+    margin-left: 5px;
+    margin-top: 2px;
+
+  }
+  .lektionNumber{
+    position: relative;
+    top: -60px;
+    left: 40px;
+    font-weight: 700;
+    font-size: 4em;
+    width: 20px;
+    cursor: pointer;
+  }
+  .lernLineTitle{
+    display: inline-block;
+    position: relative;
+    top: -30px;
+    font-size: 3em;
+    font-weight: 700;
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+  .feature{
+    height: 50px;
+    display: inline-block;
+    cursor: pointer;
+  }
+  .green{
+    background: #5bb75b;
+  }
+}
+
+
 
 #layerswitcher{
   position: absolute;
@@ -176,6 +324,7 @@ map{
     right: 350px;
   }
 }
+
 
 
 #editInfoEinheit{
@@ -257,6 +406,37 @@ map{
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: solid;
+    .colorDiv{
+      display: inline-block;
+      margin-left: 80px;
+    }
+    .sliderDiv{
+      display: inline-block;
+      margin-left: 60px;
+    }
+    .slider{
+      width: 110px;
+      display: inline-block;
+      margin-left: 5px;
+      height: 2px;
+      .ui-slider-handle{
+        top: -.7em;
+        width: 3px;
+        margin-left: -.2em;
+      }
+      .ui-state-hover{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+      .ui-state-active{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+      .ui-state-focus{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+    }
   }
   .colorpickerInput{
     width: 60px;
@@ -307,7 +487,7 @@ map{
         padding: 3px;
       }
       input{
-       width:205px;
+        width:205px;
         margin-bottom: 0px;
       }
       .icon{
@@ -549,7 +729,7 @@ map{
 
 #georeference{
   width: 263px;
-  height: 600px;
+  height: 580px;
   position: absolute;
   top: 80px;
   right: 20px;
@@ -761,18 +941,18 @@ map{
     width: 170px;
   }
   .bottom{
-      height: 30px;
-      .deeplink-btn{
-          margin-left: 10px;
-      }
-      .picture-btn{
-          margin-right: 10px;
-          float: right;
-      }
-      .learn-list-btn{
-          margin-right: 10px;
-          float: right;
-      }
+    height: 30px;
+    .deeplink-btn{
+      margin-left: 10px;
+    }
+    .picture-btn{
+      margin-right: 10px;
+      float: right;
+    }
+    .learn-list-btn{
+      margin-right: 10px;
+      float: right;
+    }
   }
 }
 
@@ -805,6 +985,11 @@ map{
     @include border-radius($borderRadius);
   }
   .timeline-band-1{
+    .timeline-date-label{
+      color: $black;
+    }
+  }
+  .timeline-band-inner{
     .timeline-date-label{
       color: $black;
     }

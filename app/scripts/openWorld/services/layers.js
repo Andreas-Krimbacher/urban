@@ -9,17 +9,54 @@ angular.module('udm.openWorld')
 
         var OLmap = OpenLayersMap.getMap();
 
+
+
         var featureStyle = new OpenLayers.StyleMap({
-            "default": new OpenLayers.Style({
+            "default": new OpenLayers.Style(),
+            "temporary": new OpenLayers.Style(),
+            "select": new OpenLayers.Style()
+        });
+
+        var lookupDefault = {
+            "point": {
                 strokeColor:'${color}',
                 strokeOpacity: .7,
                 strokeWidth: 8,
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}'
-            }),
-            "temporary": new OpenLayers.Style({
+                graphicZIndex: '${zIndex}',
+            },
+            "poly": {
+                strokeColor:'${color}',
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                pointRadius: 6,
+                fillColor:'${color}',
+                fillOpacity: 0.4,
+                graphicZIndex: '${zIndex}',
+            },
+            "line" : {
+                strokeColor:'${color}',
+                strokeOpacity: .7,
+                strokeWidth: 8,
+                pointRadius: 6,
+                fillColor:'${color}',
+                fillOpacity: 0.4,
+                graphicZIndex: '${zIndex}',
+            },
+            "pointOri" : {
+                fillOpacity: 0.8,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("default", "typ", lookupDefault);
+
+        var lookupTemporary = {
+            "point": {
                 strokeColor: '${color}',
                 strokeOpacity: 1,
                 strokeWidth: 8,
@@ -28,8 +65,8 @@ angular.module('udm.openWorld')
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
-            }),
-            "select": new OpenLayers.Style({
+            },
+            "poly": {
                 strokeColor: '${color}',
                 strokeOpacity: 1,
                 strokeWidth: 8,
@@ -38,8 +75,67 @@ angular.module('udm.openWorld')
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
-            })
-        });
+            },
+            "line" : {
+                strokeColor: '${color}',
+                strokeOpacity: 1,
+                strokeWidth: 8,
+                fillColor: '${color}',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "pointOri" : {
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("temporary", "typ", lookupTemporary);
+
+        var lookupSelect = {
+            "point": {
+                strokeColor: '${color}',
+                strokeOpacity: 1,
+                strokeWidth: 8,
+                fillColor: '${color}',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "poly": {
+                strokeColor: '${color}',
+                strokeOpacity: 1,
+                strokeWidth: 8,
+                fillColor: '${color}',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "line" : {
+                strokeColor: '${color}',
+                strokeOpacity: 1,
+                strokeWidth: 8,
+                fillColor: '${color}',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "pointOri" : {
+                fillOpacity: 1,
+                'pointRadius':30,
+                rotation:"${rot}",
+                externalGraphic: '/styles/images/viewpoint.png'
+            }
+        };
+
+        featureStyle.addUniqueValueRules("select", "typ", lookupSelect);
 
 
         var calculateZindex = function(layerPackage,infoEinheit,position){

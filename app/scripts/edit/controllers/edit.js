@@ -2,7 +2,7 @@
 
 angular.module('udm.edit')
     .controller('EditCtrl', function ($scope,$dialog,georeference) {
-        $scope.editView = 'lernEinheit';
+        $scope.editView = 'infoEinheit';
 
         $scope.showFileUpload = function(type) {
             $scope.$broadcast('showFileUpload',type);

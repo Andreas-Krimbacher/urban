@@ -43,8 +43,8 @@ Timeline.ClassicTheme._Impl = function() {
                                 // to be moved to anytime after this date.
     this.ether = {
         backgroundColors: [
-            "white",
-            "greenyellow",
+            "#d3d3d3",
+            "#5bb75b",
             "#CCC",
             "#AAA"
         ],

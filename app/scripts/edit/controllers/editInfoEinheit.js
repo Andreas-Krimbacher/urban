@@ -26,7 +26,7 @@ angular.module('udm.edit')
         $scope.addProcess = false;
         $scope.modifyProcess = false;
 
-
+        $scope.$emit('$clearMap');
 
         feature.setFeatureLayer();
         feature.setEditLayer();
@@ -115,6 +115,7 @@ angular.module('udm.edit')
             if(index == -1){
                 $scope.editFeature = {};
                 $scope.editFeature.color = '#7ad674';
+                $scope.editFeature.rot = 0;
                 $scope.editFeature.id = $scope.nextFeatureId;
                 $scope.nextFeatureId++;
                 $scope.editFeature.plan = '';
@@ -155,15 +156,25 @@ angular.module('udm.edit')
                 else{
                     $scope.editFeature =  $scope.features[index];
 
+                    if($scope.editFeature.typ == 'pointOri'){
+                        $scope.editFeature.feature.attributes.rot = $scope.editFeature.rot;
+                    }
+
                     feature.removeFeature($scope.editFeature.feature);
-                    feature.addEditFeature($scope.editFeature.feature);
+                    feature.addEditFeature($scope.editFeature);
 
                     $scope.creatingNewFeature = false;
                     $scope.mode = 'editFeature';
                 }
             }
 
-
+            $scope.$on('sliderChanged', function(e,value) {
+                    if(value.name == 'rot'){
+                        $scope.editFeature.rot = value.value;
+                        $scope.editFeature.feature.attributes.rot = value.value;
+                        feature.redrawEditLayer();
+                    }
+            });
         };
 
         $scope.deleteFeature = function(index){
@@ -248,7 +259,13 @@ angular.module('udm.edit')
         $scope.drawFeature = function(){
             $scope.addProcess = true;
             feature.drawFeature($scope.editFeature.typ, function(element){
-                element.attributes.color = $scope.editFeature.color;
+                element.attributes.typ = $scope.editFeature.typ;
+                if($scope.editFeature.typ == 'pointOri'){
+                    element.attributes.rot = $scope.editFeature.rot;
+                }
+                else{
+                    element.attributes.color = $scope.editFeature.color;
+                }
                 feature.stopDrawFeature($scope.editFeature.typ);
                 feature.redrawEditLayer();
                 if(!$scope.$$phase) $scope.$apply($scope.editFeature.feature = element,$scope.addProcess = false);
@@ -289,6 +306,7 @@ angular.module('udm.edit')
 
 
         $scope.back = function(){
+
             if($scope.mode == 'editInfoEinheit'){
                 $scope.mode = 'list';
             }
@@ -298,7 +316,7 @@ angular.module('udm.edit')
                 feature.removeEditFeature();
                 feature.stopModifyFeature();
                 feature.stopDrawFeature($scope.editFeature.typ);
-                $scope.editFeature.feature = null;
+                //$scope.editFeature.feature = null;
                 $scope.addProcess = false;
                 $scope.modifyProcess = false;
                 feature.removeEditOverlayPlanLayer();
