@@ -19,4 +19,12 @@ angular.module('udm.edit')
             $scope.editView = mode;
         }
 
+        $scope.showInfoEinheitInMap = function(infoEinheit){
+            $scope.$broadcast('showInfoEinheit',infoEinheit);
+        };
+
+        $scope.clearMapView = function(){
+            $scope.$broadcast('clearMapView');
+        }
+
     });

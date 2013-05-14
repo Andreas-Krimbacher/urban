@@ -7,7 +7,7 @@
     <button class="btn btn-small" type="button" ng-click="setMode('georef')" ng-class="{true:'btn-warning', false:'btn-inverse'}[editView=='georef']">Georefernzieren</button>
 </div>
 
-    <div ng-switch="editView">
+    <div ng-switch="editView" id="editView">
         <div ng-switch-when="infoEinheit" ng-include="'views/edit/infoEinheit.html'"></div>
         <div ng-switch-when="lernEinheit" ng-include="'views/edit/lernEinheit.html'"></div>
         <div ng-switch-when="georef" ng-include="'views/edit/georeference.html'"></div>

@@ -440,6 +440,8 @@ module.exports.saveLernEinheit =  function(req, res) {
             values['LernLektion'] = {value: lernEinheit.lernLektionen[y].id, type : 'integer'};
             values['Desc'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].info || null, type : 'string'};
             values['Typ'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].typ, type : 'string'};
+            values['StartYear'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].start, type : 'integer'};
+            values['EndYear'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].end, type : 'integer'};
 
             if(lernEinheit.lernLektionen[x].lernFeature[y].typ == 'planVgl'){
                 values['InfoEinheit1'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].plan1 || null, type : 'integer'};
@@ -566,7 +568,9 @@ module.exports.getLernEinheit =  function(req, res) {
                 feature = {
                     info:result.rows[x].Desc,
                     typ:result.rows[x].Typ,
-                    id:result.rows[x].Id
+                    id:result.rows[x].Id,
+                    start:result.rows[x].StartYear,
+                    end:result.rows[x].EndYear
                 };
 
                 if(result.rows[x].Typ == 'infoEinheit'){
@@ -578,8 +582,8 @@ module.exports.getLernEinheit =  function(req, res) {
                 }
                 if(result.rows[x].Typ == 'planVgl'){
                     feature.plan1 = result.rows[x].InfoEinheit1;
-                    feature.plan2 = result.rows[x].InfoEinheit1;
-                    feature.plan3 = result.rows[x].InfoEinheit1 || null;
+                    feature.plan2 = result.rows[x].InfoEinheit2;
+                    feature.plan3 = result.rows[x].InfoEinheit3 || null;
                 }
 
                 lektion.lernFeature.push(feature);

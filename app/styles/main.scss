@@ -168,6 +168,14 @@ map{
   z-index: 2500;
 }
 
+#editView{
+  #layerlist{
+    right: 350px;
+  }
+  #infobox{
+    right: 350px;
+  }
+}
 
 
 #editInfoEinheit{
@@ -333,7 +341,6 @@ map{
   }
 
 }
-
 
 #editLernEinheit{
   @include panel;

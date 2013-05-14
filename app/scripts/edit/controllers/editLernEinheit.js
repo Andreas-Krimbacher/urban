@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.edit')
-    .controller('EditLernEinheitCtrl', function ($scope,$http,feature, util) {
+    .controller('EditLernEinheitCtrl', function ($scope,$http,feature,$timeout, util) {
         $scope.mode = 'list';
 
         $scope.nextLernEinheitId = null;
@@ -12,6 +12,7 @@ angular.module('udm.edit')
         $scope.lernEinheiten = [];
         $scope.lernLektionen = [];
 
+        $scope.origInfoEinheiten = [];
         $scope.infoEinheiten = [];
         $scope.feature = [];
 
@@ -45,6 +46,7 @@ angular.module('udm.edit')
 
 
         $scope.editLernEinheitMode = function(index){
+
             if(index == -1){
                 $scope.editLernEinheit = {};
                 $scope.editLernEinheit.id = $scope.nextLernEinheitId;
@@ -102,7 +104,7 @@ angular.module('udm.edit')
 
             $http.get('/pg/getInfoEinheitenList').
                 success(function(data, status, headers, config) {
-                    $scope.infoEinheiten = data.list;
+                    $scope.origInfoEinheiten = data.list;
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
@@ -138,7 +140,8 @@ angular.module('udm.edit')
         };
 
         $scope.editLernFeatureMode = function(index){
-
+            angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
+            $scope.clearMapView();
             if(index == -1){
                 $scope.editLernFeature = {};
                 $scope.editLernFeature.id = $scope.nextLernFeatureId;
@@ -148,8 +151,31 @@ angular.module('udm.edit')
             }
             else{
                 $scope.creatingNewLernFeature = false;
-                $scope.editLernFeature = $scope.editLernLektion.lernFeature[index];
+                $timeout(function(){$scope.editLernFeature = $scope.editLernLektion.lernFeature[index];});
                 $scope.featureEditing = true;
+
+
+                var lernFeature = $scope.editLernLektion.lernFeature[index];
+                //show in Map
+                if(lernFeature.typ == 'infoEinheit') $scope.showInfoEinheitInMap({infoEinheit:lernFeature.infoEinheit,feature: false});
+                if(lernFeature.typ == 'feature') $scope.showInfoEinheitInMap({infoEinheit:lernFeature.infoEinheit,feature: lernFeature.feature});
+                if(lernFeature.typ == 'planVgl'){
+                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan1,feature: false});
+                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan2,feature: false});
+                    if(lernFeature.plan3) $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan3,feature: false});
+                }
+
+
+                if(lernFeature.typ == 'feature'){
+                    $http.get('/pg/getInfoEinheit/' + lernFeature.infoEinheit).
+                        success(function(data, status, headers, config) {
+                            $scope.feature = data.infoEinheit.features;
+                        }).
+                        error(function(data, status, headers, config) {
+                            // called asynchronously if an error occurs
+                            // or server returns response with an error status.
+                        });
+                }
             }
         };
 
@@ -159,6 +185,7 @@ angular.module('udm.edit')
                 return;
             }
 
+            $scope.clearMapView();
             $scope.editLernFeature.infoEinheit = '';
             $scope.editLernFeature.feature = '';
             $scope.editLernFeature.plan1 = '';
@@ -176,7 +203,8 @@ angular.module('udm.edit')
             for(var x in $scope.infoEinheiten){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.infoEinheit){
                     $scope.editLernFeature.title = [$scope.infoEinheiten[x].title];
-                    $scope.editLernFeature.infoEinheitData = $scope.infoEinheiten[x];
+                    $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
+                    $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
                 }
             }
 
@@ -191,7 +219,11 @@ angular.module('udm.edit')
                     // or server returns response with an error status.
                 });
 
-            if($scope.editLernFeature.typ == 'infoEinheit') $scope.featureValid = true;
+            $scope.clearMapView();
+            if($scope.editLernFeature.typ == 'infoEinheit'){
+                $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.infoEinheit,feature: false});
+                $scope.featureValid = true;
+            }
 
         };
 
@@ -204,11 +236,12 @@ angular.module('udm.edit')
             for(var x in $scope.feature){
                 if($scope.feature[x].id ==  $scope.editLernFeature.feature){
                     $scope.editLernFeature.title = [$scope.feature[x].title];
-                    $scope.editLernFeature.featureData = $scope.feature[x];
-                    if(!$scope.editLernFeature.featureData.start) $scope.editLernFeature.featureData.start = $scope.editLernFeature.infoEinheitData.start;
-                    if(!$scope.editLernFeature.featureData.end) $scope.editLernFeature.featureData.end = $scope.editLernFeature.infoEinheitData.end;
+                    if($scope.feature[x].start) $scope.editLernFeature.start = $scope.feature[x].start;
+                    if($scope.feature[x].end) $scope.editLernFeature.end = $scope.feature[x].end;
                 }
             }
+
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.infoEinheit,feature: $scope.editLernFeature.feature});
 
             $scope.featureValid = true;
         };
@@ -222,9 +255,13 @@ angular.module('udm.edit')
             for(var x in $scope.infoEinheiten){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan1){
                     $scope.editLernFeature.title = [$scope.infoEinheiten[x].title];
-                    $scope.editLernFeature.plan1Data = $scope.infoEinheiten[x];
+                    $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
+                    $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
+                    $scope.infoEinheiten.splice(x,1);
                 }
             }
+
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan1,feature: false});
 
         };
 
@@ -237,9 +274,15 @@ angular.module('udm.edit')
             for(var x in $scope.infoEinheiten){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan2){
                     $scope.editLernFeature.title.push($scope.infoEinheiten[x].title);
-                    $scope.editLernFeature.plan2Data = $scope.infoEinheiten[x];
+                    if($scope.editLernFeature.start > $scope.infoEinheiten[x].start)
+                        $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
+                    if($scope.editLernFeature.end < $scope.infoEinheiten[x].end)
+                        $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
+                    $scope.infoEinheiten.splice(x,1);
                 }
             }
+
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan2,feature: false});
 
             $scope.featureValid = true;
         };
@@ -250,9 +293,14 @@ angular.module('udm.edit')
             for(var x in $scope.infoEinheiten){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan3){
                     $scope.editLernFeature.title.push($scope.infoEinheiten[x].title);
-                    $scope.editLernFeature.plan3Data = $scope.infoEinheiten[x];
+                    if($scope.editLernFeature.start > $scope.infoEinheiten[x].start)
+                        $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
+                    if($scope.editLernFeature.end < $scope.infoEinheiten[x].end)
+                        $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
                 }
             }
+
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan3,feature: false});
 
             $scope.featureValid = true;
         };
@@ -261,6 +309,7 @@ angular.module('udm.edit')
             if($scope.creatingNewLernFeature){
                 $scope.editLernLektion.lernFeature.push($scope.editLernFeature);
             }
+            $scope.clearMapView();
             $scope.editLernFeature = null;
             $scope.featureEditing = false;
 
@@ -270,6 +319,7 @@ angular.module('udm.edit')
         $scope.deleteLernFeature = function(index){
 
             if($scope.editLernFeature && ($scope.editLernLektion.lernFeature[index].id == $scope.editLernFeature.id)){
+                $scope.clearMapView();
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
             }
@@ -284,6 +334,7 @@ angular.module('udm.edit')
                 $scope.mode = 'list';
             }
             if($scope.mode == 'editLernLektion'){
+                $scope.clearMapView();
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
 
@@ -299,38 +350,10 @@ angular.module('udm.edit')
             $scope.editLernLektion.end = -99999999;
 
             for(var x in $scope.editLernLektion.lernFeature){
-                if($scope.editLernLektion.lernFeature[x].typ == 'infoEinheit'){
-                    if($scope.editLernLektion.lernFeature[x].infoEinheitData){
-                        if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].infoEinheitData.start)
-                            $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].infoEinheitData.start;
-                        if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].infoEinheitData.end)
-                            $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].infoEinheitData.end;
-                    }
-                }
-                if($scope.editLernLektion.lernFeature[x].typ == 'feature'){
-                    if($scope.editLernLektion.lernFeature[x].featureData){
-                        if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].featureData.start)
-                            $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].featureData.start;
-                        if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].featureData.end)
-                            $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].featureData.end;
-                    }
-                }
-                if($scope.editLernLektion.lernFeature[x].typ == 'planVgl'){
-                    if($scope.editLernLektion.lernFeature[x].plan1Data){
-                        if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].plan1Data.start)
-                            $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].plan1Data.start;
-                        if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].plan1Data.end)
-                            $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].plan1Data.end;
-                        if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].plan2Data.start)
-                            $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].plan2Data.start;
-                        if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].plan2Data.end)
-                            $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].plan2Data.end;
-                        if($scope.editLernLektion.lernFeature[x].plan3Data && $scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].plan3Data.start)
-                            $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].plan3Data.start;
-                        if($scope.editLernLektion.lernFeature[x].plan3Data && $scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].plan3Data.end)
-                            $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].plan3Data.end;
-                    }
-                }
+                if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].start)
+                    $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].start;
+                if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].end)
+                    $scope.editLernLektion.end = $scope.editLernLektion.lernFeature[x].end;
             }
 
             if($scope.creatingNewLernLektion){

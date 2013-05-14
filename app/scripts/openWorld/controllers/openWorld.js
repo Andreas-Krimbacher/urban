@@ -26,17 +26,13 @@ angular.module('udm.openWorld')
 
                 $scope.$broadcast('addInfoElements',data.list);
 
-//                showInfoEinheit(data.list[0]);
- //               showInfoEinheit(data.list[1]);
-//                showInfoEinheit(data.list[2]);
-
             }).
             error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
             });
 
-        var showInfoEinheit = function(infoEinheit){
+        var showInfoEinheit = function(infoEinheit,editMode){
 
             for(var x in infoEinheitenInMap){
                 if(infoEinheitenInMap[x] == infoEinheit.id){
@@ -79,12 +75,11 @@ angular.module('udm.openWorld')
 
                     infoEinheit.selected = false;
 
-                    $scope.$broadcast('showLayerInList',data.infoEinheit);
-
-
-                    $scope.$broadcast('showInfo',data.infoEinheit);
-                    $scope.panelVisibility.info = true;
+                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,editMode:editMode});
                     $scope.panelVisibility.layerlist = true;
+
+                    $scope.$broadcast('showInfo',{data:data.infoEinheit,editMode:editMode});
+                    $scope.panelVisibility.info = true;
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
@@ -104,7 +99,7 @@ angular.module('udm.openWorld')
             }
             $scope.panelVisibility.info = true;
             $scope.$broadcast('selectItem',{type:'feature', id: feature.attributes.element.id});
-            $scope.$broadcast('showInfo', feature.attributes.element);
+            $scope.$broadcast('showInfo', {data:feature.attributes.element});
         };
 
         $scope.reorderLayers = function(e, ui){
@@ -138,31 +133,36 @@ angular.module('udm.openWorld')
 
         $scope.$on('showInfoPlan', function(e,feature) {
             $scope.panelVisibility.info = true;
-            $scope.$broadcast('showInfo',feature);
+            $scope.$broadcast('showInfo',{data:feature});
         });
 
         $scope.$on('hideInfoBox', function(e,feature) {
             $scope.panelVisibility.info = false;
         });
 
-//        $scope.$on('showInfoEinheitFeature', function(e,info) {
-//            var isInMap = false;
-//            for(var x in infoEinheitenInMap){
-//                if(infoEinheitenInMap[x] == info.infoEinheit){
-//
-//                }
-//            }
-//            if(!isInMap){
-//                $scope.showInfoEinheit({id:info.infoEinheit});
-//            }
-//        });
-
-         $scope.showImageSlider = function(img){
-             $scope.$broadcast('setImg',img);
-             $scope.panelVisibility.imgslider = true;
-         }
+        $scope.showImageSlider = function(img){
+            $scope.$broadcast('setImg',img);
+            $scope.panelVisibility.imgslider = true;
+        }
         $scope.hideImageSlider = function(){
             $scope.panelVisibility.imgslider = false;
         }
+
+        //listeners for lern einheiten modul
+        $scope.$on('showInfoEinheit', function(e,data) {
+            showInfoEinheit({id:data.infoEinheit},true);
+        });
+        $scope.$on('clearMapView', function(e) {
+
+            for(var x in infoEinheitenInMap){
+                layers.removeInfoEinheit(infoEinheitenInMap[x]);
+            }
+            infoEinheitenInMap = [];
+
+            $scope.$broadcast('clearLayerList');
+            $scope.panelVisibility.layerlist = false;
+            $scope.panelVisibility.info = false;
+
+        });
 
     });

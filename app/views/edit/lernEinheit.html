@@ -1,3 +1,9 @@
+<div id="openWorld" class="editLerneinheit" ng-controller="OpenWorldCtrl">
+    <layerlist ng-show="panelVisibility.layerlist"></layerlist>
+    <infobox ng-show="panelVisibility.info"></infobox>
+    <imgslider></imgslider>
+</div>
+
 <div id="editLernEinheit" ng-controller="EditLernEinheitCtrl">
     <div id="editLernEinheitTop">
         <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
