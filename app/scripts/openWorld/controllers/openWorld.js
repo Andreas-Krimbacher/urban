@@ -4,6 +4,8 @@ angular.module('udm.openWorld')
     .controller('OpenWorldCtrl', function ($scope,$http,layers, util) {
 
         $scope.mapClass = 'withTimeline';
+        layers.fetchMap();
+        layers.resetMap();
 
         $scope.panelVisibility = {info : false,
             layerlist : false,
@@ -32,7 +34,7 @@ angular.module('udm.openWorld')
                 // or server returns response with an error status.
             });
 
-        var showInfoEinheit = function(infoEinheit,editMode){
+        var showInfoEinheit = function(infoEinheit,editMode,selectFeature,onlyBase){
 
             for(var x in infoEinheitenInMap){
                 if(infoEinheitenInMap[x] == infoEinheit.id){
@@ -71,15 +73,19 @@ angular.module('udm.openWorld')
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
                         }
+                        if(selectFeature && infoEinheit.features[x].id == selectFeature) selectFeature = infoEinheit.features[x];
                     }
 
                     infoEinheit.selected = false;
 
-                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,editMode:editMode});
+                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,editMode:editMode,onlyBase:onlyBase});
                     $scope.panelVisibility.layerlist = true;
 
                     $scope.$broadcast('showInfo',{data:data.infoEinheit,editMode:editMode});
                     $scope.panelVisibility.info = true;
+
+                    if(!selectFeature)  $scope.$broadcast('selectItem',{type:'infoEinheit',id:infoEinheitenInMap[x]});
+                    else selectFeatureFunc(selectFeature);
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
@@ -100,6 +106,12 @@ angular.module('udm.openWorld')
             $scope.panelVisibility.info = true;
             $scope.$broadcast('selectItem',{type:'feature', id: feature.attributes.element.id});
             $scope.$broadcast('showInfo', {data:feature.attributes.element});
+        };
+
+        var selectFeatureFunc = function(feature){
+            $scope.$broadcast('selectItem',{type:'feature', id: feature.id});
+            $scope.$broadcast('showInfo', {data:feature});
+            if(feature.typ != 'plan' && feature.typ != 'planOverlay') layers.selectfeature(feature);
         };
 
         $scope.reorderLayers = function(e, ui){
@@ -150,7 +162,7 @@ angular.module('udm.openWorld')
 
         //listeners for lern einheiten modul
         $scope.$on('showInfoEinheit', function(e,data) {
-            showInfoEinheit({id:data.infoEinheit},true);
+            showInfoEinheit({id:data.infoEinheit},true,data.feature,data.onlyBase);
         });
         $scope.$on('clearMapView', function(e) {
 

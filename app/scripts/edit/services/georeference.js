@@ -111,7 +111,7 @@ angular.module('udm.edit')
         redrawImageOverlay: function(){
             if(imgLayer) imgLayer.redraw();
         },
-	fetchMap: function(){
+	    fetchMap: function(){
             map = OpenLayersMap.getMap();
         },
         centerImg: function(){

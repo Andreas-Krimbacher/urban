@@ -2,7 +2,7 @@
     <ul ui-sortable="{stop : reorderLayers}" ng-model="layers" class="base">
         <li ng-repeat="item in layers">
             <div class="layerListItem" ng-class="{'selectedItem' :  selectedId == item.baseLayer.id}">
-                <div class="list-title" ng-click="selectItem(item.id,item.baseLayer.id)">{{item.baseLayer.title}}</div>
+                <div class="list-title" ng-click="selectItem(item.id,item.baseLayer.id)">{{item.title}}</div>
                 <slider min='0' max='100' step='1' name='baseLayer_{{item.id}}_{{item.baseLayer.id}}' value='{{item.baseLayer.opacity*100}}'></slider>
                 <div class="placeholder"><div class="button-icon" ng-click="toogleFeatureLayer($index)" ng-show="item.hasFeatureLayer" ng-class="{'selected' : item.featureLayer.visible}"><i class="icon-map-marker"></i></div></div>
                 <div class="button-icon" ng-click="removeInfoEinheit($index)" ng-class="{'disabled':editMode}"><i class="icon-trash"></i></div>

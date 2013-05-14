@@ -51,7 +51,11 @@
             <a  class="button-icon" href="#/edit"><i class="icon-pencil"></i></a>
             <a  class="button-icon" href="#/world"><i class="icon-heart"></i></a>
         </div>
-        <div ng-controller="MainCtrl" ng-view></div>
+
+        <div ng-controller="MainCtrl">
+            <map></map>
+            <div ng-view></div>
+        </div>
     </div>
 
     <script src="components/jquery/jquery.js"></script>

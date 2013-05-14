@@ -13,14 +13,14 @@ angular.module('udm.edit')
         };
 
         $scope.setMode = function(mode){
-		georeference.fetchMap();
+            georeference.fetchMap();
             if($scope.editView == 'georef') $scope.$broadcast('clearGeoref');
-
+            $scope.$broadcast('clearMapView');
             $scope.editView = mode;
         }
 
-        $scope.showInfoEinheitInMap = function(infoEinheit){
-            $scope.$broadcast('showInfoEinheit',infoEinheit);
+        $scope.showInfoEinheitInMap = function(data){
+            $scope.$broadcast('showInfoEinheit',data);
         };
 
         $scope.clearMapView = function(){

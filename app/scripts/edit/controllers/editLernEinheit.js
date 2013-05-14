@@ -160,15 +160,18 @@ angular.module('udm.edit')
                 if(lernFeature.typ == 'infoEinheit') $scope.showInfoEinheitInMap({infoEinheit:lernFeature.infoEinheit,feature: false});
                 if(lernFeature.typ == 'feature') $scope.showInfoEinheitInMap({infoEinheit:lernFeature.infoEinheit,feature: lernFeature.feature});
                 if(lernFeature.typ == 'planVgl'){
-                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan1,feature: false});
-                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan2,feature: false});
-                    if(lernFeature.plan3) $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan3,feature: false});
+                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan1,feature: false,onlyBase : true});
+                    $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan2,feature: false,onlyBase : true});
+                    if(lernFeature.plan3) $scope.showInfoEinheitInMap({infoEinheit:lernFeature.plan3,feature: false,onlyBase : true});
                 }
 
 
                 if(lernFeature.typ == 'feature'){
                     $http.get('/pg/getInfoEinheit/' + lernFeature.infoEinheit).
                         success(function(data, status, headers, config) {
+                            for(var x in data.infoEinheit.features){
+                                if( data.infoEinheit.features[x].typ == 'plan') data.infoEinheit.features.splice(x,1);
+                            }
                             $scope.feature = data.infoEinheit.features;
                         }).
                         error(function(data, status, headers, config) {
@@ -212,6 +215,9 @@ angular.module('udm.edit')
 
             $http.get('/pg/getInfoEinheit/' + $scope.editLernFeature.infoEinheit).
                 success(function(data, status, headers, config) {
+                    for(var x in data.infoEinheit.features){
+                        if( data.infoEinheit.features[x].typ == 'plan') data.infoEinheit.features.splice(x,1);
+                    }
                     $scope.feature = data.infoEinheit.features;
                 }).
                 error(function(data, status, headers, config) {
@@ -241,6 +247,7 @@ angular.module('udm.edit')
                 }
             }
 
+            $scope.clearMapView();
             $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.infoEinheit,feature: $scope.editLernFeature.feature});
 
             $scope.featureValid = true;
@@ -261,7 +268,7 @@ angular.module('udm.edit')
                 }
             }
 
-            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan1,feature: false});
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan1,feature: false,onlyBase : true});
 
         };
 
@@ -282,7 +289,7 @@ angular.module('udm.edit')
                 }
             }
 
-            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan2,feature: false});
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan2,feature: false,onlyBase : true});
 
             $scope.featureValid = true;
         };
@@ -300,7 +307,7 @@ angular.module('udm.edit')
                 }
             }
 
-            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan3,feature: false});
+            $scope.showInfoEinheitInMap({infoEinheit:$scope.editLernFeature.plan3,feature: false,onlyBase : true});
 
             $scope.featureValid = true;
         };

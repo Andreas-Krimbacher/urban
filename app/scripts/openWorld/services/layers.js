@@ -99,7 +99,7 @@ angular.module('udm.openWorld')
 
             tileLayer.setZIndex(zIndex);
 
-            if(!OLmap) OLmap = OpenLayersMap.getMap();
+            //if(!OLmap) OLmap = OpenLayersMap.getMap();
             OLmap.addLayer(tileLayer);
 
             return tileLayer;
@@ -126,8 +126,6 @@ angular.module('udm.openWorld')
             });
 
 
-            if(!OLmap) OLmap = OpenLayersMap.getMap();
-
             var hoverControl = new OpenLayers.Control.SelectFeature(featureLayer,{hover: true,
                 highlightOnly: true,
                 renderIntent: "temporary"
@@ -135,6 +133,8 @@ angular.module('udm.openWorld')
             OLmap.addControl(hoverControl);
             hoverControl.activate();
 
+
+            //only top layer can be selected!!!
             var selectControl = new OpenLayers.Control.SelectFeature(featureLayer,{
                 onSelect:function(feature){
                     feature.attributes.onSelect(feature);
@@ -144,6 +144,8 @@ angular.module('udm.openWorld')
                 }});
             OLmap.addControl(selectControl);
             selectControl.activate();
+
+            featureLayer.selectControl = selectControl;
 
 
             featureLayer.setZIndex(zIndex);
@@ -249,6 +251,22 @@ angular.module('udm.openWorld')
 
         // Public API here
         return {
+            resetMap : function(){
+                OpenLayersMap.resetMap();
+            },
+            fetchMap: function(){
+                OLmap = OpenLayersMap.getMap();
+            },
+            selectfeature : function(feature){
+                for(var x in layerPackages){
+                    for(var y in layerPackages[x].featureLayer.layer.features){
+                        if(layerPackages[x].featureLayer.layer.features[y].attributes.id == feature.id){
+                            layerPackages[x].featureLayer.layer.selectControl.select(layerPackages[x].featureLayer.layer.features[y]);
+                            break;
+                        }
+                    }
+                }
+            },
             addInfoEinheit : function(infoEinheit,position){
 
                 var layerPackage = {};

@@ -39,6 +39,8 @@ angular.module('udm.util')
                             break;
                         }
                     }
+
+                    if(data.onlyBase) scope.toogleFeatureLayer(0);
                 });
 
                 scope.$on('selectItem', function(e,id) {
