@@ -2,6 +2,8 @@
 
 angular.module('udm.edit')
     .controller('EditLernEinheitCtrl', function ($scope,$http,feature,$timeout, util) {
+
+        $scope.topTitle = 'Übersicht';
         $scope.mode = 'list';
 
         $scope.nextLernEinheitId = null;
@@ -57,6 +59,7 @@ angular.module('udm.edit')
 
                 $scope.creatingNewLernEinheit = true;
 
+                $scope.topTitle = 'Lern-Einheit';
                 $scope.mode = 'editLernEinheit';
             }
             else{
@@ -78,6 +81,7 @@ angular.module('udm.edit')
 
                         $scope.creatingNewLernEinheit = false;
 
+                        $scope.topTitle = 'Lern-Einheit';
                         $scope.mode = 'editLernEinheit';
 
                     }).
@@ -122,6 +126,7 @@ angular.module('udm.edit')
                 $scope.featureEditing = false;
                 $scope.creatingNewLernLektion = true;
 
+                $scope.topTitle = 'Lern-Lektion';
                 $scope.mode = 'editLernLektion';
             }
             else{
@@ -130,6 +135,7 @@ angular.module('udm.edit')
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
 
+                $scope.topTitle = 'Lern-Lektion';
                 $scope.mode = 'editLernLektion';
             }
         };
@@ -338,6 +344,7 @@ angular.module('udm.edit')
 
         $scope.back = function(){
             if($scope.mode == 'editLernEinheit'){
+                $scope.topTitle = 'Übersicht';
                 $scope.mode = 'list';
             }
             if($scope.mode == 'editLernLektion'){
@@ -345,6 +352,7 @@ angular.module('udm.edit')
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
 
+                $scope.topTitle = 'Lern-Einheit';
                 $scope.mode = 'editLernEinheit';
             }
         };
@@ -370,6 +378,7 @@ angular.module('udm.edit')
             $scope.editLernLektion = null;
             $scope.featureEditing = false;
 
+            $scope.topTitle = 'Lern-Einheit';
             $scope.mode = 'editLernEinheit';
         };
 
@@ -394,6 +403,7 @@ angular.module('udm.edit')
 
             $http.post('/pg/saveLernEinheit',$scope.editLernEinheit).
                 success(function(data, status, headers, config) {
+                    $scope.topTitle = 'Übersicht';
                     $scope.mode = 'list';
                 }).
                 error(function(data, status, headers, config) {

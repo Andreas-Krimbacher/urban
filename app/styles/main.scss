@@ -1,5 +1,6 @@
 @import "compass_twitter_bootstrap";
 @import "compass/css3";
+@import "compass";
 
 body{
   font-size: 11px;
@@ -50,6 +51,8 @@ textarea {
 $borderRadius: 2px;
 $black : #373737;
 
+$green:  #5bb75b;
+
 @mixin panel{
   background-color: rgba(245,245,245,0.7);
   z-index: 2500;
@@ -57,7 +60,41 @@ $black : #373737;
   @include border-radius($borderRadius);
 }
 
+//glyph big
+
+[class^="glyph-big-"],
+[class*=" glyph-big-"] {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  vertical-align: text-top;
+  background-repeat: no-repeat;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.glyph-big-book{
+  background-image: url("images/glyph-big/book.png");
+}
+.glyph-big-pencil{
+  background-image: url("images/glyph-big/pencil.png");
+}
+.glyph-big-world{
+  background-image: url("images/glyph-big/global.png");
+}
+
 //Overall classes
+
+
+#powerTip{
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-right: 7px !important;
+  padding-left: 7px !important;
+  border-radius: 2px !important;
+}
+
 
 .seperator-line{
   width: auto;
@@ -114,18 +151,33 @@ div.olControlZoom a {
 }
 
 .outOfView{
-  left: -2000px !important;
+ left: -2000px !important;
 }
 
 
 #top-bar{
-  height: 30px;
-  background-color: #5bb75b;
+  height: 40px;
+  background-color: $green; // Old browsers
+  @include filter-gradient($green, #3b773b, vertical); // IE6-9
+  @include background-image(linear-gradient(top, $green 0%,#3b773b 100%));
   font-size: 1.6em;
   line-height: 30px;
   padding-left: 10px;
   font-weight: 700;
-  .button-icon{
+  h2{
+    font-size: 1.5em;
+    display: inline-block;
+    //width: 500px;
+    float: left;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 30px;
+    color: #000000;
+    margin-top: 0px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  a{
     display: inline-block;
     float: right;
     margin-right: 10px;
@@ -138,14 +190,14 @@ div.olControlZoom a {
 
 #map {
   width: 100%;
-  height: 700px;
+  height: 670px;
 }
 map{
   .all{
-    height: 680px !important;
+    height: 670px !important;
   }
   .withTimeline{
-    height: 580px !important;
+    height: 570px !important;
   }
 }
 
@@ -288,7 +340,7 @@ map{
     cursor: pointer;
   }
   .green{
-    background: #5bb75b;
+    background: $green;
   }
 }
 
@@ -296,7 +348,7 @@ map{
 
 #layerswitcher{
   position: absolute;
-  top: 40px;
+  top: 50px;
   left: 50px;
   z-index: 2400;
   a{
@@ -311,7 +363,7 @@ map{
 
 #editNav{
   position: absolute;
-  top: 40px;
+  top: 50px;
   right: 20px;
   z-index: 2500;
 }
@@ -330,11 +382,22 @@ map{
 #editInfoEinheit{
   @include panel;
   position: absolute;
-  top: 80px;
+  top: 90px;
   right: 20px;
   z-index: 2500;
   width: 283px;
   height: 600px;
+  .topBarText{
+    display: inline-block;
+    width: 210px;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-align: center;
+    height: 40px;
+    position: absolute;
+    top: 12px;
+    left: 40px;
+  }
   .back{
     margin-left: 10px;
     margin-top: 10px;
@@ -342,7 +405,7 @@ map{
   .img{
     float: right;
     margin-top: 10px;
-    margin-right: 20px;
+    margin-right: 10px;
   }
   .infoEinheitTable{
     font-weight: 700;
@@ -356,6 +419,10 @@ map{
     }
     .edit{
       margin-top: 18px;
+    }
+    .icon-tags{
+      margin-top: 10px;
+      margin-left: 5px;
     }
   }
   .label{
@@ -504,7 +571,7 @@ map{
   }
   .infotext{
     overflow: hidden;
-    width: 150px;
+    width: 180px;
     padding: 0px;
   }
   .date{
@@ -522,14 +589,26 @@ map{
 
 }
 
+
 #editLernEinheit{
   @include panel;
   position: absolute;
-  top: 80px;
+  top: 90px;
   right: 20px;
   z-index: 2500;
   width: 283px;
   height: 600px;
+  .topBarText{
+    display: inline-block;
+    width: 210px;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-align: center;
+    height: 40px;
+    position: absolute;
+    top: 12px;
+    left: 40px;
+  }
   .back{
     margin-left: 10px;
     margin-top: 10px;
@@ -560,7 +639,7 @@ map{
     }
     .infotext{
       padding: 0px;
-      width: 150px;
+      width: 180px;
       overflow: hidden;
     }
     .icon-book{
@@ -731,7 +810,7 @@ map{
   width: 263px;
   height: 580px;
   position: absolute;
-  top: 80px;
+  top: 90px;
   right: 20px;
   padding: 10px;
   @include panel;
@@ -827,7 +906,6 @@ map{
   }
 }
 
-
 #image-gallery{
   position: absolute;
   top:100px;
@@ -836,14 +914,50 @@ map{
   height: 400px;
   @include panel;
   img{
-    height: 400px;
+    max-height: 100%;
+    max-width: 100%;
   }
   .close-btn{
     position: absolute;
     right: 3px;
     z-index: 2501;
   }
+  .carousel-caption{
+    display: none;
+  }
+  .carousel-control{
+    top: 200px;
+    width: 36px;
+    line-height: 33px;
+    cursor: pointer;
+  }
+  .left{
+    padding-right: 4px;
+  }
+  .right{
+    padding-left: 4px;
+  }
+  .carousel-indicators{
+    position: absolute;
+    top: 10px;
+    z-index: 2501;
+    li{
+      display: block;
+      float: left;
+      width: 10px;
+      height: 10px;
+      margin-left: 5px;
+      text-indent: -999px;
+      background-color: #808080;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .active{
+      background-color: #000000;
+    }
+  }
 }
+
 
 
 //fix
@@ -851,7 +965,6 @@ map{
   background-image: none;
   cursor: default !important;
 }
-
 
 
 #layerlist{
@@ -874,6 +987,8 @@ map{
         width: 110px;
         line-height: 16px;
         font-size: 0.95em;
+        overflow: hidden;
+        white-space: nowrap;
       }
       .ui-slider-handle{
         height: 1em;

@@ -7,15 +7,22 @@ angular.module('udm.util')
             restrict: 'E',
             link: function postLink(scope, element, attrs) {
 
-                scope.$on('setImg', function(e,value) {
-                    $('.wmuSlider').html('<div class="wmuSliderWrapper" id="image-gallery-content"></div>');
-                    for(var img in value){
-                        $('#image-gallery-content').append('<article><img src="'+value[img]+'" /></article>');
-                    }
-                    $('.wmuSlider').wmuSlider({slideshow:false});
-                });
-                //$('#image-gallery-content').append('<article><img src="/imgData/2/sdf.png" /></article>');
+                var host = 'http://localhost:9000';
 
+                scope.myInterval = 'false';
+                scope.slides = [];
+
+                scope.$on('setImg', function(e,value) {
+                    scope.slides = [];
+
+                    for(var img in value){
+                        scope.slides.push({
+                            image: host+ value[img]
+                        });
+                    }
+
+                    if(!scope.$$phase) scope.$digest();
+                });
 
                 scope.close = function(){
                     scope.hideImageSlider(false);

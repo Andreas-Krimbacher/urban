@@ -72,10 +72,17 @@ uploadGeoreference.configure({
 
         var opts = options.imageVersions.jpeg;
 
-        var fileSrc = options.uploadDir() + '/' + fileInfo.name.replace(' ','\\ ');
-        var fileDst = opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(' ','\\ ') + '.' + opts.extname;
+        var oldFileName = options.uploadDir() + '/' + fileInfo.name;
+        var newFileName = options.uploadDir() + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
 
-        var cmd =  'convert '+fileSrc+' -define jpeg:extent=1500kb '+fileDst;
+        fs.renameSync(oldFileName, newFileName);
+
+        fileInfo.name = path.basename(newFileName);
+
+        var fileSrc = newFileName;
+        var fileDst = opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + opts.extname;
+
+        var cmd =  'convert '+fileSrc+' -resize "1500x1500" '+fileDst;
 
         console.log(cmd)
         exec(cmd, function (err, stdout, stderr) {
@@ -89,11 +96,6 @@ uploadGeoreference.configure({
         });
 
     }
-//    getFileList: function(options,callback){
-//        console.log('getFileList');
-//
-//
-//    }
 });
 
 uploadImage.configure({
@@ -107,12 +109,40 @@ uploadImage.configure({
             width: 80,
             height: 80
         }
+    },
+    beforeProcessing: function(options,fileInfo,callback){
+        console.log('pre process - file: '+fileInfo.name);
+
+        var oldFileName = options.uploadDir() + '/' + fileInfo.name;
+        var tmpFileName = options.uploadDir() + '/tmp' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
+        var newFileName = options.uploadDir() + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
+
+        fs.renameSync(oldFileName, tmpFileName);
+
+        fileInfo.name = path.basename(newFileName, path.extname(newFileName)) + '.jpg';
+
+        var fileSrc = tmpFileName;
+        var fileDst = options.uploadDir() + '/' + fileInfo.name;
+
+        var cmd =  'convert '+fileSrc+' -resize "800x400" '+fileDst;
+
+        console.log(cmd)
+        exec(cmd, function (err, stdout, stderr) {
+            if (err) throw err;
+
+            console.log(stdout);
+            console.log(stderr);
+
+            console.log('Converted to jpeg');
+
+            fs.unlink(tmpFileName, function (err) {
+                if (err) console.log('cant delete file ' + tmpFileName);
+            });
+
+            callback();
+        });
+
     }
-//    getFileList: function(options,callback){
-//        console.log('getFileList');
-//
-//
-//    }
 });
 
 var uploadImageFunc = function (req, res, next) {

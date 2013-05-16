@@ -13,8 +13,6 @@ angular.module('udm.edit')
         $scope.CPProcess = false;
         $scope.addCPProcess = false;
 
-        $scope.setFileUploadTarget({name : 'georeferenceUpload', target : 'georeferenceUpload'});
-
         $scope.$on('$viewContentLoaded', function() {
             $('#select2').css({ width: '0px' });
         });
@@ -72,6 +70,7 @@ angular.module('udm.edit')
             if($scope.selectedId == -1){
                 setProcessState(false);
                 $scope.currentImg = false;
+                $scope.setFileUploadTarget({name : 'georeferenceUpload', target : 'georeferenceUpload'});
                 $scope.showFileUpload('georeferenceUpload');
             }
             else if($scope.selectedId >= 0 && $scope.selectedId != ''){

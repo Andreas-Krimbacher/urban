@@ -46,8 +46,8 @@ angular.module('udm.openWorld')
                 graphicZIndex: '${zIndex}',
             },
             "pointOri" : {
-                fillOpacity: 0.8,
-                'pointRadius':30,
+                fillOpacity: 0.7,
+                'pointRadius':25,
                 rotation:"${rot}",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
@@ -88,8 +88,9 @@ angular.module('udm.openWorld')
             },
             "pointOri" : {
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
         };
@@ -129,8 +130,9 @@ angular.module('udm.openWorld')
             },
             "pointOri" : {
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
         };
@@ -171,7 +173,7 @@ angular.module('udm.openWorld')
 
             var tileLayer = new OpenLayers.Layer.TileStream( metaData.tileDB,
                 "http://localhost:8888/", {layername: metaData.tileDB,
-                    minResolution:metaData.TileSet.minRes,
+                    minResolution:0,
                     maxResolution:metaData.TileSet.maxRes,
                     maxExtent:bounds,
                     type:'png',
@@ -283,6 +285,16 @@ angular.module('udm.openWorld')
 
         var addFeatureToLayer = function(feature,layer){
             layer.addFeatures([feature]);
+
+        };
+
+        var addTooltip = function(feature){
+            $('[id="'+feature.feature.geometry.id+'"]').data('powertip', feature.title);
+            $('[id="'+feature.feature.geometry.id+'"]').powerTip({placement:'se',
+                followMouse : true,
+            });
+
+
         };
 
         var setZindexLayer = function(layer,zIndex,type){
@@ -413,6 +425,13 @@ angular.module('udm.openWorld')
                 }
 
                 if(layerPackage.featureLayer.layer) addFeatureLayer(layerPackage.featureLayer.layer);
+
+                for(var x in infoEinheit.features){
+                    if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                        addTooltip(infoEinheit.features[x]);
+                    }
+                }
+
 
                 layerPackages[infoEinheit.id] = layerPackage;
             },

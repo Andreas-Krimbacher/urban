@@ -57,8 +57,8 @@ angular.module('udm.edit')
                 graphicZIndex: '${zIndex}',
             },
             "pointOri" : {
-                fillOpacity: 0.8,
-                'pointRadius':30,
+                fillOpacity: 0.7,
+                'pointRadius':25,
                 rotation:"${rot}",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
@@ -99,8 +99,9 @@ angular.module('udm.edit')
             },
             "pointOri" : {
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
         };
@@ -140,8 +141,9 @@ angular.module('udm.edit')
             },
             "pointOri" : {
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             }
         };
@@ -182,21 +184,23 @@ angular.module('udm.edit')
 
         var featureEditStyleOri = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
-                fillOpacity: 0.8,
-                'pointRadius':30,
+                fillOpacity: 0.7,
+                'pointRadius':25,
                 rotation:"${rot}",
                 externalGraphic: '/styles/images/viewpoint.png'
             }),
             "temporary": new OpenLayers.Style({
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             }),
             "select": new OpenLayers.Style({
                 fillOpacity: 1,
-                'pointRadius':30,
+                'pointRadius':25,
                 rotation:"${rot}",
+                cursor: "pointer",
                 externalGraphic: '/styles/images/viewpoint.png'
             })
         });
@@ -204,6 +208,13 @@ angular.module('udm.edit')
 
     // Public API here
     return {
+        clearAllLayer : function(){
+            baseLayer = null;
+            overlayLayers = [];
+            featureLayer = null;
+            editLayer = null;
+            editOverlayPlanLayer = null;
+        },
         setBaseLayer : function(metaData){
 
             if(baseLayer){

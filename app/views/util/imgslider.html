@@ -1,6 +1,12 @@
 <div id="image-gallery" ng-class="{'outOfView':!panelVisibility.imgslider}">
     <div class="button-icon close-btn" ng-click="close()"><i class="icon-remove"></i></div>
-    <div class="wmuSlider">
-        <div class="wmuSliderWrapper" id="image-gallery-content"></div>
-    </div>
+    <carousel interval="myInterval">
+        <slide ng-repeat="slide in slides" active="slide.active">
+            <img ng-src="{{slide.image}}" style="margin:auto;">
+            <div class="carousel-caption">
+                <h4>Slide {{$index}}</h4>
+                <p>{{slide.text}}</p>
+            </div>
+        </slide>
+    </carousel>
 </div>

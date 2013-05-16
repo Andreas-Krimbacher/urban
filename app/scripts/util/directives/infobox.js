@@ -17,6 +17,8 @@ angular.module('udm.util')
 
               if(!scope.$$phase) scope.$digest();
 
+              //if(scope.info.img) scope.showImgSlider();
+
           });
 
           scope.info = {title : '',desc: ''};

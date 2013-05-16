@@ -78,6 +78,9 @@ module.exports = function(req, res) {
 
         var gcp = queryData.gcp.split('|');
 
+        if (!fs.existsSync(filePaths.georeference.tilesDir))
+            fs.mkdirSync(filePaths.georeference.tilesDir);
+
         // creating tmp directory recursive
         var tmpPath = filePaths.georeference.tilesDir + '/tmp';
         if (!fs.existsSync(tmpPath))

@@ -3,6 +3,7 @@
 angular.module('udm.edit')
     .controller('EditInfoEinheitCtrl', function ($scope,$http,feature, util) {
         $scope.mode = 'list';
+        $scope.topTitle = 'Übersicht'
 
         $scope.nextInfoEinheitId = null;
         $scope.nextFeatureId = null;
@@ -27,6 +28,8 @@ angular.module('udm.edit')
         $scope.modifyProcess = false;
 
         $scope.$emit('$clearMap');
+
+        feature.clearAllLayer();
 
         feature.setFeatureLayer();
         feature.setEditLayer();
@@ -53,6 +56,7 @@ angular.module('udm.edit')
                 $scope.features = [];
                 $scope.creatingNewInfoEinheit = true;
 
+                $scope.topTitle = 'Info-Einheit'
                 $scope.mode = 'editInfoEinheit';
             }
             else{
@@ -85,6 +89,7 @@ angular.module('udm.edit')
 
                         $scope.creatingNewInfoEinheit = false;
 
+                        $scope.topTitle = 'Info-Einheit'
                         $scope.mode = 'editInfoEinheit';
 
                     }).
@@ -123,6 +128,7 @@ angular.module('udm.edit')
                 $scope.editFeature.feature = null;
                 $scope.creatingNewFeature = true;
 
+                $scope.topTitle = 'Info-Feature';
                 $scope.mode = 'editFeature';
             }
             else{
@@ -144,6 +150,7 @@ angular.module('udm.edit')
                             }
 
                             $scope.creatingNewFeature = false;
+                            $scope.topTitle = 'Info-Feature';
                             $scope.mode = 'editFeature';
 
                         }).
@@ -164,6 +171,7 @@ angular.module('udm.edit')
                     feature.addEditFeature($scope.editFeature);
 
                     $scope.creatingNewFeature = false;
+                    $scope.topTitle = 'Info-Feature';
                     $scope.mode = 'editFeature';
                 }
             }
@@ -308,6 +316,7 @@ angular.module('udm.edit')
         $scope.back = function(){
 
             if($scope.mode == 'editInfoEinheit'){
+                $scope.topTitle = 'Übersicht';
                 $scope.mode = 'list';
             }
             if($scope.mode == 'editFeature'){
@@ -326,6 +335,7 @@ angular.module('udm.edit')
                     $scope.hasBaseLayer = false;
                 }
 
+                $scope.topTitle = 'Info-Einheit';
                 $scope.mode = 'editInfoEinheit';
             }
         };
@@ -348,6 +358,7 @@ angular.module('udm.edit')
 
             $http.post('/pg/saveInfoEinheit',$scope.editInfoEinheit).
                 success(function(data, status, headers, config) {
+                    $scope.topTitle = 'Übersicht';
                     $scope.mode = 'list';
                 }).
                 error(function(data, status, headers, config) {
@@ -392,7 +403,7 @@ angular.module('udm.edit')
             if($scope.creatingNewFeature) $scope.features.push($scope.editFeature);
             if($scope.editFeature.typ == 'plan') $scope.hasBaseLayer = true;
 
-
+            $scope.topTitle = 'Info-Einheit';
             $scope.mode = 'editInfoEinheit';
         };
 

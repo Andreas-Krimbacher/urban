@@ -88,7 +88,7 @@ module.exports = function (grunt) {
                     port: 9000,
                     // Change this to '0.0.0.0' to access the server from outside.
                     hostname: 'localhost',
-                    bases: [yeomanConfig.app,'.tmp',FileServer],
+                    bases: [yeomanConfig.app,'.tmp',FileServer,'app/components/angular-ui-bootstrap'],
                     server: path.resolve('app/server/server.js'),
                     watchChanges: true
                     //debug:true

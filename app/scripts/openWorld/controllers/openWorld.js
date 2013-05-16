@@ -97,10 +97,11 @@ angular.module('udm.openWorld')
         var featureSelected = function(feature){
             if(!feature){
                 if(!$scope.$$phase){
-                    $scope.$apply($scope.panelVisibility.info = false);
+                    $scope.$apply($scope.panelVisibility.info = false,$scope.panelVisibility.imgslider = false);
                 }
                 else{
                     $scope.panelVisibility.info = false;
+                    $scope.panelVisibility.imgslider = false
                 }
                 return;
             }
@@ -154,8 +155,9 @@ angular.module('udm.openWorld')
         });
 
         $scope.showImageSlider = function(img){
-            $scope.$broadcast('setImg',img);
             $scope.panelVisibility.imgslider = true;
+            $scope.$broadcast('setImg',img);
+
         }
         $scope.hideImageSlider = function(){
             $scope.panelVisibility.imgslider = false;
@@ -163,6 +165,7 @@ angular.module('udm.openWorld')
 
         //listeners for lern einheiten modul
         $scope.$on('showInfoEinheit', function(e,data) {
+            $scope.panelVisibility.imgslider = false;
             showInfoEinheit({id:data.infoEinheit},true,data.feature,data.onlyBase);
         });
         $scope.$on('clearMapView', function(e) {

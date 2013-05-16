@@ -1,4 +1,4 @@
-<div id="layerlist">
+<div id="layerlist" style="top:{{130-layers.length*20}}px;">
     <ul ui-sortable="{stop : reorderLayers}" ng-model="layers" class="base">
         <li ng-repeat="item in layers">
             <div class="layerListItem" ng-class="{'selectedItem' :  selectedId == item.baseLayer.id}">

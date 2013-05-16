@@ -19,7 +19,6 @@ angular.module('udm.map')
             _currentBasempas = _basemaps[id];
         }
 
-
         // Public API here
         return {
             getMap : function(){
@@ -28,7 +27,7 @@ angular.module('udm.map')
             createMap : function (divId) {
                 var options = {
                     projection: "EPSG:900913",
-                    units: 'm'
+                    units: 'm',
                 };
                 map = new OpenLayers.Map(divId,options);
 
@@ -41,25 +40,26 @@ angular.module('udm.map')
                 if(!offline){
                     var gphy = new OpenLayers.Layer.Google(
                         "Google Physical",
-                        {type: google.maps.MapTypeId.TERRAIN}
+                        {type: google.maps.MapTypeId.TERRAIN},
+                        {numZoomLevels: 19}
                     );
                     _basemaps.gphy = {name:'Google Gelände',map:gphy,active:false};
 
                     var gmap = new OpenLayers.Layer.Google(
                         "Google Streets",
-                        {numZoomLevels: 20}
+                        {numZoomLevels: 19}
                     );
                     _basemaps.gmap = {name:'Google Streets',map:gmap,active:false};
 
                     var ghyb = new OpenLayers.Layer.Google(
                         "Google Hybrid",
-                        {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+                        {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 19}
                     );
                     _basemaps.ghyb = {name:'Google Hybrid',map:ghyb,active:false};
 
                     var gsat = new OpenLayers.Layer.Google(
                         "Google Satellite",
-                        {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+                        {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19}
                     );
                     _basemaps.gsat = {name:'Google Luftbild',map:gsat,active:false};
 

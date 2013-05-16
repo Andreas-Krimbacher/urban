@@ -2,14 +2,16 @@
 
     <div id="editInfoEinheitTop">
         <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
+        <div class="topBarText">{{topTitle}}</div>
         <div class="button-icon img" ng-click="uploadImg()"><i class="icon-picture" ng-show="mode != 'list'"></i></div>
     </div>
 
     <table class="table table-striped infoEinheitTable" ng-show="mode=='list'">
         <tr>
-            <td colspan="2"><input type="text" name="input" placeholder="Neue Info-Einheit …" ng-model="newInfoEinheitTitle" required></td><td><div class="button-icon" ng-click="editInfoEinheitMode(-1)"><i class="icon-plus"></i></div></td>
+            <td colspan="3"><input type="text" name="input" placeholder="Neue Info-Einheit …" ng-model="newInfoEinheitTitle" required></td><td><div class="button-icon" ng-click="editInfoEinheitMode(-1)"><i class="icon-plus"></i></div></td>
         </tr>
         <tr ng-repeat="item in infoEinheiten">
+            <td><i class="icon-tags icon"></i></td>
             <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
             <td class="noPadding"><div class="button-icon edit" ng-click="editInfoEinheitMode($index)"><i class="icon-pencil"></i></div></td>
             <td><div class="button-icon trash" ng-click="deleteInfoEinheit($index)"><i class="icon-trash"></i></div></td>
