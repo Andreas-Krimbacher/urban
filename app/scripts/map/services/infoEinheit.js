@@ -1,15 +1,13 @@
 'use strict';
 
-angular.module('udm.openWorld')
-    .factory('layers', function (OpenLayersMap) {
+angular.module('udm.map')
+    .factory('mapInfoEinheit', function (OpenLayersMap) {
 
         var layerPackages = {};
 
         var nextZindexTop = 1000;
 
         var OLmap = OpenLayersMap.getMap();
-
-
 
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style(),
@@ -25,7 +23,7 @@ angular.module('udm.openWorld')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "poly": {
                 strokeColor:'${color}',
@@ -34,7 +32,7 @@ angular.module('udm.openWorld')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "line" : {
                 strokeColor:'${color}',
@@ -43,7 +41,7 @@ angular.module('udm.openWorld')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "pointOri" : {
                 fillOpacity: 0.7,
@@ -197,7 +195,6 @@ angular.module('udm.openWorld')
 
             tileLayer.setZIndex(zIndex);
 
-            //if(!OLmap) OLmap = OpenLayersMap.getMap();
             OLmap.addLayer(tileLayer);
 
             return tileLayer;
@@ -291,7 +288,7 @@ angular.module('udm.openWorld')
         var addTooltip = function(feature){
             $('[id="'+feature.feature.geometry.id+'"]').data('powertip', feature.title);
             $('[id="'+feature.feature.geometry.id+'"]').powerTip({placement:'se',
-                followMouse : true,
+                followMouse : true
             });
 
 
@@ -361,9 +358,6 @@ angular.module('udm.openWorld')
         return {
             resetMap : function(){
                 OpenLayersMap.resetMap();
-            },
-            fetchMap: function(){
-                OLmap = OpenLayersMap.getMap();
             },
             selectfeature : function(feature){
                 for(var x in layerPackages){
@@ -456,11 +450,32 @@ angular.module('udm.openWorld')
                     delete layerPackages[id];
                 }
             },
+            removeAllInfoEinheiten : function(){
+                for(var id in layerPackages){
+                    for(var x in layerPackages[id].baseLayer){
+                        removeTileLayer(layerPackages[id].baseLayer[x].layer);
+                    }
+                    for(var x in layerPackages[id].overlayLayer){
+                        removeTileLayer(layerPackages[id].overlayLayer[x].layer);
+                    }
+                    if(layerPackages[id].featureLayer.layer) removeFeatureLayer(layerPackages[id].featureLayer.layer);
+
+                    nextZindexTop = 200;
+                    for(var x in layerPackages){
+                        if((layerPackages[x] != layerPackages[id]) && nextZindexTop < layerPackages[x].zIndexBase)
+                            nextZindexTop = layerPackages[x].zIndexBase;
+                    }
+                    if(nextZindexTop < 900) nextZindexTop = 900;
+                    nextZindexTop = nextZindexTop + 100;
+
+                    delete layerPackages[id];
+                }
+            },
             setOpacity : function(typ,infoEinheitId,featureId,value){
                 if(layerPackages[infoEinheitId] && layerPackages[infoEinheitId][typ] && layerPackages[infoEinheitId][typ][featureId])
                     layerPackages[infoEinheitId][typ][featureId].layer.setOpacity(value);
             },
-            toogleVisibility : function(typ,infoEinheitId,featureId){
+            toggleVisibility : function(typ,infoEinheitId){
                 if(typ == 'featureLayer')
                     if(layerPackages[infoEinheitId] && layerPackages[infoEinheitId].featureLayer.layer){
                         layerPackages[infoEinheitId].featureLayer.layer.setVisibility(!layerPackages[infoEinheitId].featureLayer.layer.getVisibility());
@@ -538,8 +553,6 @@ angular.module('udm.openWorld')
 
                 setZindexPackage(layerPackages[id],type);
             },
-
-
             removeTileLayer : function(tileLayer){
                 OLmap.removeLayer(tileLayer);
             },

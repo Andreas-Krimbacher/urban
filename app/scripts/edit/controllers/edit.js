@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('udm.edit')
-    .controller('EditCtrl', function ($scope,$dialog,georeference) {
+    .controller('EditCtrl', function ($scope,OpenLayersMap) {
+        OpenLayersMap.resetMap();
+
         $scope.editView = 'infoEinheit';
 
         $scope.showFileUpload = function(type) {
@@ -13,18 +15,12 @@ angular.module('udm.edit')
         };
 
         $scope.setMode = function(mode){
-            georeference.fetchMap();
-            if($scope.editView == 'georef') $scope.$broadcast('clearGeoref');
-            $scope.$broadcast('clearMapView');
+            OpenLayersMap.resetMap();
             $scope.editView = mode;
-        }
+        };
 
         $scope.showInfoEinheitInMap = function(data){
             $scope.$broadcast('showInfoEinheit',data);
         };
-
-        $scope.clearMapView = function(){
-            $scope.$broadcast('clearMapView');
-        }
 
     });

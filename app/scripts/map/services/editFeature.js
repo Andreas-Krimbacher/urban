@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('udm.edit')
-  .factory('feature', function (OpenLayersMap) {
+angular.module('udm.map')
+  .factory('mapEditFeature', function (OpenLayersMap) {
 
         var baseLayer = null;
         var overlayLayers = [];
@@ -19,7 +19,7 @@ angular.module('udm.edit')
         };
         var featureAddedCallback = null;
 
-        var map = OpenLayersMap.getMap();
+        var OLmap = OpenLayersMap.getMap();
 
 
         var featureStyle = new OpenLayers.StyleMap({
@@ -36,7 +36,7 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "poly": {
                 strokeColor:'${color}',
@@ -45,7 +45,7 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "line" : {
                 strokeColor:'${color}',
@@ -54,7 +54,7 @@ angular.module('udm.edit')
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
-                graphicZIndex: '${zIndex}',
+                graphicZIndex: '${zIndex}'
             },
             "pointOri" : {
                 fillOpacity: 0.7,
@@ -218,7 +218,7 @@ angular.module('udm.edit')
         setBaseLayer : function(metaData){
 
             if(baseLayer){
-                map.removeLayer(baseLayer);
+                OLmap.removeLayer(baseLayer);
             }
 
             var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
@@ -239,10 +239,10 @@ angular.module('udm.edit')
 
             baseLayer.setZIndex(100);
 
-            map.addLayer(baseLayer);
+            OLmap.addLayer(baseLayer);
         },
         removeBaseLayer : function(){
-            if(baseLayer) map.removeLayer(baseLayer);
+            if(baseLayer) OLmap.removeLayer(baseLayer);
             baseLayer = null;
         },
         addOverlayLayer : function(metaData){
@@ -268,12 +268,12 @@ angular.module('udm.edit')
 
             overlayLayers.push({layer: overlayLayer, name : metaData.tileDB});
 
-            map.addLayer(overlayLayer);
+            OLmap.addLayer(overlayLayer);
         },
         removeOverlayLayer : function(metaData){
           for(var x in overlayLayers){
               if(overlayLayers[x].name == metaData.tileDB){
-                  map.removeLayer(overlayLayers[x].layer);
+                  OLmap.removeLayer(overlayLayers[x].layer);
                   overlayLayers.splice(x,1);
               }
           }
@@ -281,7 +281,7 @@ angular.module('udm.edit')
         },
         removeAllOverlayLayer : function(metaData){
             for(var x in overlayLayers){
-                    map.removeLayer(overlayLayers[x].layer);
+                    OLmap.removeLayer(overlayLayers[x].layer);
             }
             overlayLayers = [];
 
@@ -289,7 +289,7 @@ angular.module('udm.edit')
         setEditOverlayPlanLayer : function(metaData){
 
             if(editOverlayPlanLayer){
-                map.removeLayer(editOverlayPlanLayer);
+                OLmap.removeLayer(editOverlayPlanLayer);
             }
 
             var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
@@ -310,16 +310,16 @@ angular.module('udm.edit')
 
             editOverlayPlanLayer.setZIndex(250);
 
-            map.addLayer(editOverlayPlanLayer);
+            OLmap.addLayer(editOverlayPlanLayer);
         },
         removeEditOverlayPlanLayer : function(){
-            if(editOverlayPlanLayer) map.removeLayer(editOverlayPlanLayer);
+            if(editOverlayPlanLayer) OLmap.removeLayer(editOverlayPlanLayer);
             editOverlayPlanLayer = null;
         },
         setFeatureLayer : function(){
 
             if(featureLayer){
-                map.removeLayer(featureLayer);
+                OLmap.removeLayer(featureLayer);
             }
 
             featureLayer = new OpenLayers.Layer.Vector("Features",{
@@ -329,7 +329,7 @@ angular.module('udm.edit')
 
             featureLayer.setZIndex(300);
 
-            map.addLayer(featureLayer);
+            OLmap.addLayer(featureLayer);
 
         },
         addFeature : function(feature){
@@ -341,13 +341,13 @@ angular.module('udm.edit')
             if(featureLayer) featureLayer.removeFeatures([feature]);
 
         },
-        removeAllFeatures : function(feature){
+        removeAllFeatures : function(){
             if(featureLayer) featureLayer.removeAllFeatures();
 
         },
         setEditLayer : function(){
             if(editLayer){
-                map.removeLayer(editLayer);
+                OLmap.removeLayer(editLayer);
             }
 
             editLayer = new OpenLayers.Layer.Vector("Edit",{
@@ -357,7 +357,7 @@ angular.module('udm.edit')
 
             editLayer.setZIndex(400);
 
-            map.addLayer(editLayer);
+            OLmap.addLayer(editLayer);
 
 
 
@@ -370,13 +370,13 @@ angular.module('udm.edit')
                     OpenLayers.Handler.Polygon,{featureAdded : featureAdded})
             };
 
-            map.addControl(drawControl.point);
-            map.addControl(drawControl.line);
-            map.addControl(drawControl.poly);
+            OLmap.addControl(drawControl.point);
+            OLmap.addControl(drawControl.line);
+            OLmap.addControl(drawControl.poly);
 
             modifyControl = new OpenLayers.Control.ModifyFeature(editLayer);
 
-            map.addControl(modifyControl);
+            OLmap.addControl(modifyControl);
 
         },
         addEditFeature : function(feature){

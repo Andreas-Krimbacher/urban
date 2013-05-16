@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.map')
-  .controller('MapCtrl', function ($scope,$rootScope,OpenLayersMap,layers) {
+  .controller('MapCtrl', function ($scope,$rootScope,OpenLayersMap) {
         OpenLayersMap.createMap('map');
         OpenLayersMap.setCenter(2.3408,48.8567,14);
 

@@ -9,16 +9,11 @@ angular.module('udm.util')
 
           scope.$on('showInfo', function(e,info) {
 
-
               scope.info = info.data;
               if(scope.info.info == 'null') scope.info.info = '';
-
-              scope.editMode = info.editMode;
+              scope.editMode = info.mode;
 
               if(!scope.$$phase) scope.$digest();
-
-              //if(scope.info.img) scope.showImgSlider();
-
           });
 
           scope.info = {title : '',desc: ''};

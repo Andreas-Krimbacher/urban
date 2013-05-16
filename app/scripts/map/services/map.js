@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.map')
-    .factory('OpenLayersMap', function ($rootScope) {
+    .factory('OpenLayersMap', function () {
         // Service logic
         var map = null;
         var offline = false;
@@ -95,6 +95,17 @@ angular.module('udm.map')
                 for (var i = map.layers.length-1; i >= 0; i--){
                     if(!map.layers[i].isBaseLayer) map.removeLayer(map.layers[i]);
                 }
+                for (var i = map.controls.length-1; i >= 0; i--){
+
+                    if(map.controls[i].displayClass != 'olControlNavigation' && map.controls[i].displayClass != 'olControlZoom'){
+                        map.controls[i].deactivate();
+                        map.removeControl(map.controls[i]);
+                    }
+                }
+
+                map.events.remove('zoomend');
+                map.events.remove('movestart');
+                map.events.remove('move');
             }
         }
     });

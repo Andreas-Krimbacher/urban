@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('udm.edit')
-    .controller('EditInfoEinheitCtrl', function ($scope,$http,feature, util) {
+    .controller('EditInfoEinheitCtrl', function ($scope,$http,mapEditFeature, util) {
         $scope.mode = 'list';
         $scope.topTitle = 'Übersicht'
 
@@ -27,12 +27,10 @@ angular.module('udm.edit')
         $scope.addProcess = false;
         $scope.modifyProcess = false;
 
-        $scope.$emit('$clearMap');
+        mapEditFeature.clearAllLayer();
 
-        feature.clearAllLayer();
-
-        feature.setFeatureLayer();
-        feature.setEditLayer();
+        mapEditFeature.setFeatureLayer();
+        mapEditFeature.setEditLayer();
 
         $http.get('/pg/getInfoEinheitenList').
             success(function(data, status, headers, config) {
@@ -74,15 +72,15 @@ angular.module('udm.edit')
                             if($scope.features[x].info == 'null') $scope.features[x].info = '';
 
                             if($scope.features[x].typ == 'plan'){
-                                feature.setBaseLayer($scope.features[x].feature);
+                                mapEditFeature.setBaseLayer($scope.features[x].feature);
                                 $scope.hasBaseLayer = true;
                             }
                             else if($scope.features[x].typ == 'planOverlay'){
-                                feature.addOverlayLayer($scope.features[x].feature);
+                                mapEditFeature.addOverlayLayer($scope.features[x].feature);
                             }
                             else{
                                 $scope.features[x].feature = util.WKTToFeature($scope.features[x].feature);
-                                feature.addFeature($scope.features[x].feature);
+                                mapEditFeature.addFeature($scope.features[x].feature);
                             }
 
                         }
@@ -145,8 +143,8 @@ angular.module('udm.edit')
                             $scope.editFeature.plan = $scope.features[index].feature.tileDB;
 
                             if($scope.editFeature.typ == 'planOverlay'){
-                                feature.removeOverlayLayer($scope.editFeature.feature);
-                                feature.setEditOverlayPlanLayer($scope.editFeature.feature);
+                                mapEditFeature.removeOverlayLayer($scope.editFeature.feature);
+                                mapEditFeature.setEditOverlayPlanLayer($scope.editFeature.feature);
                             }
 
                             $scope.creatingNewFeature = false;
@@ -167,8 +165,8 @@ angular.module('udm.edit')
                         $scope.editFeature.feature.attributes.rot = $scope.editFeature.rot;
                     }
 
-                    feature.removeFeature($scope.editFeature.feature);
-                    feature.addEditFeature($scope.editFeature);
+                    mapEditFeature.removeFeature($scope.editFeature.feature);
+                    mapEditFeature.addEditFeature($scope.editFeature);
 
                     $scope.creatingNewFeature = false;
                     $scope.topTitle = 'Info-Feature';
@@ -180,21 +178,21 @@ angular.module('udm.edit')
                     if(value.name == 'rot'){
                         $scope.editFeature.rot = value.value;
                         $scope.editFeature.feature.attributes.rot = value.value;
-                        feature.redrawEditLayer();
+                        mapEditFeature.redrawEditLayer();
                     }
             });
         };
 
         $scope.deleteFeature = function(index){
             if($scope.features[index].typ == 'plan'){
-                feature.removeBaseLayer($scope.features[index].feature);
+                mapEditFeature.removeBaseLayer($scope.features[index].feature);
                 $scope.hasBaseLayer = false;
             }
             else if($scope.features[index].typ == 'planOverlay'){
-                feature.removeOverlayLayer($scope.features[index].feature);
+                mapEditFeature.removeOverlayLayer($scope.features[index].feature);
             }
             else{
-                feature.removeFeature($scope.features[index].feature);
+                mapEditFeature.removeFeature($scope.features[index].feature);
             }
             $scope.featuresToDelete.push($scope.features[index].id);
             $scope.features.splice(index,1);
@@ -214,9 +212,9 @@ angular.module('udm.edit')
             }
 
             $scope.removeFeature();
-            feature.removeEditOverlayPlanLayer();
+            mapEditFeature.removeEditOverlayPlanLayer();
             if($scope.editingBaseLayerFeature){
-                feature.removeBaseLayer();
+                mapEditFeature.removeBaseLayer();
                 $scope.hasBaseLayer = false;
             }
 
@@ -247,10 +245,10 @@ angular.module('udm.edit')
                 }
 
                 if($scope.editFeature.typ == 'plan'){
-                    feature.setBaseLayer(plan);
+                    mapEditFeature.setBaseLayer(plan);
                 }
                 else{
-                    feature.setEditOverlayPlanLayer(plan);
+                    mapEditFeature.setEditOverlayPlanLayer(plan);
                 }
 
                 $scope.editFeature.feature = plan;
@@ -261,12 +259,12 @@ angular.module('udm.edit')
             if(!$scope.editFeature.feature) return;
             $scope.editFeature.color = value.value;
             $scope.editFeature.feature.attributes.color = value.value;
-            feature.redrawEditLayer();
+            mapEditFeature.redrawEditLayer();
         });
 
         $scope.drawFeature = function(){
             $scope.addProcess = true;
-            feature.drawFeature($scope.editFeature.typ, function(element){
+            mapEditFeature.drawFeature($scope.editFeature.typ, function(element){
                 element.attributes.typ = $scope.editFeature.typ;
                 if($scope.editFeature.typ == 'pointOri'){
                     element.attributes.rot = $scope.editFeature.rot;
@@ -274,8 +272,8 @@ angular.module('udm.edit')
                 else{
                     element.attributes.color = $scope.editFeature.color;
                 }
-                feature.stopDrawFeature($scope.editFeature.typ);
-                feature.redrawEditLayer();
+                mapEditFeature.stopDrawFeature($scope.editFeature.typ);
+                mapEditFeature.redrawEditLayer();
                 if(!$scope.$$phase) $scope.$apply($scope.editFeature.feature = element,$scope.addProcess = false);
             });
 
@@ -283,19 +281,19 @@ angular.module('udm.edit')
 
         $scope.cancel = function(){
             if($scope.addProcess){
-                feature.stopDrawFeature($scope.editFeature.typ);
+                mapEditFeature.stopDrawFeature($scope.editFeature.typ);
                 $scope.addProcess = false;
             }
             if($scope.modifyProcess){
-                feature.stopModifyFeature();
+                mapEditFeature.stopModifyFeature();
                 $scope.modifyProcess = false
             }
         };
 
         $scope.removeFeature = function(){
-            feature.removeEditFeature();
-            feature.stopModifyFeature();
-            feature.stopDrawFeature($scope.editFeature.typ);
+            mapEditFeature.removeEditFeature();
+            mapEditFeature.stopModifyFeature();
+            mapEditFeature.stopDrawFeature($scope.editFeature.typ);
             $scope.editFeature.feature = null;
             $scope.addProcess = false;
             $scope.modifyProcess = false;
@@ -303,11 +301,11 @@ angular.module('udm.edit')
 
         $scope.modifyFeature = function(){
             if($scope.modifyProcess){
-                feature.stopModifyFeature();
+                mapEditFeature.stopModifyFeature();
                 $scope.modifyProcess = false;
             }
             else{
-                feature.modifyFeature();
+                mapEditFeature.modifyFeature();
                 $scope.modifyProcess = true;
             }
         };
@@ -322,16 +320,16 @@ angular.module('udm.edit')
             if($scope.mode == 'editFeature'){
 
 
-                feature.removeEditFeature();
-                feature.stopModifyFeature();
-                feature.stopDrawFeature($scope.editFeature.typ);
+                mapEditFeature.removeEditFeature();
+                mapEditFeature.stopModifyFeature();
+                mapEditFeature.stopDrawFeature($scope.editFeature.typ);
                 //$scope.editFeature.feature = null;
                 $scope.addProcess = false;
                 $scope.modifyProcess = false;
-                feature.removeEditOverlayPlanLayer();
+                mapEditFeature.removeEditOverlayPlanLayer();
 
                 if($scope.creatingNewFeature && $scope.editFeature.typ == 'plan'){
-                    feature.removeBaseLayer();
+                    mapEditFeature.removeBaseLayer();
                     $scope.hasBaseLayer = false;
                 }
 
@@ -343,10 +341,10 @@ angular.module('udm.edit')
 
         $scope.save = function(){
 
-            feature.removeBaseLayer();
+            mapEditFeature.removeBaseLayer();
             $scope.hasBaseLayer = false;
-            feature.removeAllOverlayLayer();
-            feature.removeAllFeatures();
+            mapEditFeature.removeAllOverlayLayer();
+            mapEditFeature.removeAllFeatures();
 
             $scope.editInfoEinheit.features =  $scope.features;
             for(var x in $scope.editInfoEinheit.features){
@@ -380,11 +378,11 @@ angular.module('udm.edit')
 
         $scope.saveFeature = function(){
 
-            feature.stopModifyFeature();
-            feature.removeEditFeature();
+            mapEditFeature.stopModifyFeature();
+            mapEditFeature.removeEditFeature();
             $scope.addProcess = false;
             $scope.modifyProcess = false;
-            feature.removeEditOverlayPlanLayer();
+            mapEditFeature.removeEditOverlayPlanLayer();
 
             if($scope.editFeature.typ == 'plan' || $scope.editFeature.typ == 'planOverlay'){
                 for(var x in $scope.editFeature.planList){
@@ -394,10 +392,10 @@ angular.module('udm.edit')
             }
 
             if($scope.editFeature.typ == 'planOverlay'){
-                feature.addOverlayLayer($scope.editFeature.feature);
+                mapEditFeature.addOverlayLayer($scope.editFeature.feature);
             }
             else if($scope.editFeature.typ != 'plan'){
-                feature.addFeature($scope.editFeature.feature);
+                mapEditFeature.addFeature($scope.editFeature.feature);
             }
 
             if($scope.creatingNewFeature) $scope.features.push($scope.editFeature);

@@ -5,7 +5,7 @@
                 <div class="list-title" ng-click="selectItem(item.id,item.baseLayer.id)">{{item.title}}</div>
                 <slider min='0' max='100' step='1' name='baseLayer_{{item.id}}_{{item.baseLayer.id}}' value='{{item.baseLayer.opacity*100}}'></slider>
                 <div class="placeholder"><div class="button-icon" ng-click="toogleFeatureLayer($index)" ng-show="item.hasFeatureLayer" ng-class="{'selected' : item.featureLayer.visible}"><i class="icon-map-marker"></i></div></div>
-                <div class="button-icon" ng-click="removeInfoEinheit($index)" ng-class="{'disabled':editMode}"><i class="icon-trash"></i></div>
+                <div class="button-icon" ng-click="removeInfoEinheit($index)" ng-hide="item.editMode == 'lern'"><i class="icon-trash"></i></div>
             </div>
 
             <ul class="overlay">

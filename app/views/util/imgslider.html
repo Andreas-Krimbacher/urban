@@ -1,8 +1,8 @@
-<div id="image-gallery" ng-class="{'outOfView':!panelVisibility.imgslider}">
+<div id="image-gallery">
     <div class="button-icon close-btn" ng-click="close()"><i class="icon-remove"></i></div>
     <carousel interval="myInterval">
         <slide ng-repeat="slide in slides" active="slide.active">
-            <img ng-src="{{slide.image}}" style="margin:auto;">
+            <img ng-src="{{slide.image}}">
             <div class="carousel-caption">
                 <h4>Slide {{$index}}</h4>
                 <p>{{slide.text}}</p>

@@ -1,9 +1,10 @@
 'use strict';
 
 angular.module('udm.lern')
-    .controller('LernCtrl', function ($scope,$http,layers, util) {
+    .controller('LernCtrl', function ($scope,$http,mapInfoEinheit, util) {
 
         $scope.$emit('$clearMap');
+
 
         $http.get('/pg/getLernEinheitList').
             success(function(data, status, headers, config) {
@@ -55,18 +56,85 @@ angular.module('udm.lern')
             if($scope.currentLektion == ($scope.lernLektionen.length-1) && $scope.currentFeature == ($scope.lernLektionen[$scope.currentLektion].lernFeature.length-1)) $scope.last = true;
         };
 
+
+        var showInfoEinheit = function(infoEinheit,selectFeature){
+
+            $http.get('/pg/getInfoEinheit/'+infoEinheit).
+                success(function(data, status, headers, config) {
+
+                    var infoEinheit = data.infoEinheit;
+
+                    for(var x in infoEinheit.features){
+                        if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                            infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature);
+                            infoEinheit.features[x].feature.attributes.id = infoEinheit.features[x].id;
+                            infoEinheit.features[x].feature.attributes.infoEinheit = infoEinheit.id;
+                            infoEinheit.features[x].feature.attributes.element = infoEinheit.features[x];
+                            infoEinheit.features[x].feature.attributes.typ = infoEinheit.features[x].typ;
+                            infoEinheit.features[x].feature.attributes.rot = infoEinheit.features[x].rot;
+                            infoEinheit.features[x].feature.attributes.onSelect = function(feature){
+                                $scope.$broadcast('featureSelected',feature);
+                            }
+                        }
+                    }
+
+                    mapInfoEinheit.addInfoEinheit(infoEinheit,'top');
+
+                    for(var x in infoEinheit.features){
+                        if(infoEinheit.features[x].typ == 'plan'){
+                            infoEinheit.baseLayer.title = infoEinheit.features[x].title;
+                            infoEinheit.baseLayer.id = infoEinheit.features[x].id;
+                        }
+                        else if(infoEinheit.features[x].typ == 'planOverlay'){
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].title = infoEinheit.features[x].title;
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
+                        }
+                        if(selectFeature && infoEinheit.features[x].id == selectFeature) selectFeature = infoEinheit.features[x];
+                    }
+
+                    infoEinheit.selected = false;
+
+                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,mode:'lern'});
+                    $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: true});
+
+
+                    $scope.$broadcast('showInfo',{data:data.infoEinheit,mode:'lern'});
+                    $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: true});
+
+
+                    if(selectFeature){
+                        $scope.$broadcast('selectItem',{type:'feature', id: selectFeature.id});
+                        $scope.$broadcast('showInfo', {data:selectFeature});
+                        if(selectFeature.typ != 'plan' && selectFeature.typ != 'planOverlay') mapInfoEinheit.selectfeature(selectFeature);
+                    };
+
+                }).
+                error(function(data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+        };
+
         var showFeature = function(lernFeature){
 
-            $scope.$broadcast('clearMapView');
+
+            mapInfoEinheit.removeAllInfoEinheiten();
+
+
+            $scope.$broadcast('clearLayerList');
+            $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: false});
+            $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: false});
+            $scope.$broadcast('toogleInfoControlVisibility',{type:'imgslider',state: false});
 
             $scope.currentLernFeature = lernFeature;
 
-            if(lernFeature.typ == 'infoEinheit') $scope.$broadcast('showInfoEinheit',{infoEinheit:lernFeature.infoEinheit,feature: false});
-            if(lernFeature.typ == 'feature') $scope.$broadcast('showInfoEinheit',{infoEinheit:lernFeature.infoEinheit,feature: lernFeature.feature});
+            if(lernFeature.typ == 'infoEinheit') showInfoEinheit(lernFeature.infoEinheit,false);
+            if(lernFeature.typ == 'feature') showInfoEinheit(lernFeature.infoEinheit,lernFeature.feature);
             if(lernFeature.typ == 'planVgl'){
-                $scope.$broadcast('showInfoEinheit',{infoEinheit:lernFeature.plan1,feature: false,onlyBase : true});
-                $scope.$broadcast('showInfoEinheit',{infoEinheit:lernFeature.plan2,feature: false,onlyBase : true});
-                if(lernFeature.plan3) $scope.$broadcast('showInfoEinheit',{infoEinheit:lernFeature.plan3,feature: false,onlyBase : true});
+                showInfoEinheit(lernFeature.plan1,false);
+                showInfoEinheit(lernFeature.plan2,false);
+                if(lernFeature.plan3) showInfoEinheit(lernFeature.plan3,false);
             }
         };
 

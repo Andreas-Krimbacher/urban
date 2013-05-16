@@ -906,6 +906,7 @@ map{
   }
 }
 
+
 #image-gallery{
   position: absolute;
   top:100px;
@@ -916,6 +917,7 @@ map{
   img{
     max-height: 100%;
     max-width: 100%;
+    margin: auto;
   }
   .close-btn{
     position: absolute;

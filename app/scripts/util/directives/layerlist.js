@@ -10,7 +10,7 @@ angular.module('udm.util')
                 scope.layers = [];
                 scope.selectedId = null;
 
-                scope.editMode = false;
+                scope.editMode = '';
 
                 scope.selectItem = function(infoEinheit,feature){
                     scope.selectedId = feature;
@@ -29,7 +29,8 @@ angular.module('udm.util')
 
                 scope.$on('showLayerInList', function(e,data) {
                     var infoEinheit = data.infoEinheit;
-                    scope.editMode = data.editMode;
+                    scope.editMode = data.mode;
+                    infoEinheit.editMode = data.mode;
 
                     scope.layers.splice(0,0,infoEinheit);
                     if(infoEinheit.baseLayer.id) scope.selectedId = infoEinheit.baseLayer.id;
@@ -69,7 +70,7 @@ angular.module('udm.util')
                 });
 
                 scope.removeInfoEinheit = function(index){
-                    if(scope.editMode) return;
+                    if(scope.editMode == 'lern') return;
                     for(var x in scope.layers[index].features){
                         if(scope.selectedId ==  scope.layers[index].features[x].id){
                             scope.selectedId = null;
