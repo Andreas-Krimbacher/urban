@@ -7,13 +7,16 @@ angular.module('udm.map')
 
         $rootScope.$on('$routeChangeSuccess', function (ev, data) {
             if(data.$$route){
-                if(data.$$route.controller == 'OpenWorldCtrl') $scope.mapClass = 'withTimeline';
-                if(data.$$route.controller == 'EditCtrl') $scope.mapClass = 'all';
-                if(data.$$route.controller == 'LernCtrl') $scope.mapClass = 'withTimeline';
+                if(data.$$route.controller == 'EditCtrl'){
+                    $('.olLayerGoogleCopyright').css('bottom','0px');
+                }
+                else{
+                    $('.olLayerGoogleCopyright').css('bottom','100px');
+                }
             }
         });
 
-        $scope.$on('$clearMap', function (ev, data) {
+        $scope.$on('$clearMap', function () {
             OpenLayersMap.resetMap();
         });
 

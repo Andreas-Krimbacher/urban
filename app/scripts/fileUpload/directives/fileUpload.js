@@ -8,7 +8,7 @@ angular.module('udm.fileUpload')
             scope:{
                 name: '@'
             },
-            link: function postLink(scope, element, attrs) {
+            link: function postLink(scope) {
                 var initialized = false;
                 var target = false;
 
@@ -28,11 +28,9 @@ angular.module('udm.fileUpload')
                     $('#fu-modal-' + scope.name).modal({
                         keyboard: false,
                         backdrop : 'static'
-                    })
-                    $('#fu-modal-' + scope.name).on('hidden', function () {
+                    }).on('hidden', function () {
                         $rootScope.$broadcast('fileUploadFinished',scope.name);
-                    })
-                    $('#fu-modal-' + scope.name).modal('show');
+                    }).modal('show');
                 });
 
                 scope.close = function(){
@@ -42,8 +40,9 @@ angular.module('udm.fileUpload')
                 function setFileUpload(){
                     if(initialized) $('#fileupload-' + scope.name + ' table tbody tr.template-download').remove();
 
+                    var element = $('#fileupload-' + scope.name);
                     // Initialize the jQuery File Upload widget:
-                    $('#fileupload-' + scope.name).fileupload({
+                    element.fileupload({
                         // Uncomment the following to send cross-domain cookies:
                         //xhrFields: {withCredentials: true},
                         dataType: 'json',
@@ -55,9 +54,9 @@ angular.module('udm.fileUpload')
                     $.ajax({
                         // Uncomment the following to send cross-domain cookies:
                         //xhrFields: {withCredentials: true},
-                        url: $('#fileupload-' + scope.name).fileupload('option', 'url'),
+                        url: element.fileupload('option', 'url'),
                         dataType: 'json',
-                        context: $('#fileupload-' + scope.name)[0]
+                        context: element[0]
                     }).done(function (result) {
                             $(this).fileupload('option', 'done')
                                 .call(this, null, {result: result});

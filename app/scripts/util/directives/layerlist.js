@@ -5,7 +5,7 @@ angular.module('udm.util')
         return {
             templateUrl: '../views/util/layerlist.html',
             restrict: 'E',
-            link: function postLink(scope, element, attrs) {
+            link: function postLink(scope) {
 
                 scope.layers = [];
                 scope.selectedId = null;
@@ -13,15 +13,23 @@ angular.module('udm.util')
                 scope.editMode = '';
 
                 scope.selectItem = function(infoEinheit,feature){
+                    if(scope.editMode == 'lernStart') return;
                     scope.selectedId = feature;
-                    for(var x in scope.layers){
+                    var x;
+                    var y;
+                    for(x = 0; x < scope.layers.length; x++){
                         if(scope.layers[x].id == infoEinheit){
-                            for(var y in scope.layers[x].features){
-                                if(scope.layers[x].features[y].id == feature){
-                                    if(scope.layers[x].features[y].typ == 'plan') scope.$emit('showInfoPlan',scope.layers[x]);
-                                    else scope.$emit('showInfoPlan',scope.layers[x].features[y]);
-                                    return;
+                            if(feature){
+                                for(y = 0; y < scope.layers[x].features.length; y++){
+                                    if(scope.layers[x].features[y].id == feature){
+                                        if(scope.layers[x].features[y].typ == 'plan') scope.$emit('showInfoPlan',scope.layers[x]);
+                                        else scope.$emit('showInfoPlan',scope.layers[x].features[y]);
+                                        return;
+                                    }
                                 }
+                            }
+                            else{
+                                scope.$emit('showInfoPlan',scope.layers[x]);
                             }
                         }
                     }
@@ -35,10 +43,7 @@ angular.module('udm.util')
                     scope.layers.splice(0,0,infoEinheit);
                     if(infoEinheit.baseLayer.id) scope.selectedId = infoEinheit.baseLayer.id;
                     else{
-                        for(var x in infoEinheit.features){
-                            scope.selectedId = infoEinheit.features[x].id;
-                            break;
-                        }
+                        scope.selectedId = infoEinheit.features[0].id;
                     }
 
                     if(data.onlyBase) scope.toogleFeatureLayer(0);
@@ -47,18 +52,16 @@ angular.module('udm.util')
                 scope.$on('selectItem', function(e,id) {
                     if(id.type == 'infoEinheit'){
                         var idFound = false;
-                        for(var x in scope.layers){
+                        var x;
+                        for(x = 0; x < scope.layers.length; x++){
                             if(scope.layers[x].id == id.id){
                                 if(scope.layers[x].baseLayer.id){
                                     id.id = scope.layers[x].baseLayer.id;
                                     idFound = true;
                                 }
                                 else{
-                                    for(var y in scope.layers[x].features){
-                                        id.id = scope.layers[x].features[y].id;
+                                        id.id = scope.layers[x].features[0].id;
                                         idFound = true;
-                                        break;
-                                    }
                                 }
                                 break;
                             }
@@ -71,7 +74,8 @@ angular.module('udm.util')
 
                 scope.removeInfoEinheit = function(index){
                     if(scope.editMode == 'lern') return;
-                    for(var x in scope.layers[index].features){
+                    var x;
+                    for(x = 0; x < scope.layers[index].features.length; x++){
                         if(scope.selectedId ==  scope.layers[index].features[x].id){
                             scope.selectedId = null;
                             scope.$emit('hideInfoBox');
@@ -87,7 +91,7 @@ angular.module('udm.util')
                     scope.layers[index].featureLayer.visible = !scope.layers[index].featureLayer.visible;
                 };
 
-                scope.$on('clearLayerList', function(e,id) {
+                scope.$on('clearLayerList', function() {
                     scope.layers = [];
                 });
             }

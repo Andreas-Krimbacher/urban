@@ -1,21 +1,23 @@
-<div id="layerlist" style="top:{{130-layers.length*20}}px;">
-    <ul ui-sortable="{stop : reorderLayers}" ng-model="layers" class="base">
-        <li ng-repeat="item in layers">
-            <div class="layerListItem" ng-class="{'selectedItem' :  selectedId == item.baseLayer.id}">
-                <div class="list-title" ng-click="selectItem(item.id,item.baseLayer.id)">{{item.title}}</div>
-                <slider min='0' max='100' step='1' name='baseLayer_{{item.id}}_{{item.baseLayer.id}}' value='{{item.baseLayer.opacity*100}}'></slider>
-                <div class="placeholder"><div class="button-icon" ng-click="toogleFeatureLayer($index)" ng-show="item.hasFeatureLayer" ng-class="{'selected' : item.featureLayer.visible}"><i class="icon-map-marker"></i></div></div>
-                <div class="button-icon" ng-click="removeInfoEinheit($index)" ng-hide="item.editMode == 'lern'"><i class="icon-trash"></i></div>
-            </div>
+<div class="sortableArea">
+    <div id="layerlist" style="top:{{90-layers.length*20}}px;">
+        <ul ui-sortable="{stop : reorderLayers}" ng-model="layers" class="base">
+            <li ng-repeat="item in layers">
+                <div class="layerListItem" ng-class="{'selectedItem' :  selectedId == item.baseLayer.id}">
+                    <div class="list-title" ng-click="selectItem(item.id,item.baseLayer.id)" ng-class="{'withoutSlider' :  !item.hasBaseLayer}">{{item.title}}</div>
+                    <slider ng-show="$parent.item.hasBaseLayer" min='0' max='100' step='1' name='baseLayer_{{item.id}}_{{item.baseLayer.id}}' value='{{item.baseLayer.opacity*100}}'></slider>
+                    <div class="placeholder"><div class="button-icon" ng-click="toogleFeatureLayer($index)" ng-show="item.hasFeatureLayer" ng-class="{'selected' : item.featureLayer.visible}"><i class="icon-map-marker"></i></div></div>
+                    <div class="button-icon" ng-click="removeInfoEinheit($index)" ng-hide="item.editMode == 'lern' || item.editMode == 'lernStart'"><i class="icon-trash"></i></div>
+                </div>
 
-            <ul class="overlay">
-                <li ng-repeat="overlay in item.overlayLayer">
-                    <div class="layerListItem" ng-class="{'selectedItem' : selectedId == overlay.id}">
-                        <div class="list-title" ng-click="selectItem(item.id,overlay.id)">{{overlay.title}}</div>
-                        <slider min='0' max='100' step='1' name='overlayLayer_{{item.id}}_{{overlay.id}}' value='{{overlay.opacity*100}}'></slider>
-                    </div>
-                </li>
-            </ul>
-        </li>
-    </ul>
+                <ul class="overlay">
+                    <li ng-repeat="overlay in item.overlayLayer">
+                        <div class="layerListItem" ng-class="{'selectedItem' : selectedId == overlay.id}">
+                            <div class="list-title" ng-click="selectItem(item.id,overlay.id)">{{overlay.title}}</div>
+                            <slider min='0' max='100' step='1' name='overlayLayer_{{item.id}}_{{overlay.id}}' value='{{overlay.opacity*100}}'></slider>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>

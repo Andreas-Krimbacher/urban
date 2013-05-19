@@ -19,9 +19,10 @@ angular.module('udm.edit')
 
         function getImgList(){
             $http.get('/fs',{params: {action:'georeferenceFileList'}}).
-                success(function(data, status, headers, config) {
+                success(function(data) {
                     $scope.items = [{id:-1,text:'Upload'}];
-                    for(var x in data){
+                    var x;
+                    for(x=0; x < data.length; x++){
                         $scope.items.push({id:+x+1,text:data[x].name, path : data[x].path,width:1000,height:500, scale : 1,realWidth:data[x].width,realHeight:data[x].height, rot:0,opacity:1});
                     }
                     $scope.selectedId = '';
@@ -96,7 +97,7 @@ angular.module('udm.edit')
         });
 
         $scope.addCP = function(){
-            if($scope.resultDisplayed) return;
+            if($scope.resultDisplayed || $scope.addCPProcess) return;
             if(!$scope.CPProcess){
                 setProcessState(true);
             }
@@ -104,10 +105,22 @@ angular.module('udm.edit')
             mapGeoreference.redrawImageOverlay();
             $scope.addCPProcess = true;
             mapGeoreference.createCP($scope.currentImg,function(point){
+                if(!point){
+                    $scope.addCPProcess = false;
+                    if($scope.continousEditing){
+                        $scope.addCP();
+                    }
+                    return;
+                }
                 if(!$scope.$$phase) $scope.$apply($scope.CP.push(point));
-                if($scope.continousEditing) $scope.addCP();
+                else $scope.CP.push(point);
+                if($scope.continousEditing){
+                    $scope.addCPProcess = false;
+                    $scope.addCP();
+                }
                 else{
                     if(!$scope.$$phase) $scope.$apply($scope.addCPProcess = false);
+                    else $scope.addCPProcess = false;
                 }
             },function(){
                 if(!$scope.$$phase) $scope.$digest();
@@ -130,7 +143,15 @@ angular.module('udm.edit')
             }
         }
 
-        $scope.cancelCP = function(index){
+        $scope.mouseEnter = function(id){
+            mapGeoreference.highlightCP(id);
+        };
+
+        $scope.mouseLeave = function(id){
+            mapGeoreference.unhighlightCP(id);
+        };
+
+        $scope.cancelCP = function(){
             if($scope.resultDisplayed) return;
             mapGeoreference.cancelCP();
             $scope.addCPProcess = false;
@@ -166,7 +187,8 @@ angular.module('udm.edit')
             $scope.addCPProcess = false;
 
             var gcp = '';
-            for(var x in $scope.CP){
+            var x;
+            for(x = 0; x < $scope.CP.length; x++){
                 gcp += $scope.CP[x].imgPoint.pixel + ',' + $scope.CP[x].imgPoint.line + ',' + $scope.CP[x].worldPoint.lon + ',' + $scope.CP[x].worldPoint.lat;
                 if(x < $scope.CP.length-1) gcp += '|';
             }
@@ -177,7 +199,7 @@ angular.module('udm.edit')
 
 
             $http.get('/geo',{params: params}).
-                success(function(data, status, headers, config) {
+                success(function(data) {
                     $scope.showResult(data);
                 }).
                 error(function(data, status, headers, config) {
@@ -193,7 +215,7 @@ angular.module('udm.edit')
             mapGeoreference.hideEditLayers();
 
             $scope.currentImg.opacity = 1;
-            if(!$scope.$$phase) $scope.$digest()
+            if(!$scope.$$phase) $scope.$digest();
             mapGeoreference.showResultLayer(metaData);
 
             $scope.resultDisplayed = true;
@@ -219,7 +241,7 @@ angular.module('udm.edit')
 
         $scope.save = function(){
             $http.get('/geo',{params: {action:'save',tileDB:metaData.tileDB}}).
-                success(function(data, status, headers, config) {
+                success(function() {
                     $scope.reset();
                 }).
                 error(function(data, status, headers, config) {
@@ -229,7 +251,7 @@ angular.module('udm.edit')
         };
 
 
-        $scope.reset = function(metaData){
+        $scope.reset = function(){
             mapGeoreference.destroyResultLayer();
             mapGeoreference.destroyEditLayers();
             setProcessState(false);

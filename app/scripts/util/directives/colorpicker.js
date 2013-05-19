@@ -13,10 +13,10 @@ angular.module('udm.util')
 
           var colorpickerCreated = false;
 
-          attrs.$observe('color', function(changedValue){
+          attrs.$observe('color', function(){
               processChange()
           });
-          attrs.$observe('name', function(changedValue){
+          attrs.$observe('name', function(){
               processChange()
           });
 
@@ -29,8 +29,6 @@ angular.module('udm.util')
 
           function createColorPicker(){
 
-              var firstChange = true;
-
               var name = scope.name;
               var color = scope.color;
 
@@ -40,7 +38,7 @@ angular.module('udm.util')
                   theme: 'bootstrap',
                   swatchPosition: 'right',
                   position : 'left',
-                  change: function(hex, opacity) {
+                  change: function(hex) {
                       scope.$emit('colorpickerChanged',{value:hex,name:name});
                   }
               });

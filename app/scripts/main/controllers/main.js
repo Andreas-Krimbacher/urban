@@ -3,6 +3,7 @@
 angular.module('udm')
   .controller('MainCtrl', function ($scope,$location,$route,OpenLayersMap) {
         $scope.setRoute = function(path){
+            OpenLayersMap.setNumZoomLevel(18);
             $location.path(path);
             $route.reload();
         };

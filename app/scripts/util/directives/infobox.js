@@ -5,12 +5,13 @@ angular.module('udm.util')
     return {
       templateUrl: '../views/util/infobox.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
+      link: function postLink(scope) {
 
           scope.$on('showInfo', function(e,info) {
 
               scope.info = info.data;
               if(scope.info.info == 'null') scope.info.info = '';
+              if(scope.info.lernInfo == 'null') scope.info.lernInfo = false;
               scope.editMode = info.mode;
 
               if(!scope.$$phase) scope.$digest();

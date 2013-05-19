@@ -5,7 +5,7 @@ angular.module('udm.util')
         return {
             template: '<div id="timeline"></div>',
             restrict: 'E',
-            link: function postLink(scope, element, attrs) {
+            link: function postLink(scope) {
 
                 var eventSource = new Timeline.DefaultEventSource();
                 var bandInfos = [
@@ -33,12 +33,12 @@ angular.module('udm.util')
 
                 scope.$on('addInfoElements', function(e,infoElements) {
 
-                    for(var x in infoElements){
+                    var x;
+                    for(x = 0; x < infoElements; x++){
                         infoElements[x].isDuration = false;
                         infoElements[x].caption = infoElements[x].title;
-                        infoElements[x].textColor = 'white';
+                        infoElements[x].textColor = 'black';
                     }
-
 
                     eventSource.loadJSON({events:infoElements},'');
                 });

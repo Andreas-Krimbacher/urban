@@ -8,15 +8,25 @@ var filePaths = require('./filePaths');
 
 
 // http://nodejs.org/api.html#_child_processes
-var sys = require('sys')
+var sys = require('sys');
 var exec = require('child_process').exec;
 var child;
+
+var counter;
+var finish;
 
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
     if(queryData.action == 'georeferenceFileList'){
 
-        var counter = 1;
+        counter = 1;
+
+        finish = function(respond){
+            if (!--counter) {
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.end(JSON.stringify(respond));
+            }
+        };
 
         fs.readdir(filePaths.georeference.jpegDir + '/',function(err,files){
             if(err){
@@ -26,19 +36,13 @@ module.exports = function(req, res) {
 
             var respond = [];
 
-            for(var x in files){
+            var x;
+            for(x = 0; x < files.length; x++){
                 if(path.extname(files[x]) == '.jpeg') respond.push({name: files[x], path:filePaths.georeference.serverJpegUrl + '/' + files[x]});
                 getImgSize(respond,x);
             }
             finish(respond);
         });
-
-        var finish = function(respond){
-            if (!--counter) {
-                res.writeHead(200, {'Content-Type': 'text/plain'});
-                res.end(JSON.stringify(respond));
-            }
-        };
 
         var getImgSize = function(respond,index){
             counter++;
@@ -57,8 +61,15 @@ module.exports = function(req, res) {
     }
     if(queryData.action == 'planList'){
 
-        var counter = 1;
+        counter = 1;
         var respond = [];
+
+        finish = function(){
+            if (!--counter) {
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.end(JSON.stringify(respond));
+            }
+        };
 
         fs.readdir(filePaths.tiles.baseDir + '/',function(err,files){
             if(err){
@@ -66,20 +77,13 @@ module.exports = function(req, res) {
                 return
             }
 
-            var respond = [];
-
-            for(var x in files){
+            var x;
+            for(x = 0; x < files.length; x++){
                 if(path.extname(files[x]) == '.mbtiles') getMetaData(files[x]);
             }
             finish();
         });
 
-        var finish = function(){
-            if (!--counter) {
-                res.writeHead(200, {'Content-Type': 'text/plain'});
-                res.end(JSON.stringify(respond));
-            }
-        };
 
         var getMetaData = function(name){
             counter++;

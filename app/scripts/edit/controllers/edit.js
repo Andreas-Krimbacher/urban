@@ -4,7 +4,7 @@ angular.module('udm.edit')
     .controller('EditCtrl', function ($scope,OpenLayersMap) {
         OpenLayersMap.resetMap();
 
-        $scope.editView = 'infoEinheit';
+        $scope.editView = 'lernEinheit';
 
         $scope.showFileUpload = function(type) {
             $scope.$broadcast('showFileUpload',type);
@@ -16,6 +16,10 @@ angular.module('udm.edit')
 
         $scope.setMode = function(mode){
             OpenLayersMap.resetMap();
+
+            if(mode == 'georef') OpenLayersMap.setNumZoomLevel(18);
+            else OpenLayersMap.setNumZoomLevel(18);
+
             $scope.editView = mode;
         };
 

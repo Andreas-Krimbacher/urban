@@ -30,7 +30,7 @@ uploadGeoreference.configure({
                     height: opts.height,
                     src: options.imageVersions.jpeg.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + options.imageVersions.jpeg.extname,
                     dst: opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + opts.extname
-                },function(err, stdout, stderr) {
+                },function(err) {
                     if (err) throw err;
                     console.log('Converted to thumbnail');
                     callback();
@@ -59,7 +59,7 @@ uploadGeoreference.configure({
 
                 easyimg.convert({src:options.uploadDir() + '/' + fileInfo.name,
                         dst:opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + opts.extname},
-                    function(err, stdout, stderr) {
+                    function(err) {
                         if (err) throw err;
                         console.log('Converted to tiff');
                         callback();
@@ -73,18 +73,17 @@ uploadGeoreference.configure({
         var opts = options.imageVersions.jpeg;
 
         var oldFileName = options.uploadDir() + '/' + fileInfo.name;
-        var newFileName = options.uploadDir() + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
+        var fileSrc = options.uploadDir() + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
 
-        fs.renameSync(oldFileName, newFileName);
+        fs.renameSync(oldFileName, fileSrc);
 
-        fileInfo.name = path.basename(newFileName);
+        fileInfo.name = path.basename(fileSrc);
 
-        var fileSrc = newFileName;
         var fileDst = opts.dir + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)) + '.' + opts.extname;
 
         var cmd =  'convert '+fileSrc+' -resize "1500x1500" '+fileDst;
 
-        console.log(cmd)
+        console.log(cmd);
         exec(cmd, function (err, stdout, stderr) {
             if (err) throw err;
 
@@ -114,19 +113,18 @@ uploadImage.configure({
         console.log('pre process - file: '+fileInfo.name);
 
         var oldFileName = options.uploadDir() + '/' + fileInfo.name;
-        var tmpFileName = options.uploadDir() + '/tmp' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
+        var fileSrc = options.uploadDir() + '/tmp' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
         var newFileName = options.uploadDir() + '/' + path.basename(fileInfo.name, path.extname(fileInfo.name)).replace(/\s/g,'_').replace(/\W/g, '_')  + path.extname(fileInfo.name);
 
-        fs.renameSync(oldFileName, tmpFileName);
+        fs.renameSync(oldFileName, fileSrc);
 
         fileInfo.name = path.basename(newFileName, path.extname(newFileName)) + '.jpg';
 
-        var fileSrc = tmpFileName;
         var fileDst = options.uploadDir() + '/' + fileInfo.name;
 
         var cmd =  'convert '+fileSrc+' -resize "800x400" '+fileDst;
 
-        console.log(cmd)
+        console.log(cmd);
         exec(cmd, function (err, stdout, stderr) {
             if (err) throw err;
 
@@ -135,8 +133,8 @@ uploadImage.configure({
 
             console.log('Converted to jpeg');
 
-            fs.unlink(tmpFileName, function (err) {
-                if (err) console.log('cant delete file ' + tmpFileName);
+            fs.unlink(fileSrc, function (err) {
+                if (err) console.log('cant delete file ' + fileSrc);
             });
 
             callback();

@@ -343,7 +343,15 @@ Timeline.OriginalEventPainter.prototype.paintPreciseDurationEvent = function(evt
     
     var labelDivClassName = this._getLabelDivClassName(evt);
     var labelSize = this._frc.computeSize(text, labelDivClassName);
-    var labelLeft = startPixel + theme.event.label.leftMargin; //changed: add left offset to title
+
+    if(((endPixel-startPixel) - labelSize.width - 2*theme.event.label.leftMargin) < 0){
+        var labelLeft = endPixel + theme.event.label.leftMargin; //changed: add left offset to title
+    }
+    else{
+        var labelLeft = startPixel + theme.event.label.leftMargin; //changed: add left offset to title
+    }
+
+
     var labelRight = labelLeft + labelSize.width;
     
     var leftEdge = Math.max(labelLeft, startPixel);

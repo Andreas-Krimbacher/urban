@@ -22,6 +22,7 @@ angular.module('udm.edit')
         $scope.newLernEinheitTitle = null;
         $scope.creatingNewLernEinheit = false;
 
+        $scope.newLernLektionTitle = null;
         $scope.editLernLektion = null;
         $scope.creatingNewLernLektion = false;
 
@@ -34,39 +35,61 @@ angular.module('udm.edit')
         $scope.featuresToDelete = [];
         $scope.lektionenToDelete = [];
 
+        mapInfoEinheit.clearAllLayers();
+
 
         //functions to show and hide features in the map -----------------------------------------------------------------
 
-        var showInfoEinheit = function(infoEinheit,selectFeature){
+        var showInfoEinheit = function(infoEinheit,selectFeature, visibility){
 
 
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
-                success(function(data, status, headers, config) {
+                success(function(data) {
 
                     var infoEinheit = data.infoEinheit;
 
-                    for(var x in infoEinheit.features){
+                    infoEinheit.hasBaseLayer = false;
+                    infoEinheit.hasFeatureLayer = false;
+
+                    infoEinheit.lernInfo = $scope.editLernFeature.info;
+                    var attr;
+                    var x;
+                    for(x = 0; x < infoEinheit.features.length; x++){
+                        infoEinheit.features[x].lernInfo = $scope.editLernFeature.info;
+                        if(typeof visibility === 'object'){
+                            if(typeof visibility[infoEinheit.features[x].id] !== 'undefined')
+                                infoEinheit.features[x].hideInMap = !visibility[infoEinheit.features[x].id];
+                        }
                         if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
-                            infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature);
-                            infoEinheit.features[x].feature.attributes.id = infoEinheit.features[x].id;
-                            infoEinheit.features[x].feature.attributes.infoEinheit = infoEinheit.id;
-                            infoEinheit.features[x].feature.attributes.element = infoEinheit.features[x];
-                            infoEinheit.features[x].feature.attributes.typ = infoEinheit.features[x].typ;
-                            infoEinheit.features[x].feature.attributes.rot = infoEinheit.features[x].rot;
-                            infoEinheit.features[x].feature.attributes.onSelect = function(feature){
-                                $scope.$broadcast('featureSelected',feature);
-                            }
+
+                            attr = {typ : infoEinheit.features[x].typ,
+                                id : infoEinheit.features[x].id,
+                                infoEinheit : infoEinheit.id,
+                                element : infoEinheit.features[x],
+                                onSelect : function(feature){
+                                    $scope.$broadcast('featureSelected',feature);
+                                }};
+                            if(infoEinheit.features[x].typ == 'pointOri') attr.rot = infoEinheit.features[x].rot;
+                            else attr.color = infoEinheit.features[x].color;
+
+                            infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature,attr);
+
+                            if(!infoEinheit.features[x].hideInMap) infoEinheit.hasFeatureLayer = true;
+                        }
+                        else if(infoEinheit.features[x].typ == 'planOverlay' && visibility == 'plan'){
+                            infoEinheit.features[x].opacity = 0;
                         }
                     }
 
                     mapInfoEinheit.addInfoEinheit(infoEinheit,'top');
 
-                    for(var x in infoEinheit.features){
-                        if(infoEinheit.features[x].typ == 'plan'){
+                    for(x = 0; x < infoEinheit.features.length; x++){
+                        if(infoEinheit.features[x].typ == 'plan' && !infoEinheit.features[x].hideInMap){
+                            infoEinheit.hasBaseLayer = true;
                             infoEinheit.baseLayer.title = infoEinheit.features[x].title;
                             infoEinheit.baseLayer.id = infoEinheit.features[x].id;
                         }
-                        else if(infoEinheit.features[x].typ == 'planOverlay'){
+                        else if(infoEinheit.features[x].typ == 'planOverlay' && !infoEinheit.features[x].hideInMap){
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].title = infoEinheit.features[x].title;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
@@ -76,17 +99,19 @@ angular.module('udm.edit')
 
                     infoEinheit.selected = false;
 
-                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,mode:'lern'});
+                    var onlyBase = false;
+                    if(visibility == 'plan') onlyBase = true;
+                    $scope.$broadcast('showLayerInList',{infoEinheit:infoEinheit,mode:'lern',onlyBase:onlyBase});
                     $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: true});
 
-                    $scope.$broadcast('showInfo',{data:data.infoEinheit,mode:'lern'});
+                    $scope.$broadcast('showInfo',{data:infoEinheit,mode:'lern'});
                     $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: true});
 
                     if(selectFeature){
                         $scope.$broadcast('selectItem',{type:'feature', id: selectFeature.id});
                         $scope.$broadcast('showInfo', {data:selectFeature});
                         if(selectFeature.typ != 'plan' && selectFeature.typ != 'planOverlay') mapInfoEinheit.selectfeature(selectFeature);
-                    };
+                    }
 
                 }).
                 error(function(data, status, headers, config) {
@@ -112,7 +137,7 @@ angular.module('udm.edit')
 
 
         $http.get('/pg/getLernEinheitList').
-            success(function(data, status, headers, config) {
+            success(function(data) {
                 $scope.nextLernEinheitId = data.nextLernEinheitId;
                 $scope.nextLernLektionId = data.nextLernLektionId;
                 $scope.nextLernFeatureId = data.nextLernFeatureId;
@@ -141,17 +166,27 @@ angular.module('udm.edit')
             }
             else{
                 $http.get('/pg/getLernEinheit/'+$scope.lernEinheiten[index].id).
-                    success(function(data, status, headers, config) {
+                    success(function(data) {
                         $scope.nextLernLektionId = data.nextLernLektionId;
                         $scope.nextLernFeatureId = data.nextLernFeatureId;
 
                         $scope.editLernEinheit = data.lernEinheit;
-                        $scope.lernLektionen = data.lernEinheit.lernLektionen;
 
-                        if(data.lernEinheit.info == 'null') data.lernEinheit.info = '';
+                        $scope.editLernEinheit.lernLektionen.sort(function(a, b){
+                            return a.order-b.order;
+                        });
 
-                        for(var x in $scope.lernLektionen){
-                            for(var y in $scope.lernLektionen[x].lernFeature){
+                        $scope.lernLektionen = $scope.editLernEinheit.lernLektionen;
+
+                        if($scope.editLernEinheit.info == 'null') $scope.editLernEinheit.info = '';
+
+                        var x;
+                        var y;
+                        for(x=0; x < $scope.lernLektionen.length; x++){
+                            $scope.lernLektionen[x].lernFeature.sort(function(a, b){
+                                return a.order-b.order;
+                            });
+                            for(y = 0; y < $scope.lernLektionen[x].lernFeature.length; y++){
                                 if($scope.lernLektionen[x].lernFeature[y].info == 'null') $scope.lernLektionen[x].lernFeature[y].info = '';
                             }
                         }
@@ -171,7 +206,7 @@ angular.module('udm.edit')
 
         $scope.deleteLernEinheit = function(index){
             $http.get('/pg/deleteLernEinheit/'+$scope.lernEinheiten[index].id).
-                success(function(data, status, headers, config) {
+                success(function() {
                     $scope.lernEinheiten.splice(index,1);
                 }).
                 error(function(data, status, headers, config) {
@@ -184,7 +219,7 @@ angular.module('udm.edit')
         $scope.editLernLektionMode = function(index){
 
             $http.get('/pg/getInfoEinheitenList').
-                success(function(data, status, headers, config) {
+                success(function(data) {
                     $scope.origInfoEinheiten = data.list;
                 }).
                 error(function(data, status, headers, config) {
@@ -208,7 +243,7 @@ angular.module('udm.edit')
             }
             else{
                 $scope.creatingNewLernLektion = false;
-                $scope.editLernLektion = $scope.lernLektionen[index];
+                $scope.editLernLektion = angular.copy($scope.lernLektionen[index]);
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
 
@@ -232,37 +267,58 @@ angular.module('udm.edit')
                 $scope.nextLernFeatureId++;
                 $scope.creatingNewLernFeature = true;
                 $scope.featureEditing = true;
+                $scope.editLernFeature.infoEinheit = '';
+                $scope.editLernFeature.hasBaseLayer = false;
+                $scope.editLernFeature.visible = {};
+
+                $scope.topTitle = 'Lern-Feature';
+                $scope.mode = 'editLernFeature';
             }
             else{
                 $scope.creatingNewLernFeature = false;
-                $timeout(function(){$scope.editLernFeature = $scope.editLernLektion.lernFeature[index];});
                 $scope.featureEditing = true;
 
+                var lernFeature = null;
+                lernFeature = angular.copy($scope.editLernLektion.lernFeature[index]);
 
-                var lernFeature = $scope.editLernLektion.lernFeature[index];
+                $timeout(function(){$scope.editLernFeature = lernFeature;});
+
                 //show in Map
-                if(lernFeature.typ == 'infoEinheit') showInfoEinheit(lernFeature.infoEinheit,false);
-                if(lernFeature.typ == 'feature') showInfoEinheit(lernFeature.infoEinheit,lernFeature.feature);
+                if(lernFeature.typ == 'infoEinheit') showInfoEinheit(lernFeature.infoEinheit,false,lernFeature.visible);
+                if(lernFeature.typ == 'feature') showInfoEinheit(lernFeature.infoEinheit,lernFeature.feature,lernFeature.visible);
                 if(lernFeature.typ == 'planVgl'){
-                    showInfoEinheit(lernFeature.plan1,false);
-                    showInfoEinheit(lernFeature.plan2,false);
-                    if(lernFeature.plan3) showInfoEinheit(lernFeature.plan3,false);
+                    showInfoEinheit(lernFeature.plan1,false, 'plan');
+                    showInfoEinheit(lernFeature.plan2,false, 'plan');
+                    if(lernFeature.plan3) showInfoEinheit(lernFeature.plan3,false, 'plan');
                 }
 
 
-                if(lernFeature.typ == 'feature'){
+                if(lernFeature.typ != 'planVgl'){
                     $http.get('/pg/getInfoEinheit/' + lernFeature.infoEinheit).
-                        success(function(data, status, headers, config) {
-                            for(var x in data.infoEinheit.features){
-                                if( data.infoEinheit.features[x].typ == 'plan') data.infoEinheit.features.splice(x,1);
+                        success(function(data) {
+                            var x;
+                            for(x = 0; x < data.infoEinheit.features.length; x++){
+                                if(lernFeature.typ == 'infoEinheit' && data.infoEinheit.features[x].typ == 'plan'){
+                                    lernFeature.visible[data.infoEinheit.features[x].id] = true;
+                                    data.infoEinheit.features.splice(x,1);
+                                    lernFeature.hasBaseLayer = true;
+                                }
                             }
+
                             $scope.feature = data.infoEinheit.features;
+
+                            $scope.featureValid = true;
                         }).
                         error(function(data, status, headers, config) {
                             // called asynchronously if an error occurs
                             // or server returns response with an error status.
                         });
+
                 }
+                mapInfoEinheit.setMapView(lernFeature.mapView);
+
+                $scope.topTitle = 'Lern-Feature';
+                $scope.mode = 'editLernFeature';
             }
         };
 
@@ -275,8 +331,13 @@ angular.module('udm.edit')
             }
 
             removeAllFeaturesFromMap();
+
+            angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
+
+            $scope.editLernFeature.hasBaseLayer = false;
+            $scope.editLernFeature.visible = {};
             $scope.editLernFeature.infoEinheit = '';
-            $scope.editLernFeature.feature = '';
+            $scope.editLernFeature.feature = null;
             $scope.editLernFeature.plan1 = '';
             $scope.editLernFeature.plan2 = '';
             $scope.editLernFeature.plan3 = '';
@@ -289,7 +350,8 @@ angular.module('udm.edit')
                 return;
             }
 
-            for(var x in $scope.infoEinheiten){
+            var x;
+            for(x = 0; x < $scope.infoEinheiten.length; x++){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.infoEinheit){
                     $scope.editLernFeature.title = [$scope.infoEinheiten[x].title];
                     $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
@@ -297,35 +359,49 @@ angular.module('udm.edit')
                 }
             }
 
-            $scope.editLernFeature.feature = '';
+            $scope.editLernFeature.feature = null;
+            $scope.editLernFeature.hasBaseLayer = false;
+            $scope.editLernFeature.visible = {};
+
+            removeAllFeaturesFromMap();
 
             $http.get('/pg/getInfoEinheit/' + $scope.editLernFeature.infoEinheit).
-                success(function(data, status, headers, config) {
-                    for(var x in data.infoEinheit.features){
-                        if( data.infoEinheit.features[x].typ == 'plan') data.infoEinheit.features.splice(x,1);
+                success(function(data) {
+                    var x;
+                    for(x = 0; x < data.infoEinheit.features.length; x++){
+                        if($scope.editLernFeature.typ == 'infoEinheit' && data.infoEinheit.features[x].typ == 'plan'){
+                            $scope.editLernFeature.visible[data.infoEinheit.features[x].id] = true;
+                            data.infoEinheit.features.splice(x,1);
+                            $scope.editLernFeature.hasBaseLayer = true;
+                        }
                     }
+                    for(x = 0; x < data.infoEinheit.features.length; x++){
+                        data.infoEinheit.features[x].visible = true;
+                        $scope.editLernFeature.visible[data.infoEinheit.features[x].id] = true;
+                    }
+
                     $scope.feature = data.infoEinheit.features;
+
+                    if($scope.editLernFeature.typ == 'feature') $scope.editLernFeature.feature = $scope.feature[0].id;
+
+                    showInfoEinheit($scope.editLernFeature.infoEinheit, $scope.editLernFeature.feature,'all');
+
+                    $scope.featureValid = true;
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
                     // or server returns response with an error status.
                 });
-
-            removeAllFeaturesFromMap();
-            if($scope.editLernFeature.typ == 'infoEinheit'){
-                showInfoEinheit($scope.editLernFeature.infoEinheit, false);
-                $scope.featureValid = true;
-            }
-
         };
 
-        $scope.setLernFeatureFeature = function(){
+        $scope.selectFeature = function(){
             if(!$scope.editLernFeature.feature ||  $scope.editLernFeature.feature == ''){
                 $scope.featureValid = false;
                 return;
             }
 
-            for(var x in $scope.feature){
+            var x;
+            for(x = 0; x < $scope.feature.length; x++){
                 if($scope.feature[x].id ==  $scope.editLernFeature.feature){
                     $scope.editLernFeature.title = [$scope.feature[x].title];
                     if($scope.feature[x].start) $scope.editLernFeature.start = $scope.feature[x].start;
@@ -334,9 +410,29 @@ angular.module('udm.edit')
             }
 
             removeAllFeaturesFromMap();
-            showInfoEinheit($scope.editLernFeature.infoEinheit, $scope.editLernFeature.feature);
+            showInfoEinheit($scope.editLernFeature.infoEinheit, $scope.editLernFeature.feature,$scope.editLernFeature.visible);
 
             $scope.featureValid = true;
+        };
+
+        $scope.changeVisibility = function(){
+            removeAllFeaturesFromMap();
+            showInfoEinheit($scope.editLernFeature.infoEinheit, $scope.editLernFeature.feature,$scope.editLernFeature.visible);
+
+        };
+
+        $scope.checkLastVisibleItem = function(id){
+
+            if(!$scope.editLernFeature) return true;
+
+            if(!$scope.editLernFeature.visible[id])  return false;
+
+            var count = 0;
+            for(var x in $scope.editLernFeature.visible){
+                if($scope.editLernFeature.visible[x]) count++;
+            }
+
+            return ((count <= 1) && !$scope.editLernFeature.hasBaseLayer);
         };
 
         $scope.setLernFeaturePlan1 = function(){
@@ -344,17 +440,28 @@ angular.module('udm.edit')
                 $scope.featureValid = false;
                 return;
             }
-
-            for(var x in $scope.infoEinheiten){
+            var x;
+            for(x = 0; x < $scope.infoEinheiten.length; x++){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan1){
                     $scope.editLernFeature.title = [$scope.infoEinheiten[x].title];
                     $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
                     $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
-                    $scope.infoEinheiten.splice(x,1);
+
                 }
             }
 
-            showInfoEinheit($scope.editLernFeature.plan1, false);
+            angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
+            for(x = $scope.infoEinheiten.length- 1; x >= 0; x--){
+                if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan1) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan2) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan3) $scope.infoEinheiten.splice(x,1);
+            }
+
+
+            removeAllFeaturesFromMap();
+            showInfoEinheit($scope.editLernFeature.plan1, false, 'plan');
+            if($scope.editLernFeature.plan2 != '') showInfoEinheit($scope.editLernFeature.plan2, false, 'plan');
+            if($scope.editLernFeature.plan3 != '') showInfoEinheit($scope.editLernFeature.plan3, false, 'plan');
 
         };
 
@@ -364,26 +471,37 @@ angular.module('udm.edit')
                 return;
             }
 
-            for(var x in $scope.infoEinheiten){
+            var x;
+            for(x = 0; x < $scope.infoEinheiten.length; x++){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan2){
                     $scope.editLernFeature.title.push($scope.infoEinheiten[x].title);
                     if($scope.editLernFeature.start > $scope.infoEinheiten[x].start)
                         $scope.editLernFeature.start = $scope.infoEinheiten[x].start;
                     if($scope.editLernFeature.end < $scope.infoEinheiten[x].end)
                         $scope.editLernFeature.end = $scope.infoEinheiten[x].end;
-                    $scope.infoEinheiten.splice(x,1);
                 }
             }
 
-            showInfoEinheit($scope.editLernFeature.plan2, false);
+            angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
+            for(x = $scope.infoEinheiten.length- 1; x >= 0; x--){
+                if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan1) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan2) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan3) $scope.infoEinheiten.splice(x,1);
+            }
+
+            removeAllFeaturesFromMap();
+            showInfoEinheit($scope.editLernFeature.plan1, false, 'plan');
+            showInfoEinheit($scope.editLernFeature.plan2, false, 'plan');
+            if($scope.editLernFeature.plan3 != '') showInfoEinheit($scope.editLernFeature.plan3, false, 'plan');
 
             $scope.featureValid = true;
         };
 
         $scope.setLernFeaturePlan3 = function(){
-            if(!$scope.editLernFeature.plan1 ||  $scope.editLernFeature.plan1 == '') return;
+            if(!$scope.editLernFeature.plan1 ||  $scope.editLernFeature.plan1 == '' || !$scope.editLernFeature.plan2 ||  $scope.editLernFeature.plan2 == '') return;
 
-            for(var x in $scope.infoEinheiten){
+            var x;
+            for(x = 0; x < $scope.infoEinheiten.length; x++){
                 if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan3){
                     $scope.editLernFeature.title.push($scope.infoEinheiten[x].title);
                     if($scope.editLernFeature.start > $scope.infoEinheiten[x].start)
@@ -393,18 +511,42 @@ angular.module('udm.edit')
                 }
             }
 
-            showInfoEinheit($scope.editLernFeature.plan3, false);
+            angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
+            for(x = $scope.infoEinheiten.length- 1; x >= 0; x--){
+                if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan1) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan2) $scope.infoEinheiten.splice(x,1);
+                else if($scope.infoEinheiten[x].id ==  $scope.editLernFeature.plan3) $scope.infoEinheiten.splice(x,1);
+            }
+
+            removeAllFeaturesFromMap();
+            showInfoEinheit($scope.editLernFeature.plan1, false, 'plan');
+            showInfoEinheit($scope.editLernFeature.plan2, false, 'plan');
+            showInfoEinheit($scope.editLernFeature.plan3, false, 'plan');
 
             $scope.featureValid = true;
         };
 
         $scope.saveLernFeature = function(){
+
+            $scope.editLernFeature.mapView = mapInfoEinheit.getMapView();
+
             if($scope.creatingNewLernFeature){
                 $scope.editLernLektion.lernFeature.push($scope.editLernFeature);
             }
+            else{
+                var x;
+                for(x = 0; x < $scope.editLernLektion.lernFeature.length; x++){
+                    if($scope.editLernLektion.lernFeature[x].id == $scope.editLernFeature.id)
+                        $scope.editLernLektion.lernFeature[x] = $scope.editLernFeature;
+                }
+            }
+
             removeAllFeaturesFromMap();
             $scope.editLernFeature = null;
             $scope.featureEditing = false;
+
+            $scope.topTitle = 'Lern-Lektion';
+            $scope.mode = 'editLernLektion';
 
         };
 
@@ -428,12 +570,16 @@ angular.module('udm.edit')
                 $scope.mode = 'list';
             }
             if($scope.mode == 'editLernLektion'){
+                $scope.topTitle = 'Lern-Einheit';
+                $scope.mode = 'editLernEinheit';
+            }
+            if($scope.mode == 'editLernFeature'){
                 removeAllFeaturesFromMap();
                 $scope.editLernFeature = null;
                 $scope.featureEditing = false;
 
-                $scope.topTitle = 'Lern-Einheit';
-                $scope.mode = 'editLernEinheit';
+                $scope.topTitle = 'Lern-Lektion';
+                $scope.mode = 'editLernLektion';
             }
         };
 
@@ -444,7 +590,9 @@ angular.module('udm.edit')
             $scope.editLernLektion.start = +99999999;
             $scope.editLernLektion.end = -99999999;
 
-            for(var x in $scope.editLernLektion.lernFeature){
+            var x;
+            for(x = 0; x < $scope.editLernLektion.lernFeature.length; x++){
+                $scope.editLernLektion.lernFeature[x].order = parseInt(x)+1;
                 if($scope.editLernLektion.start > $scope.editLernLektion.lernFeature[x].start)
                     $scope.editLernLektion.start = $scope.editLernLektion.lernFeature[x].start;
                 if($scope.editLernLektion.end < $scope.editLernLektion.lernFeature[x].end)
@@ -453,6 +601,12 @@ angular.module('udm.edit')
 
             if($scope.creatingNewLernLektion){
                 $scope.lernLektionen.push($scope.editLernLektion);
+            }
+            else{
+                for(x = 0; x < $scope.lernLektionen.length; x++){
+                    if($scope.lernLektionen[x].id == $scope.editLernLektion.id)
+                        $scope.lernLektionen[x] = $scope.editLernLektion;
+                }
             }
 
             $scope.editLernLektion = null;
@@ -466,13 +620,12 @@ angular.module('udm.edit')
 
             $scope.editLernEinheit.lernLektionen =  $scope.lernLektionen;
 
-
-
             $scope.editLernEinheit.start = +99999999;
             $scope.editLernEinheit.end = -99999999;
 
-
-            for(var x in $scope.editLernEinheit.lernLektionen){
+            var x;
+            for(x = 0; x < $scope.editLernEinheit.lernLektionen.length; x++){
+                $scope.editLernEinheit.lernLektionen[x].order = parseInt(x)+1;
                 if($scope.editLernEinheit.start > $scope.editLernEinheit.lernLektionen[x].start)
                     $scope.editLernEinheit.start = $scope.editLernEinheit.lernLektionen[x].start;
                 if($scope.editLernEinheit.end < $scope.editLernEinheit.lernLektionen[x].end)
@@ -482,7 +635,7 @@ angular.module('udm.edit')
             if($scope.creatingNewLernEinheit) $scope.lernEinheiten.push($scope.editLernEinheit);
 
             $http.post('/pg/saveLernEinheit',$scope.editLernEinheit).
-                success(function(data, status, headers, config) {
+                success(function() {
                     $scope.topTitle = 'Übersicht';
                     $scope.mode = 'list';
                 }).
@@ -491,7 +644,7 @@ angular.module('udm.edit')
                     // or server returns response with an error status.
                 });
 
-            for(var x in $scope.featuresToDelete){
+            for(x = 0; x < $scope.featuresToDelete; x++){
                 $http.get('/pg/deleteLernFeature/' +$scope.featuresToDelete[x]).
                     success(function(data, status, headers, config) {
 
@@ -502,7 +655,7 @@ angular.module('udm.edit')
                     });
             }
 
-            for(var x in $scope.lektionenToDelete){
+            for(x = 0; x < $scope.lektionenToDelete; x++){
                 $http.get('/pg/deleteLernLektion/' +$scope.lektionenToDelete[x]).
                     success(function(data, status, headers, config) {
 

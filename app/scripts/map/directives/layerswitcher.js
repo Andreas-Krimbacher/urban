@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('udm.map')
-  .directive('layerswitcher', function (OpenLayersMap,$compile) {
+  .directive('layerswitcher', function (OpenLayersMap) {
     return {
       templateUrl: '../views/map/layerswitcher.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
+      link: function postLink(scope) {
           scope.basemaps = OpenLayersMap.getBasemaps();
 
           scope.setBasemap = function(id){

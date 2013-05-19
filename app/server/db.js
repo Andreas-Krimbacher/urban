@@ -12,7 +12,7 @@ client.connect();
 // Edit Info Einheit
 
 module.exports.deleteFeature =  function(req, res) {
-    client.query('DELETE FROM "Feature" WHERE "Id"='+req.params.feature+';', function(err, result) {
+    client.query('DELETE FROM "InfoFeature" WHERE "Id"='+req.params.feature+';', function(err) {
 
         if(err) {
             console.log(err);
@@ -29,7 +29,7 @@ module.exports.deleteFeature =  function(req, res) {
 };
 
 module.exports.deleteInfoEinheit =  function(req, res) {
-    client.query('DELETE FROM "InfoEinheiten" WHERE "Id"='+req.params.infoEinheit+';', function(err, result) {
+    client.query('DELETE FROM "InfoEinheit" WHERE "Id"='+req.params.infoEinheit+';', function(err) {
 
         if(err) {
             console.log(err);
@@ -37,7 +37,7 @@ module.exports.deleteInfoEinheit =  function(req, res) {
             return
         }
 
-        client.query('DELETE FROM "Feature" WHERE "InfoEinheit"='+req.params.infoEinheit+';', function(err, result) {
+        client.query('DELETE FROM "InfoFeature" WHERE "InfoEinheit"='+req.params.infoEinheit+';', function(err) {
 
             if(err) {
                 console.log(err);
@@ -55,7 +55,9 @@ module.exports.deleteInfoEinheit =  function(req, res) {
 };
 
 module.exports.InfoEinheitenList =  function(req, res) {
-    client.query('SELECT * FROM "InfoEinheiten";', function(err, resultList) {
+    client.query('SELECT * FROM "InfoEinheit";', function(err, resultList) {
+
+        var x;
 
         if(err) {
             console.log(err);
@@ -63,7 +65,7 @@ module.exports.InfoEinheitenList =  function(req, res) {
             return
         }
 
-        client.query('SELECT "Id" FROM "InfoEinheiten" ORDER BY "Id" DESC LIMIT 1;', function(err, nextInfoEinheitId) {
+        client.query('SELECT "Id" FROM "InfoEinheit" ORDER BY "Id" DESC LIMIT 1;', function(err, nextInfoEinheitId) {
 
             if(err) {
                 console.log(err);
@@ -71,10 +73,10 @@ module.exports.InfoEinheitenList =  function(req, res) {
                 return
             }
 
-            if(nextInfoEinheitId.rows[0]) var nextInfoEinheitId = nextInfoEinheitId.rows[0].Id + 1;
+            if(nextInfoEinheitId.rows[0]) nextInfoEinheitId = nextInfoEinheitId.rows[0].Id + 1;
             else nextInfoEinheitId = 1;
 
-            client.query('SELECT "Id" FROM "Feature" ORDER BY "Id" DESC LIMIT 1;', function(err, nextFeatureId) {
+            client.query('SELECT "Id" FROM "InfoFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, nextFeatureId) {
 
                 if(err) {
                     console.log(err);
@@ -82,8 +84,8 @@ module.exports.InfoEinheitenList =  function(req, res) {
                     return
                 }
 
-                respondList = [];
-                for(var x in resultList.rows){
+                var respondList = [];
+                for(x=0; x < resultList.rows.length; x++){
                     respondList.push({
                         title:resultList.rows[x].Title,
                         start:resultList.rows[x].StartYear,
@@ -94,9 +96,9 @@ module.exports.InfoEinheitenList =  function(req, res) {
                     });
                 }
 
-                if(nextFeatureId.rows[0]) var nextFeatureId = nextFeatureId.rows[0].Id + 1;
+                if(nextFeatureId.rows[0]) nextFeatureId = nextFeatureId.rows[0].Id + 1;
                 else nextFeatureId = 1;
-                result = {nextInfoEinheitId : nextInfoEinheitId,
+                var result = {nextInfoEinheitId : nextInfoEinheitId,
                     nextFeatureId : nextFeatureId,
                     list : respondList};
 
@@ -109,13 +111,29 @@ module.exports.InfoEinheitenList =  function(req, res) {
 
 module.exports.getInfoEinheit =  function(req, res) {
     var counter = 1;
+    var x;
 
     var respondFeatures = [];
     var infoEinheit = null;
     var nextFeatureId = null;
 
+
+    var finish = function(){
+
+        if (!--counter) {
+
+            infoEinheit.features = respondFeatures;
+
+            var result = {nextId : nextFeatureId,
+                infoEinheit : infoEinheit};
+
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(JSON.stringify(result));
+        }
+    };
+
     counter++;
-    client.query('SELECT * FROM "InfoEinheiten" WHERE "Id" = '+req.params.infoEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "InfoEinheit" WHERE "Id" = '+req.params.infoEinheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -138,7 +156,7 @@ module.exports.getInfoEinheit =  function(req, res) {
     });
 
     counter++;
-    client.query('SELECT "Id" FROM "Feature" ORDER BY "Id" DESC LIMIT 1;', function(err, resultId) {
+    client.query('SELECT "Id" FROM "InfoFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, resultId) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -155,7 +173,7 @@ module.exports.getInfoEinheit =  function(req, res) {
 
     counter++;
 
-    client.query('SELECT * FROM "Feature" WHERE "InfoEinheit" = '+req.params.infoEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "InfoFeature" WHERE "InfoEinheit" = '+req.params.infoEinheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -163,7 +181,7 @@ module.exports.getInfoEinheit =  function(req, res) {
         }
 
 
-        for(var x in result.rows){
+        for(x=0; x < result.rows.length; x++){
             respondFeatures.push({
                 title:result.rows[x].Title,
                 start:result.rows[x].StartYear,
@@ -182,8 +200,7 @@ module.exports.getInfoEinheit =  function(req, res) {
             }
             else{
                 counter++;
-                respondFeatures[respondFeatures.length-1].feature = {typ:result.rows[x].Typ, attr : { color : result.rows[x].Color}};
-                getGeom(result.rows[x].Id,result.rows[x].Typ,respondFeatures[respondFeatures.length-1].feature)
+                getGeom(result.rows[x].Id,result.rows[x].Typ,respondFeatures[respondFeatures.length-1])
             }
 
             counter++;
@@ -198,14 +215,14 @@ module.exports.getInfoEinheit =  function(req, res) {
 
         if(typ == 'pointOri') typ = 'point';
 
-        client.query('SELECT ST_AsText("geom_'+typ+'") FROM "Feature" WHERE "Id"='+id+';', function(err, result) {
+        client.query('SELECT ST_AsText("geom_'+typ+'") FROM "InfoFeature" WHERE "Id"='+id+';', function(err, result) {
             if(err) {
                 console.log(err);
                 res.end(err);
                 return
             }
-
-            feature.geom = result.rows[0].st_astext;
+            feature.feature = {};
+            feature.feature.geom = result.rows[0].st_astext;
 
             finish();
         });
@@ -237,7 +254,7 @@ module.exports.getInfoEinheit =  function(req, res) {
 
                     object.img = [];
 
-                    for(var x in files){
+                    for(x=0; x < files.length; x++){
                         if(path.extname(files[x]) != '') object.img.push(filePaths.image.serverUrl + src + '/' + files[x]);
                     }
 
@@ -251,26 +268,13 @@ module.exports.getInfoEinheit =  function(req, res) {
         });
     };
 
-    var finish = function(){
-
-        if (!--counter) {
-
-            infoEinheit.features = respondFeatures;
-
-            result = {nextId : nextFeatureId,
-                infoEinheit : infoEinheit};
-
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.end(JSON.stringify(result));
-        }
-    };
-
     finish();
 
 };
 
 module.exports.saveInfoEinheit =  function(req, res) {
     var counter = 1;
+    var x;
 
     var infoEinheit = req.body;
 
@@ -291,9 +295,9 @@ module.exports.saveInfoEinheit =  function(req, res) {
     values['TimeLineOrder'] = {value: infoEinheit.rank, type : 'integer'};
 
     counter++;
-    upsert(values,'InfoEinheiten',res,finish);
+    upsert(values,'InfoEinheit',res,finish);
 
-    for(var x in infoEinheit.features){
+    for(x = 0; x < infoEinheit.features.length; x++){
 
         values = {};
 
@@ -323,7 +327,7 @@ module.exports.saveInfoEinheit =  function(req, res) {
         }
 
         counter++;
-        upsert(values,'Feature',res,finish);
+        upsert(values,'InfoFeature',res,finish);
 
     }
 
@@ -335,6 +339,9 @@ module.exports.saveInfoEinheit =  function(req, res) {
 // Edit Lern Einheit
 
 module.exports.LernEinheitList =  function(req, res) {
+
+    var x;
+
     client.query('SELECT * FROM "LernEinheit";', function(err, resultList) {
 
         if(err) {
@@ -376,8 +383,8 @@ module.exports.LernEinheitList =  function(req, res) {
                     if(nextLernFeatureId.rows[0]) nextLernFeatureId = nextLernFeatureId.rows[0].Id + 1;
                     else nextLernFeatureId = 1;
 
-                    respondList = [];
-                    for(var x in resultList.rows){
+                    var respondList = [];
+                    for(x=0; x < resultList.rows.length; x++){
                         respondList.push({
                             title:resultList.rows[x].Title,
                             start:resultList.rows[x].StartYear,
@@ -387,7 +394,7 @@ module.exports.LernEinheitList =  function(req, res) {
                         });
                     }
 
-                    result = {nextLernEinheitId : nextLernEinheitId,
+                    var result = {nextLernEinheitId : nextLernEinheitId,
                         nextLernLektionId : nextLernLektionId,
                         nextLernFeatureId : nextLernFeatureId,
                         list : respondList};
@@ -395,7 +402,7 @@ module.exports.LernEinheitList =  function(req, res) {
                     res.writeHead(200, {'Content-Type': 'text/plain'});
                     res.end(JSON.stringify(result));
 
-                 });
+                });
             });
         });
     });
@@ -403,6 +410,8 @@ module.exports.LernEinheitList =  function(req, res) {
 
 module.exports.saveLernEinheit =  function(req, res) {
     var counter = 1;
+    var x;
+    var y;
 
     var lernEinheit = req.body;
 
@@ -419,12 +428,42 @@ module.exports.saveLernEinheit =  function(req, res) {
     values['Title'] = {value: lernEinheit.title, type : 'string'};
     values['Desc'] = {value: lernEinheit.info, type : 'string'};
     values['StartYear'] = {value: lernEinheit.start, type : 'integer'};
-    values['EndYear'] = {value: lernEinheit.end, type : 'integer'}
+    values['EndYear'] = {value: lernEinheit.end, type : 'integer'};
 
     counter++;
     upsert(values,'LernEinheit',res,finish);
 
-    for(var x in lernEinheit.lernLektionen){
+
+    var saveVisibility = function(lernFeature,visible){
+        client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature" = '+lernFeature+';', function(err) {
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            for(var x in visible){
+                counter++;
+                addVisibilityRecord(lernFeature,x,visible[x]);
+            }
+
+            finish();
+        });
+    };
+
+    var addVisibilityRecord = function(lernFeature,infoFeature,visibility){
+        client.query('INSERT INTO "LernFeatureVisibility"("LernFeature", "InfoFeature", "Visibility") VALUES ('+lernFeature+','+infoFeature+','+visibility+');', function(err) {
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            finish();
+        });
+    };
+
+    for(x = 0; x < lernEinheit.lernLektionen.length; x++){
 
         values = {};
 
@@ -433,13 +472,14 @@ module.exports.saveLernEinheit =  function(req, res) {
         values['Title'] = {value: lernEinheit.lernLektionen[x].title, type : 'string'};
         values['StartYear'] = {value: lernEinheit.lernLektionen[x].start, type : 'integer'};
         values['EndYear'] = {value: lernEinheit.lernLektionen[x].end, type : 'integer'};
+        values['Order'] = {value: lernEinheit.lernLektionen[x].order, type : 'integer'};
 
 
         counter++;
         upsert(values,'LernLektion',res,finish);
 
 
-        for(var y in lernEinheit.lernLektionen[x].lernFeature){
+        for(y = 0; y < lernEinheit.lernLektionen[x].lernFeature.length; y++){
 
             values = {};
 
@@ -449,6 +489,9 @@ module.exports.saveLernEinheit =  function(req, res) {
             values['Typ'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].typ, type : 'string'};
             values['StartYear'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].start, type : 'integer'};
             values['EndYear'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].end, type : 'integer'};
+            values['Order'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].order, type : 'integer'};
+            values['Zoom'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].mapView.zoom, type : 'integer'};
+            values['geom_center'] = {value : lernEinheit.lernLektionen[x].lernFeature[y].mapView.wkt.geom, type : 'geom'};
 
             if(lernEinheit.lernLektionen[x].lernFeature[y].typ == 'planVgl'){
                 values['InfoEinheit1'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].plan1 || null, type : 'integer'};
@@ -458,16 +501,21 @@ module.exports.saveLernEinheit =  function(req, res) {
             if(lernEinheit.lernLektionen[x].lernFeature[y].typ == 'feature'){
                 values['InfoEinheit1'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].infoEinheit, type : 'integer'};
                 values['Feature'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].feature, type : 'integer'};
+
+                counter++;
+                saveVisibility(lernEinheit.lernLektionen[x].lernFeature[y].id,lernEinheit.lernLektionen[x].lernFeature[y].visible);
             }
             if(lernEinheit.lernLektionen[x].lernFeature[y].typ == 'infoEinheit'){
                 values['InfoEinheit1'] = {value: lernEinheit.lernLektionen[x].lernFeature[y].infoEinheit, type : 'integer'};
+
+                counter++;
+                saveVisibility(lernEinheit.lernLektionen[x].lernFeature[y].id,lernEinheit.lernLektionen[x].lernFeature[y].visible);
             }
 
             counter++;
             upsert(values,'LernFeature',res,finish);
 
         }
-
     }
 
     finish();
@@ -477,12 +525,38 @@ module.exports.saveLernEinheit =  function(req, res) {
 
 module.exports.getLernEinheit =  function(req, res) {
     var counter = 1;
+    var x;
 
     var lernLektionen = [];
     var lernEinheit = null;
 
     var nextLernLektionId = null;
     var nextLernFeatureId = null;
+
+    var finish = function(){
+
+        if (!--counter) {
+
+            lernEinheit.lernLektionen = lernLektionen;
+
+            lernEinheit.lernLektionen.sort(function(a, b){
+                return a.order-b.order;
+            });
+
+            for(x=0; x < lernEinheit.lernLektionen.length; x++){
+                lernEinheit.lernLektionen[x].lernFeature.sort(function(a, b){
+                    return a.order-b.order;
+                });
+            }
+
+            var result = {nextLernLektionId : nextLernLektionId,
+                nextLernFeatureId:nextLernFeatureId,
+                lernEinheit : lernEinheit};
+
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(JSON.stringify(result));
+        }
+    };
 
     counter++;
     client.query('SELECT * FROM "LernEinheit" WHERE "Id" = '+req.params.lernEinheit+';', function(err, result) {
@@ -543,12 +617,13 @@ module.exports.getLernEinheit =  function(req, res) {
         }
 
 
-        for(var x in result.rows){
+        for(x=0; x < result.rows.length; x++){
             lernLektionen.push({
                 title:result.rows[x].Title,
                 start:result.rows[x].StartYear,
                 end:result.rows[x].EndYear,
-                id:result.rows[x].Id
+                id:result.rows[x].Id,
+                order:result.rows[x].Order
             });
 
             lernLektionen[lernLektionen.length -1].lernFeature = [];
@@ -571,14 +646,19 @@ module.exports.getLernEinheit =  function(req, res) {
 
             var feature;
 
-            for(var x in result.rows){
+            for(x=0; x < result.rows.length; x++){
                 feature = {
                     info:result.rows[x].Desc,
                     typ:result.rows[x].Typ,
                     id:result.rows[x].Id,
                     start:result.rows[x].StartYear,
-                    end:result.rows[x].EndYear
+                    end:result.rows[x].EndYear,
+                    order:result.rows[x].Order,
+                    mapView : {zoom:result.rows[x].Zoom}
                 };
+
+                counter++;
+                getGeom(feature);
 
                 if(result.rows[x].Typ == 'infoEinheit'){
                     feature.infoEinheit = result.rows[x].InfoEinheit1;
@@ -598,7 +678,23 @@ module.exports.getLernEinheit =  function(req, res) {
                 counter++;
                 getFeatureTitle(lektion.lernFeature[lektion.lernFeature.length-1]);
 
+                counter++;
+                getVisible(lektion.lernFeature[lektion.lernFeature.length-1]);
             }
+
+            finish();
+        });
+    };
+
+    var getGeom = function(feature){
+        client.query('SELECT ST_AsText("geom_center") FROM "LernFeature" WHERE "Id"='+feature.id+';', function(err, result) {
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            feature.mapView.wkt = {geom:result.rows[0].st_astext};
 
             finish();
         });
@@ -607,7 +703,7 @@ module.exports.getLernEinheit =  function(req, res) {
     var getFeatureTitle = function(feature){
 
         if(feature.typ == 'infoEinheit'){
-            client.query('SELECT "Title" FROM "InfoEinheiten" WHERE "Id" = '+ feature.infoEinheit +';', function(err, result) {
+            client.query('SELECT "Title" FROM "InfoEinheit" WHERE "Id" = '+ feature.infoEinheit +';', function(err, result) {
                 if(err) {
                     console.log(err);
                     res.end(err);
@@ -619,7 +715,7 @@ module.exports.getLernEinheit =  function(req, res) {
         }
 
         if(feature.typ == 'feature'){
-            client.query('SELECT "Title" FROM "Feature" WHERE "Id" = '+ feature.feature +';', function(err, result) {
+            client.query('SELECT "Title" FROM "InfoFeature" WHERE "Id" = '+ feature.feature +';', function(err, result) {
                 if(err) {
                     console.log(err);
                     res.end(err);
@@ -631,14 +727,14 @@ module.exports.getLernEinheit =  function(req, res) {
         }
 
         if(feature.typ == 'planVgl'){
-            client.query('SELECT "Title" FROM "InfoEinheiten" WHERE "Id" = '+ feature.plan1 +';', function(err, result) {
+            client.query('SELECT "Title" FROM "InfoEinheit" WHERE "Id" = '+ feature.plan1 +';', function(err, result) {
                 if(err) {
                     console.log(err);
                     res.end(err);
                     return
                 }
                 feature.title = [result.rows[0].Title];
-                client.query('SELECT "Title" FROM "InfoEinheiten" WHERE "Id" = '+ feature.plan2 +';', function(err, result) {
+                client.query('SELECT "Title" FROM "InfoEinheit" WHERE "Id" = '+ feature.plan2 +';', function(err, result) {
                     if(err) {
                         console.log(err);
                         res.end(err);
@@ -647,7 +743,7 @@ module.exports.getLernEinheit =  function(req, res) {
                     feature.title.push(result.rows[0].Title);
 
                     if(feature.plan3){
-                        client.query('SELECT "Title" FROM "InfoEinheiten" WHERE "Id" = '+ feature.plan3 +';', function(err, result) {
+                        client.query('SELECT "Title" FROM "InfoEinheit" WHERE "Id" = '+ feature.plan3 +';', function(err, result) {
                             if(err) {
                                 console.log(err);
                                 res.end(err);
@@ -665,19 +761,23 @@ module.exports.getLernEinheit =  function(req, res) {
         }
     };
 
-    var finish = function(){
+    var getVisible = function(feature){
+        client.query('SELECT * FROM "LernFeatureVisibility" WHERE "LernFeature" = '+ feature.id +';', function(err, result) {
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
 
-        if (!--counter) {
+            var visible = {};
+            for(x=0; x < result.rows.length; x++){
+                visible[result.rows[x].InfoFeature] = result.rows[x].Visibility;
+            }
 
-            lernEinheit.lernLektionen = lernLektionen;
+            feature.visible = visible;
 
-            result = {nextLernLektionId : nextLernLektionId,
-                nextLernFeatureId:nextLernFeatureId,
-                lernEinheit : lernEinheit};
-
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.end(JSON.stringify(result));
-        }
+            finish();
+        });
     };
 
     finish();
@@ -685,7 +785,7 @@ module.exports.getLernEinheit =  function(req, res) {
 };
 
 module.exports.deleteLernFeature =  function(req, res) {
-    client.query('DELETE FROM "LernFeature" WHERE "Id"='+req.params.feature+';', function(err, result) {
+    client.query('DELETE FROM "LernFeature" WHERE "Id"='+req.params.feature+';', function(err) {
 
         if(err) {
             console.log(err);
@@ -693,38 +793,22 @@ module.exports.deleteLernFeature =  function(req, res) {
             return
         }
 
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify('success'));
-    });
-};
-
-module.exports.deleteLernLektion =  function(req, res) {
-    client.query('DELETE FROM "LernLektion" WHERE "Id"='+req.params.lektion+';', function(err, result) {
-
-        if(err) {
-            console.log(err);
-            res.end(err);
-            return
-        }
-
-        client.query('DELETE FROM "LernFeature" WHERE "LernLektion"='+req.params.lektion+';', function(err, result) {
-
+        client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature" = '+req.params.feature+';', function(err) {
             if(err) {
                 console.log(err);
                 res.end(err);
                 return
             }
 
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(JSON.stringify('success'));
         });
-
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify('success'));
     });
 };
 
-module.exports.deleteLernEinheit =  function(req, res) {
-
+module.exports.deleteLernLektion =  function(req, res) {
     var counter = 1;
+    var x;
 
     var finish = function(){
         if (!--counter) {
@@ -733,8 +817,8 @@ module.exports.deleteLernEinheit =  function(req, res) {
         }
     };
 
-    var deleteLektion = function(id){
-        client.query('DELETE FROM "LernLektion" WHERE "Id"='+ id + ';', function(err, result) {
+    var deleteFeature = function(id){
+        client.query('DELETE FROM "LernFeature" WHERE "Id"='+id+';', function(err) {
 
             if(err) {
                 console.log(err);
@@ -742,7 +826,7 @@ module.exports.deleteLernEinheit =  function(req, res) {
                 return
             }
 
-            client.query('DELETE FROM "LernFeature" WHERE "LernLektion"='+ id + ';', function(err, result) {
+            client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature"='+ id + ';', function(err) {
 
                 if(err) {
                     console.log(err);
@@ -752,10 +836,99 @@ module.exports.deleteLernEinheit =  function(req, res) {
 
                 finish();
             });
+
         });
     };
 
-    client.query('DELETE FROM "LernEinheit" WHERE "Id"='+req.params.einheit+';', function(err, result) {
+
+    client.query('DELETE FROM "LernLektion" WHERE "Id"='+req.params.lektion+';', function(err) {
+
+        if(err) {
+            console.log(err);
+            res.end(err);
+            return
+        }
+
+        client.query('SELECT "Id" FROM "LernFeature" WHERE "LernLektion" ='+req.params.lektion+';', function(err, feature) {
+
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            for(x = 0; x < feature.rows.length; x++){
+                counter++;
+                deleteFeature(feature.rows[x].Id)
+            }
+
+            finish();
+        });
+    });
+};
+
+module.exports.deleteLernEinheit =  function(req, res) {
+    var counter = 1;
+    var x;
+
+    var finish = function(){
+        if (!--counter) {
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(JSON.stringify('success'));
+        }
+    };
+
+    var deleteLektion = function(id){
+        client.query('DELETE FROM "LernLektion" WHERE "Id"='+ id + ';', function(err) {
+
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            client.query('SELECT "Id" FROM "LernFeature" WHERE "LernLektion" ='+id+';', function(err, feature) {
+
+                if(err) {
+                    console.log(err);
+                    res.end(err);
+                    return
+                }
+
+                for(x = 0; x < feature.rows.length; x++){
+                    counter++;
+                    deleteFeature(feature.rows[x].Id)
+                }
+
+                finish();
+            });
+        });
+    };
+
+    var deleteFeature = function(id){
+        client.query('DELETE FROM "LernFeature" WHERE "Id"='+id+';', function(err) {
+
+            if(err) {
+                console.log(err);
+                res.end(err);
+                return
+            }
+
+            client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature"='+ id + ';', function(err) {
+
+                if(err) {
+                    console.log(err);
+                    res.end(err);
+                    return
+                }
+
+                finish();
+            });
+
+        });
+    };
+
+    client.query('DELETE FROM "LernEinheit" WHERE "Id"='+req.params.einheit+';', function(err) {
 
         if(err) {
             console.log(err);
@@ -771,7 +944,7 @@ module.exports.deleteLernEinheit =  function(req, res) {
                 return
             }
 
-            for(var x in lektionen.rows){
+            for(x=0; x < lektionen.rows.length; x++){
                 counter++;
                 deleteLektion(lektionen.rows[x].Id)
             }
@@ -787,8 +960,10 @@ module.exports.deleteLernEinheit =  function(req, res) {
 
 var upsert = function(values,tableName,res,finish){
 
+    var x;
+
     var sqlUpdate = 'UPDATE "'+tableName+'" SET ';
-    for(var x in values){
+    for(x in values){
         sqlUpdate += '"' + x + '"' + '=';
         if(values[x].type == 'geom') sqlUpdate += 'ST_GeomFromText(\''+values[x].value+'\',\'4326\') ,';
         if(values[x].type == 'string') sqlUpdate += '\'' + values[x].value + '\' ,';
@@ -799,12 +974,12 @@ var upsert = function(values,tableName,res,finish){
 
 
     var sqlInsert = 'INSERT INTO "'+tableName+'" (';
-    for(var x in values){
+    for(x in values){
         sqlInsert += '"' + x + '"' + ',';
     }
     sqlInsert = sqlInsert.substring(0,sqlInsert.length-1);
     sqlInsert += ') SELECT ';
-    for(var x in values){
+    for(x in values){
         if(values[x].type == 'geom') sqlInsert += 'ST_GeomFromText(\''+values[x].value+'\',\'4326\') ,';
         if(values[x].type == 'string') sqlInsert += '\'' + values[x].value + '\' ,';
         if(values[x].type == 'integer') sqlInsert += values[x].value + ' ,';
@@ -813,14 +988,14 @@ var upsert = function(values,tableName,res,finish){
     sqlInsert += ' WHERE NOT EXISTS (SELECT 1 FROM "'+tableName+'" WHERE "Id"=' + values['Id'].value +');';
 
     console.log(sqlUpdate);
-    client.query(sqlUpdate, function(err, result) {
+    client.query(sqlUpdate, function(err) {
         if(err) {
             console.log(err);
             res.end(err);
             return
         }
         console.log(sqlInsert);
-        client.query(sqlInsert, function(err, result) {
+        client.query(sqlInsert, function(err) {
             if(err) {
                 console.log(err);
                 res.end(err);

@@ -26,4 +26,4 @@ module.exports = {
         serverUrl : '/imgData',
         serverThumbUrl : '/imgData/thumbnail'
     }
-}
+};

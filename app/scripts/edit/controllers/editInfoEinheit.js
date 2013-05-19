@@ -3,7 +3,7 @@
 angular.module('udm.edit')
     .controller('EditInfoEinheitCtrl', function ($scope,$http,mapEditFeature, util) {
         $scope.mode = 'list';
-        $scope.topTitle = 'Übersicht'
+        $scope.topTitle = 'Übersicht';
 
         $scope.nextInfoEinheitId = null;
         $scope.nextFeatureId = null;
@@ -30,10 +30,10 @@ angular.module('udm.edit')
         mapEditFeature.clearAllLayer();
 
         mapEditFeature.setFeatureLayer();
-        mapEditFeature.setEditLayer();
+        mapEditFeature.setEditFeatureLayer();
 
         $http.get('/pg/getInfoEinheitenList').
-            success(function(data, status, headers, config) {
+            success(function(data) {
                 $scope.nextInfoEinheitId = data.nextInfoEinheitId;
                 $scope.nextFeatureId = data.nextFeatureId;
                 $scope.infoEinheiten = data.list;
@@ -54,13 +54,13 @@ angular.module('udm.edit')
                 $scope.features = [];
                 $scope.creatingNewInfoEinheit = true;
 
-                $scope.topTitle = 'Info-Einheit'
+                $scope.topTitle = 'Info-Einheit';
                 $scope.mode = 'editInfoEinheit';
             }
             else{
 
                 $http.get('/pg/getInfoEinheit/'+$scope.infoEinheiten[index].id).
-                    success(function(data, status, headers, config) {
+                    success(function(data) {
                         $scope.nextFeatureId = data.nextId;
                         $scope.editInfoEinheit = data.infoEinheit;
                         $scope.infoEinheiten[index] = data.infoEinheit;
@@ -68,10 +68,13 @@ angular.module('udm.edit')
 
                         if(data.infoEinheit.info == 'null') data.infoEinheit.info = '';
 
-                        for(var x in $scope.features){
+                        var attr;
+                        var x;
+                        for(x = 0; x < $scope.features.length; x++){
                             if($scope.features[x].info == 'null') $scope.features[x].info = '';
 
                             if($scope.features[x].typ == 'plan'){
+                                $scope.features[x].title = 'Grundplan';
                                 mapEditFeature.setBaseLayer($scope.features[x].feature);
                                 $scope.hasBaseLayer = true;
                             }
@@ -79,7 +82,11 @@ angular.module('udm.edit')
                                 mapEditFeature.addOverlayLayer($scope.features[x].feature);
                             }
                             else{
-                                $scope.features[x].feature = util.WKTToFeature($scope.features[x].feature);
+                                attr = {typ : $scope.features[x].typ};
+                                if($scope.features[x].typ == 'pointOri') attr.rot = $scope.features[x].rot;
+                                else attr.color = $scope.features[x].color;
+
+                                $scope.features[x].feature = util.WKTToFeature($scope.features[x].feature,attr);
                                 mapEditFeature.addFeature($scope.features[x].feature);
                             }
 
@@ -87,7 +94,7 @@ angular.module('udm.edit')
 
                         $scope.creatingNewInfoEinheit = false;
 
-                        $scope.topTitle = 'Info-Einheit'
+                        $scope.topTitle = 'Info-Einheit';
                         $scope.mode = 'editInfoEinheit';
 
                     }).
@@ -100,7 +107,7 @@ angular.module('udm.edit')
 
         $scope.deleteInfoEinheit = function(index){
             $http.get('/pg/deleteInfoEinheit/'+$scope.infoEinheiten[index].id).
-                success(function(data, status, headers, config) {
+                success(function() {
                     $scope.infoEinheiten.splice(index,1);
                 }).
                 error(function(data, status, headers, config) {
@@ -117,7 +124,7 @@ angular.module('udm.edit')
 
             if(index == -1){
                 $scope.editFeature = {};
-                $scope.editFeature.color = '#7ad674';
+                $scope.editFeature.color = '#000000';
                 $scope.editFeature.rot = 0;
                 $scope.editFeature.id = $scope.nextFeatureId;
                 $scope.nextFeatureId++;
@@ -135,8 +142,8 @@ angular.module('udm.edit')
 
                 if( $scope.features[index].typ == 'plan' || $scope.features[index].typ == 'planOverlay'){
                     $http.get('/fs',{params: {action:'planList'}}).
-                        success(function(data, status, headers, config) {
-                            $scope.editFeature =  $scope.features[index];
+                        success(function(data) {
+                            $scope.editFeature = angular.copy($scope.features[index]);
 
                             $scope.editFeature.planList = data;
 
@@ -144,7 +151,7 @@ angular.module('udm.edit')
 
                             if($scope.editFeature.typ == 'planOverlay'){
                                 mapEditFeature.removeOverlayLayer($scope.editFeature.feature);
-                                mapEditFeature.setEditOverlayPlanLayer($scope.editFeature.feature);
+                                mapEditFeature.setEditOverlayLayer($scope.editFeature.feature);
                             }
 
                             $scope.creatingNewFeature = false;
@@ -159,13 +166,24 @@ angular.module('udm.edit')
 
                 }
                 else{
-                    $scope.editFeature =  $scope.features[index];
+                    $scope.editFeature =  {};
+                    for(var x in $scope.features[index]){
+                        if(x == 'img'){
+                            $scope.editFeature.ing = angular.copy($scope.features[index].img);
+                        }
+                        else if(x == 'feature'){
+                            $scope.editFeature.feature = $scope.features[index].feature.clone();
+                        }
+                        else{
+                            $scope.editFeature[x] = $scope.features[index][x];
+                        }
+                    }
 
                     if($scope.editFeature.typ == 'pointOri'){
                         $scope.editFeature.feature.attributes.rot = $scope.editFeature.rot;
                     }
 
-                    mapEditFeature.removeFeature($scope.editFeature.feature);
+                    mapEditFeature.removeFeature($scope.features[index].feature);
                     mapEditFeature.addEditFeature($scope.editFeature);
 
                     $scope.creatingNewFeature = false;
@@ -174,18 +192,11 @@ angular.module('udm.edit')
                 }
             }
 
-            $scope.$on('sliderChanged', function(e,value) {
-                    if(value.name == 'rot'){
-                        $scope.editFeature.rot = value.value;
-                        $scope.editFeature.feature.attributes.rot = value.value;
-                        mapEditFeature.redrawEditLayer();
-                    }
-            });
         };
 
         $scope.deleteFeature = function(index){
             if($scope.features[index].typ == 'plan'){
-                mapEditFeature.removeBaseLayer($scope.features[index].feature);
+                mapEditFeature.removeBaseLayer();
                 $scope.hasBaseLayer = false;
             }
             else if($scope.features[index].typ == 'planOverlay'){
@@ -201,8 +212,11 @@ angular.module('udm.edit')
         $scope.typChange = function(){
 
             if( $scope.editFeature.typ == 'plan' || $scope.editFeature.typ == 'planOverlay'){
+
+                if($scope.editFeature.typ == 'plan') $scope.editFeature.title = 'Grundplan';
+
                 $http.get('/fs',{params: {action:'planList'}}).
-                    success(function(data, status, headers, config) {
+                    success(function(data) {
                         $scope.editFeature.planList = data;
                     }).
                     error(function(data, status, headers, config) {
@@ -212,7 +226,7 @@ angular.module('udm.edit')
             }
 
             $scope.removeFeature();
-            mapEditFeature.removeEditOverlayPlanLayer();
+            mapEditFeature.removeEditOverlayLayer();
             if($scope.editingBaseLayerFeature){
                 mapEditFeature.removeBaseLayer();
                 $scope.hasBaseLayer = false;
@@ -221,7 +235,7 @@ angular.module('udm.edit')
             $scope.editFeature.plan = '';
             $scope.editFeature.feature = null;
 
-
+            if($scope.editFeature.typ == 'pointOri') $scope.editFeature.rot = 0;
 
             if($scope.editFeature.typ == 'plan' && $scope.hasBaseLayer){
                 alert('nur ein Base Layer möglich');
@@ -239,8 +253,8 @@ angular.module('udm.edit')
 
         $scope.changePlan = function(){
             if($scope.editFeature.plan){
-
-                for(var x in $scope.editFeature.planList){
+                var x;
+                for(x = 0; x < $scope.editFeature.planList.length; x++){
                     if($scope.editFeature.plan == $scope.editFeature.planList[x].tileDB) var plan = $scope.editFeature.planList[x];
                 }
 
@@ -248,7 +262,7 @@ angular.module('udm.edit')
                     mapEditFeature.setBaseLayer(plan);
                 }
                 else{
-                    mapEditFeature.setEditOverlayPlanLayer(plan);
+                    mapEditFeature.setEditOverlayLayer(plan);
                 }
 
                 $scope.editFeature.feature = plan;
@@ -256,15 +270,30 @@ angular.module('udm.edit')
         };
 
         $scope.$on('colorpickerChanged', function (e,value) {
-            if(!$scope.editFeature.feature) return;
             $scope.editFeature.color = value.value;
-            $scope.editFeature.feature.attributes.color = value.value;
-            mapEditFeature.redrawEditLayer();
+            if($scope.editFeature.feature){
+                $scope.editFeature.feature.attributes.color = value.value;
+                mapEditFeature.redrawEditFeatureLayer();
+            }
+        });
+
+        $scope.$on('sliderChanged', function(e,value) {
+            if(value.name == 'rot'){
+                $scope.editFeature.rot = value.value;
+                if($scope.editFeature.feature){
+                    $scope.editFeature.feature.attributes.rot = value.value;
+                    mapEditFeature.redrawEditFeatureLayer();
+                }
+            }
         });
 
         $scope.drawFeature = function(){
             $scope.addProcess = true;
-            mapEditFeature.drawFeature($scope.editFeature.typ, function(element){
+
+            if($scope.editFeature.typ == 'pointOri') var colorRot = $scope.editFeature.rot;
+            else colorRot = $scope.editFeature.color;
+
+            mapEditFeature.drawFeature($scope.editFeature.typ,colorRot, function(element){
                 element.attributes.typ = $scope.editFeature.typ;
                 if($scope.editFeature.typ == 'pointOri'){
                     element.attributes.rot = $scope.editFeature.rot;
@@ -273,7 +302,7 @@ angular.module('udm.edit')
                     element.attributes.color = $scope.editFeature.color;
                 }
                 mapEditFeature.stopDrawFeature($scope.editFeature.typ);
-                mapEditFeature.redrawEditLayer();
+                mapEditFeature.redrawEditFeatureLayer();
                 if(!$scope.$$phase) $scope.$apply($scope.editFeature.feature = element,$scope.addProcess = false);
             });
 
@@ -291,7 +320,7 @@ angular.module('udm.edit')
         };
 
         $scope.removeFeature = function(){
-            mapEditFeature.removeEditFeature();
+            mapEditFeature.removeAllEditFeature();
             mapEditFeature.stopModifyFeature();
             mapEditFeature.stopDrawFeature($scope.editFeature.typ);
             $scope.editFeature.feature = null;
@@ -305,7 +334,7 @@ angular.module('udm.edit')
                 $scope.modifyProcess = false;
             }
             else{
-                mapEditFeature.modifyFeature();
+                mapEditFeature.modifyFeature($scope.editFeature.feature);
                 $scope.modifyProcess = true;
             }
         };
@@ -314,24 +343,46 @@ angular.module('udm.edit')
         $scope.back = function(){
 
             if($scope.mode == 'editInfoEinheit'){
+
+                mapEditFeature.removeBaseLayer();
+                $scope.hasBaseLayer = false;
+                mapEditFeature.removeAllOverlayLayer();
+                mapEditFeature.removeAllFeatures();
+
                 $scope.topTitle = 'Übersicht';
                 $scope.mode = 'list';
             }
             if($scope.mode == 'editFeature'){
 
 
-                mapEditFeature.removeEditFeature();
+                mapEditFeature.removeAllEditFeature();
                 mapEditFeature.stopModifyFeature();
                 mapEditFeature.stopDrawFeature($scope.editFeature.typ);
-                //$scope.editFeature.feature = null;
                 $scope.addProcess = false;
                 $scope.modifyProcess = false;
-                mapEditFeature.removeEditOverlayPlanLayer();
+                mapEditFeature.removeEditOverlayLayer();
 
                 if($scope.creatingNewFeature && $scope.editFeature.typ == 'plan'){
                     mapEditFeature.removeBaseLayer();
                     $scope.hasBaseLayer = false;
                 }
+                else{
+                    var x;
+                    for(x = 0; x < $scope.features.length; x++){
+                        if($scope.editFeature.id == $scope.features[x].id){
+                            if( $scope.features[x].typ == 'plan'){
+                                mapEditFeature.setBaseLayer($scope.features[x].feature);
+                            }
+                            else if( $scope.features[x].typ == 'planOverlay'){
+                                mapEditFeature.addOverlayLayer($scope.features[x].feature);
+                            }
+                            else{
+                                mapEditFeature.addFeature($scope.features[x].feature);
+                            }
+                        }
+                    }
+                }
+
 
                 $scope.topTitle = 'Info-Einheit';
                 $scope.mode = 'editInfoEinheit';
@@ -346,16 +397,22 @@ angular.module('udm.edit')
             mapEditFeature.removeAllOverlayLayer();
             mapEditFeature.removeAllFeatures();
 
+            if(!$scope.editInfoEinheit.end) $scope.editInfoEinheit.end = $scope.editInfoEinheit.start + 1;
+
             $scope.editInfoEinheit.features =  $scope.features;
-            for(var x in $scope.editInfoEinheit.features){
+            var x;
+            for(x = 0; x < $scope.editInfoEinheit.features.length; x++){
+                if($scope.editInfoEinheit.features[x].typ == 'plan'){
+                    $scope.editInfoEinheit.features[x].title = $scope.editInfoEinheit.title;
+                }
                 if($scope.editInfoEinheit.features[x].typ != 'plan' && $scope.editInfoEinheit.features[x].typ != 'planOverlay'){
-                    $scope.editInfoEinheit.features[x].feature = util.featureToWKT($scope.editInfoEinheit.features[x].feature,$scope.editInfoEinheit.features[x].typ);
+                    $scope.editInfoEinheit.features[x].feature = util.featureToWKT($scope.editInfoEinheit.features[x].feature);
                 }
             }
             if($scope.creatingNewInfoEinheit) $scope.infoEinheiten.push($scope.editInfoEinheit);
 
             $http.post('/pg/saveInfoEinheit',$scope.editInfoEinheit).
-                success(function(data, status, headers, config) {
+                success(function() {
                     $scope.topTitle = 'Übersicht';
                     $scope.mode = 'list';
                 }).
@@ -364,7 +421,7 @@ angular.module('udm.edit')
                     // or server returns response with an error status.
                 });
 
-            for(var x in $scope.featuresToDelete){
+            for(x=0; x < $scope.featuresToDelete.length; x++){
                 $http.get('/pg/deleteFeature/' + $scope.editInfoEinheit.id + '/' +$scope.featuresToDelete[x]).
                     success(function(data, status, headers, config) {
 
@@ -379,13 +436,14 @@ angular.module('udm.edit')
         $scope.saveFeature = function(){
 
             mapEditFeature.stopModifyFeature();
-            mapEditFeature.removeEditFeature();
+            mapEditFeature.removeAllEditFeature();
             $scope.addProcess = false;
             $scope.modifyProcess = false;
-            mapEditFeature.removeEditOverlayPlanLayer();
+            mapEditFeature.removeEditOverlayLayer();
 
+            var x;
             if($scope.editFeature.typ == 'plan' || $scope.editFeature.typ == 'planOverlay'){
-                for(var x in $scope.editFeature.planList){
+                for(x = 0; x < $scope.editFeature.planList.length; x++){
                     if($scope.editFeature.plan == $scope.editFeature.planList[x].tileDB) var plan = $scope.editFeature.planList[x];
                 }
                 $scope.editFeature.feature = plan;
@@ -398,7 +456,17 @@ angular.module('udm.edit')
                 mapEditFeature.addFeature($scope.editFeature.feature);
             }
 
-            if($scope.creatingNewFeature) $scope.features.push($scope.editFeature);
+            if($scope.creatingNewFeature){
+                $scope.features.push($scope.editFeature);
+            }
+            else{
+                for(x = 0; x < $scope.features.length; x++){
+                    if($scope.editFeature.id == $scope.features[x].id){
+                        $scope.features[x] = $scope.editFeature;
+                    }
+                }
+            }
+
             if($scope.editFeature.typ == 'plan') $scope.hasBaseLayer = true;
 
             $scope.topTitle = 'Info-Einheit';

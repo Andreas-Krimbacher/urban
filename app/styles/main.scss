@@ -54,14 +54,13 @@ $black : #373737;
 $green:  #5bb75b;
 
 @mixin panel{
-  background-color: rgba(245,245,245,0.7);
+  background-color: rgba(245,245,245,0.9);
   z-index: 2500;
   @include single-box-shadow;
   @include border-radius($borderRadius);
 }
 
 //glyph big
-
 [class^="glyph-big-"],
 [class*=" glyph-big-"] {
   display: inline-block;
@@ -82,6 +81,9 @@ $green:  #5bb75b;
 }
 .glyph-big-world{
   background-image: url("images/glyph-big/global.png");
+}
+.glyph-big-picture{
+  background-image: url("images/glyph-big/picture.png");
 }
 
 //Overall classes
@@ -105,6 +107,11 @@ $green:  #5bb75b;
   padding: 10px;
   overflow: auto;
 }
+
+tr{
+  background-color: white;
+}
+
 
 .list-title{
   font-weight: 700;
@@ -145,6 +152,11 @@ div.olControlZoom a {
   }
 }
 
+
+.olLayerGoogleCopyright{
+  bottom: 100px;
+  right: 0px;
+}
 
 #container{
 
@@ -192,15 +204,21 @@ div.olControlZoom a {
   width: 100%;
   height: 670px;
 }
-map{
-  .all{
-    height: 670px !important;
-  }
-  .withTimeline{
-    height: 570px !important;
-  }
-}
 
+.mapLabel{
+  cursor: default;
+  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding-top: 2px;
+  padding-bottom: 2px ;
+  padding-right: 7px;
+  padding-left: 7px;
+  border-radius: 2px;
+  position: absolute;
+  white-space: nowrap;
+  z-index: 2147483647;
+}
 
 #startDialog{
   z-index: 3000;
@@ -232,7 +250,7 @@ map{
     padding: 5px;
   }
   .title{
-    font-weight: 700;
+    font-weight: 600;
     font-size: 1.3em;
     width: 160px;
     overflow: hidden;
@@ -240,7 +258,7 @@ map{
   }
   .info{
     font-size: 1.1em;
-    font-weight: 700;
+    font-weight: 600;
     width: 170px;
     margin-top:5px;
     overflow: hidden;
@@ -254,14 +272,31 @@ map{
 #lernEinheitInfoDialog{
   z-index: 3000;
   .modal-body{
-    font-weight: 700;
+    font-weight: 600;
     font-size: 1.3em;
+  }
+  .tip{
+    font-weight: 700;
+    font-size: 0.9em;
+    text-align: left;
+    width: 400px;
+    display: inline-block;
+    float: left;
+    margin-left: 40px;
+    line-height: 14px;
+  }
+  .modal-footer{
+    padding: 10px;
+  }
+  button{
+    margin-right: 20px;
   }
 }
 
+
 #lernNavigation{
   position: absolute;
-  bottom: 130px;
+  top: 520px;
   left: 580px;
   z-index: 2500;
   .disabledWithBackground{
@@ -294,6 +329,14 @@ map{
   width: 100%;
   height: 100px;
   background: #d3d3d3;
+  position: absolute;
+  top: 610px;
+  z-index: 2500;
+  .start{
+    position: relative;
+    left: 200px;
+    top: -75px;
+  }
   .lektion{
     display: inline-block;
     width: 160px;
@@ -312,7 +355,6 @@ map{
   .lektionTitle{
     font-weight: 700;
     font-size: 1.3em;
-    margin-left: 5px;
     margin-top: 2px;
 
   }
@@ -387,6 +429,7 @@ map{
   z-index: 2500;
   width: 283px;
   height: 600px;
+  overflow: hidden;
   .topBarText{
     display: inline-block;
     width: 210px;
@@ -475,7 +518,7 @@ map{
     border-bottom: solid;
     .colorDiv{
       display: inline-block;
-      margin-left: 80px;
+      float: right;
     }
     .sliderDiv{
       display: inline-block;
@@ -571,7 +614,7 @@ map{
   }
   .infotext{
     overflow: hidden;
-    width: 180px;
+    width: 175px;
     padding: 0px;
   }
   .date{
@@ -589,7 +632,6 @@ map{
 
 }
 
-
 #editLernEinheit{
   @include panel;
   position: absolute;
@@ -598,6 +640,7 @@ map{
   z-index: 2500;
   width: 283px;
   height: 600px;
+  overflow: hidden;
   .topBarText{
     display: inline-block;
     width: 210px;
@@ -626,6 +669,7 @@ map{
     }
     .trash{
       margin-top: 10px;
+      margin-right: 5px;
     }
     .edit{
       margin-top: 13px;
@@ -672,7 +716,7 @@ map{
     .lektionenTable{
       font-weight: 700;
       width: 272px;
-      max-height: 180px;
+      max-height: 260px;
       overflow: auto;
       table{
         width: 257px;
@@ -711,19 +755,15 @@ map{
       }
     }
   }
-  .editLernLektion{
+  #editLernLektionForm{
+    margin-bottom: 0px;
+    margin-top: 10px;
     margin-left: 10px;
     .heading{
       margin-bottom: 10px;
     }
-  }
-  #editLernLektionForm{
-    margin-bottom: 0px;
-    margin-top: 10px;
     .sendLektion{
-      position: absolute;
-      top: 550px;
-      right: 0px;
+      margin-top: 20px;
     }
   }
   .addLernFeature{
@@ -742,6 +782,8 @@ map{
     }
   }
   #editLernFeatureForm{
+    margin-left: 10px;
+    margin-top: 10px;
     .heading{
       margin-top: 0px;
     }
@@ -757,14 +799,57 @@ map{
       margin-top: 5px;
     }
     .send{
-      margin-bottom: 10px;
+      margin-top: 20px;
+    }
+    #select2InfoEinheit{
+      display: none;
+    }
+    #select2Feature{
+      display: none;
+    }
+    #select2Plan1{
+      display: none;
+    }
+    #select2Plan2{
+      display: none;
+    }
+    #select2Plan3{
+      display: none;
+    }
+    .selectFeatureTable{
+      clear: both;
+      .firstRow{
+        margin-left: 5px;
+      }
+    }
+    .featureLabel{
+      margin-top: 20px;
+      margin-bottom: 5px;
+      display: inline-block;
+      float: left;
+    }
+    .visibility{
+      display: inline-block;
+      float: right;
+      margin-right: 8px;
+    }
+    .selectedFeature{
+      display: inline-block;
+      float: right;
+      margin-right: 6px;
+    }
+    .placeholder{
+      float: right;
+      margin-right: 15px;
+      margin-top: 25px;
+      display: inline-block;
     }
   }
   .featureTable{
     border-top: solid;
     border-bottom: solid;
-    width: 255px;
-    max-height: 140px;
+    width: 260px;
+    max-height: 370px;
     overflow: auto;
     clear: right;
     .noFeature{
@@ -775,6 +860,7 @@ map{
     }
     td{
       padding: 2px;
+      height: 22px;
     }
     .infotext{
       padding: 0px;
@@ -803,9 +889,6 @@ map{
   }
 }
 
-
-
-
 #georeference{
   width: 263px;
   height: 580px;
@@ -814,6 +897,7 @@ map{
   right: 20px;
   padding: 10px;
   @include panel;
+  overflow: hidden;
   #select2{
     width: 160px;
     display: none;
@@ -838,7 +922,7 @@ map{
     margin-left: 5px;
   }
   tr{
-    background-color: #d3d3d3;
+    background-color: white;
     @include border-radius($borderRadius);
     border-top: solid ;
     border-bottom: solid ;
@@ -906,12 +990,11 @@ map{
   }
 }
 
-
 #image-gallery{
   position: absolute;
-  top:100px;
-  left:100px;
-  width: 800px;
+  top:120px;
+  left: 280px;
+  width: 650px;
   height: 400px;
   @include panel;
   img{
@@ -968,15 +1051,23 @@ map{
   cursor: default !important;
 }
 
-
+.sortableArea{
+  position: absolute;
+  top: 40px;
+  right: 0px;
+  height: 670px;
+  width: 100%;
+  overflow: hidden;
+}
 #layerlist{
   .selectedItem{
     border: solid 2px #008000;
+    margin-left: -2px;
   }
   width: 250px;
   height: 100px;
   position: absolute;
-  top: 70px;
+  top: 90px;
   right: 20px;
   z-index: 2500;
   .overlay{
@@ -1004,8 +1095,12 @@ map{
     cursor: pointer;
     @include panel;
     .list-title{
+      white-space: nowrap;
       width: 115px;
       line-height: 20px;
+    }
+    .withoutSlider{
+      width: 200px;
     }
     .placeholder{
       display: inline-block;
@@ -1019,7 +1114,7 @@ map{
     margin-left: 5px;
     height: 2px;
     .ui-slider-handle{
-      top: -.7em;
+      top: -.6em;
       width: 3px;
       margin-left: -.2em;
     }
@@ -1038,6 +1133,7 @@ map{
   }
 }
 
+
 #infobox{
   width: 250px;
   height: 370px;
@@ -1045,9 +1141,26 @@ map{
   top: 210px;
   right: 20px;
   @include panel;
+  .text{
+    height: 295px;
+    overflow: auto;
+    width: 250px;
+  }
+  .lerntext{
+    max-height: 90px;
+    background-color: #5bb75b;
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(91, 183, 91, 0.6)), to(rgba(59, 119, 59, 0.8)));
+    font-weight: 700;
+    line-height: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    overflow: auto;
+  }
   .infotext{
-    height: 280px;
-
+    line-height: 17px;
+    font-size: 1.1em;
   }
   .year{
     display: inline-block;
@@ -1056,24 +1169,31 @@ map{
   h3{
     display: inline-block;
     width: 170px;
+    white-space: nowrap;
   }
-  .bottom{
-    height: 30px;
-    .deeplink-btn{
-      margin-left: 10px;
+  .bottomEnabled{
+    height: 32px;
+    &:hover{
+      background-color: $green; // Old browsers
+      @include filter-gradient($green, #3b773b, vertical); // IE6-9
+      @include background-image(linear-gradient(top, $green 0%,#3b773b 100%));
     }
-    .picture-btn{
-      margin-right: 10px;
-      float: right;
+    cursor: pointer;
+    .glyph-big-picture{
+      margin-left: 113px;
+      margin-top: 2px;
     }
-    .learn-list-btn{
-      margin-right: 10px;
-      float: right;
+  }
+  .bottomDisabled{
+    height: 32px;
+    .glyph-big-picture{
+      margin-left: 113px;
+      margin-top: 2px;
+      opacity: 0.3;
+      cursor: default;
     }
   }
 }
-
-
 
 
 .fileUpload{
@@ -1086,18 +1206,17 @@ map{
   }
 }
 
-
 .modal-backdrop{
   z-index: 2501;
 }
 
 
-
-
-
 #timeline{
   width: 100%;
   height: 100px;
+  position: absolute;
+  top: 610px;
+  z-index:2500;
   .timeline-event-tape{
     @include border-radius($borderRadius);
   }

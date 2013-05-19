@@ -1,13 +1,15 @@
 'use strict';
 
 angular.module('udm.map')
-    .factory('mapInfoEinheit', function (OpenLayersMap) {
+    .factory('mapInfoEinheit', function (OpenLayersMap,util) {
 
         var layerPackages = {};
 
         var nextZindexTop = 1000;
 
         var OLmap = OpenLayersMap.getMap();
+
+        var showAnimation = false;
 
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style(),
@@ -19,8 +21,8 @@ angular.module('udm.map')
             "point": {
                 strokeColor:'${color}',
                 strokeOpacity: .7,
-                strokeWidth: 8,
-                pointRadius: 6,
+                strokeWidth: 4,
+                pointRadius: 7,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
                 graphicZIndex: '${zIndex}'
@@ -28,7 +30,7 @@ angular.module('udm.map')
             "poly": {
                 strokeColor:'${color}',
                 strokeOpacity: .7,
-                strokeWidth: 8,
+                strokeWidth: 6,
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
@@ -37,12 +39,23 @@ angular.module('udm.map')
             "line" : {
                 strokeColor:'${color}',
                 strokeOpacity: .7,
-                strokeWidth: 8,
+                strokeWidth: 6,
                 pointRadius: 6,
                 fillColor:'${color}',
                 fillOpacity: 0.4,
                 graphicZIndex: '${zIndex}'
             },
+            "start" : {
+                strokeColor:'${color}',
+                strokeOpacity: .7,
+                strokeWidth: 6,
+                pointRadius: 6,
+                fillColor:'${color}',
+                fillOpacity: 0.4,
+                cursor: "default",
+                graphicZIndex: '${zIndex}'
+            },
+
             "pointOri" : {
                 fillOpacity: 0.7,
                 'pointRadius':25,
@@ -55,33 +68,43 @@ angular.module('udm.map')
 
         var lookupTemporary = {
             "point": {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
-                fillOpacity: 0.7,
-                pointRadius: 6,
+                strokeWidth: 4,
+                fillColor: '#ab1818',
+                fillOpacity: 0.8,
+                pointRadius: 7,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
             },
             "poly": {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
+                strokeWidth: 6,
+                fillColor: '#ab1818',
                 fillOpacity: 0.7,
                 pointRadius: 6,
                 cursor: "pointer",
                 graphicZIndex: '${zIndex}'
             },
             "line" : {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
+                strokeWidth: 6,
+                fillColor: '#ab1818',
                 fillOpacity: 0.7,
                 pointRadius: 6,
                 cursor: "pointer",
+                graphicZIndex: '${zIndex}'
+            },
+            "start" : {
+                strokeColor: '#ab1818',
+                strokeOpacity: 1,
+                strokeWidth: 6,
+                fillColor: '#ab1818',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "default",
                 graphicZIndex: '${zIndex}'
             },
             "pointOri" : {
@@ -89,7 +112,7 @@ angular.module('udm.map')
                 'pointRadius':25,
                 rotation:"${rot}",
                 cursor: "pointer",
-                externalGraphic: '/styles/images/viewpoint.png'
+                externalGraphic: '/styles/images/viewpointRed.png'
             }
         };
 
@@ -97,41 +120,51 @@ angular.module('udm.map')
 
         var lookupSelect = {
             "point": {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
-                fillOpacity: 0.7,
-                pointRadius: 6,
-                cursor: "pointer",
+                strokeWidth: 4,
+                fillColor: '#ab1818',
+                fillOpacity: 0.8,
+                pointRadius: 7,
+                cursor: "default",
                 graphicZIndex: '${zIndex}'
             },
             "poly": {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
+                strokeWidth: 6,
+                fillColor: '#ab1818',
                 fillOpacity: 0.7,
                 pointRadius: 6,
-                cursor: "pointer",
+                cursor: "default",
                 graphicZIndex: '${zIndex}'
             },
             "line" : {
-                strokeColor: '${color}',
+                strokeColor: '#ab1818',
                 strokeOpacity: 1,
-                strokeWidth: 8,
-                fillColor: '${color}',
+                strokeWidth: 6,
+                fillColor: '#ab1818',
                 fillOpacity: 0.7,
                 pointRadius: 6,
-                cursor: "pointer",
+                cursor: "default",
+                graphicZIndex: '${zIndex}'
+            },
+            "start" : {
+                strokeColor: '#ab1818',
+                strokeOpacity: 1,
+                strokeWidth: 6,
+                fillColor: '#ab1818',
+                fillOpacity: 0.7,
+                pointRadius: 6,
+                cursor: "default",
                 graphicZIndex: '${zIndex}'
             },
             "pointOri" : {
                 fillOpacity: 1,
                 'pointRadius':25,
                 rotation:"${rot}",
-                cursor: "pointer",
-                externalGraphic: '/styles/images/viewpoint.png'
+                cursor: "default",
+                externalGraphic: '/styles/images/viewpointRed.png'
             }
         };
 
@@ -146,7 +179,8 @@ angular.module('udm.map')
             }
 
             layerPackage.zIndexBase = zIndexBase;
-            for(var x in infoEinheit.features){
+            var x;
+            for(x = 0; x < infoEinheit.features.length; x++){
                 if(infoEinheit.features[x].typ == 'plan'){
                     layerPackage.baseLayer[infoEinheit.features[x].id] = {};
                     layerPackage.baseLayer[infoEinheit.features[x].id].zIndex = zIndexBase;
@@ -180,18 +214,20 @@ angular.module('udm.map')
                     transitionEffect:'resize',
                     buffer:3});
 
-            tileLayer.opacity = 0;
+            if(showAnimation){
+                tileLayer.opacity = 0;
 
-            var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
-            tileLayer.events.register('loadend',this, function(value){
-                tileLayer.events.remove('loadend');
-                var callbacks =  {
-                    eachStep: function(value) {
-                        tileLayer.setOpacity(value.opacity/100);
-                    }
-                };
-                tween.start({opacity:0}, {opacity:100}, 50, {callbacks: callbacks});
-            });
+                var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
+                tileLayer.events.register('loadend',this, function(){
+                    tileLayer.events.remove('loadend');
+                    var callbacks =  {
+                        eachStep: function(value) {
+                            tileLayer.setOpacity(value.opacity/100);
+                        }
+                    };
+                    tween.start({opacity:0}, {opacity:100}, 50, {callbacks: callbacks});
+                });
+            }
 
             tileLayer.setZIndex(zIndex);
 
@@ -202,15 +238,20 @@ angular.module('udm.map')
 
         var removeTileLayer = function(layer){
 
-            var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
+            if(showAnimation){
+                var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
 
-            var callbacks =  {
-                eachStep: function(value) {
-                    layer.setOpacity(value.opacity/100);
-                    if(value.opacity == 0) OLmap.removeLayer(layer);;
-                }
-            };
-            tween.start({opacity:layer.opacity*100}, {opacity:0}, 50*layer.opacity, {callbacks: callbacks});
+                var callbacks =  {
+                    eachStep: function(value) {
+                        layer.setOpacity(value.opacity/100);
+                        if(value.opacity == 0) OLmap.removeLayer(layer);
+                    }
+                };
+                tween.start({opacity:layer.opacity*100}, {opacity:0}, 50*layer.opacity, {callbacks: callbacks});
+            }
+            else{
+                OLmap.removeLayer(layer);
+            }
 
         };
 
@@ -228,6 +269,7 @@ angular.module('udm.map')
             OLmap.addControl(hoverControl);
             hoverControl.activate();
 
+            featureLayer.hoverControl = hoverControl;
 
             //only top layer can be selected!!!
             var selectControl = new OpenLayers.Control.SelectFeature(featureLayer,{
@@ -250,34 +292,54 @@ angular.module('udm.map')
 
         var addFeatureLayer = function(layer){
 
-            layer.setOpacity(0);
+            if(showAnimation) layer.setOpacity(0);
             OLmap.addLayer(layer);
 
-            var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
+            if(showAnimation){
+                var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
 
-            var callbacks =  {
-                eachStep: function(value) {
-                    layer.setOpacity(value.opacity/100);
-                }
-            };
+                var callbacks =  {
+                    eachStep: function(value) {
+                        layer.setOpacity(value.opacity/100);
+                    }
+                };
 
-            tween.start({opacity:0}, {opacity:100}, 50, {callbacks: callbacks});
+                tween.start({opacity:0}, {opacity:100}, 50, {callbacks: callbacks});
+            }
 
 
         };
 
         var removeFeatureLayer = function(layer){
 
-            var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
+            if(showAnimation){
+                var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
 
-            var callbacks =  {
-                eachStep: function(value) {
-                    layer.setOpacity(value.opacity/100);
-                    if(value.opacity == 0) OLmap.removeLayer(layer);
-                }
-            };
-            tween.start({opacity:layer.opacity*100}, {opacity:0}, 50*layer.opacity, {callbacks: callbacks});
+                var callbacks =  {
+                    eachStep: function(value) {
+                        layer.setOpacity(value.opacity/100);
+                        if(value.opacity == 0){
+                            layer.selectControl.deactivate();
+                            OLmap.removeControl(layer.selectControl);
 
+                            layer.hoverControl.deactivate();
+                            OLmap.removeControl(layer.hoverControl);
+
+                            OLmap.removeLayer(layer);
+                        }
+                    }
+                };
+                tween.start({opacity:layer.opacity*100}, {opacity:0}, 50*layer.opacity, {callbacks: callbacks});
+            }
+            else{
+                layer.selectControl.deactivate();
+                OLmap.removeControl(layer.selectControl);
+
+                layer.hoverControl.deactivate();
+                OLmap.removeControl(layer.hoverControl);
+
+                OLmap.removeLayer(layer);
+            }
         };
 
         var addFeatureToLayer = function(feature,layer){
@@ -286,19 +348,23 @@ angular.module('udm.map')
         };
 
         var addTooltip = function(feature){
-            $('[id="'+feature.feature.geometry.id+'"]').data('powertip', feature.title);
-            $('[id="'+feature.feature.geometry.id+'"]').powerTip({placement:'se',
+            $('[id="'+feature.feature.geometry.id+'"]').data('powertip', feature.title).powerTip({placement:'se',
                 followMouse : true
             });
+        };
 
-
+        var addLabel = function(feature){
+            var center = feature.feature.geometry.getBounds().getCenterLonLat();
+            var position = OLmap.getViewPortPxFromLonLat(center);
+            $('[id="OpenLayers.Map_2_OpenLayers_Container"]').append('<div id="label_'+feature.id+'" class="mapLabel">'+feature.title+'</div>');
+            $('#label_'+feature.id).css('top',position.y-15+'px').css('left',position.x-60+'px');
         };
 
         var setZindexLayer = function(layer,zIndex,type){
 
             type = '';
 
-            if(type == 'fadeIn'){
+            if(type == 'fadeIn' && showAnimation){
                 var preOpacity = layer.opacity;
 
                 var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
@@ -315,7 +381,7 @@ angular.module('udm.map')
                 tween.start({opacity:0}, {opacity:preOpacity*100}, 20*preOpacity, {callbacks: callbacks});
 
             }
-            else if(type == 'fadeOut'){
+            else if(type == 'fadeOut' && showAnimation){
 
                 (function( layer ) {
                     var preOpacity = layer.opacity;
@@ -341,11 +407,11 @@ angular.module('udm.map')
         };
 
         var setZindexPackage = function(layerPackage,type){
-
-            for(var x in layerPackage.baseLayer){
+            var x;
+            for(x in layerPackage.baseLayer){
                 setZindexLayer(layerPackage.baseLayer[x].layer,layerPackage.baseLayer[x].zIndex,type);
             }
-            for(var x in layerPackage.overlayLayer){
+            for(x in layerPackage.overlayLayer){
                 setZindexLayer(layerPackage.overlayLayer[x].layer,layerPackage.overlayLayer[x].zIndex,type);
             }
             if(layerPackage.featureLayer.layer){
@@ -354,14 +420,46 @@ angular.module('udm.map')
 
         };
 
+        var removeInfoEinheit = function(id){
+            var x;
+            if(layerPackages[id]){
+                for(x in layerPackages[id].baseLayer){
+                    if(layerPackages[id].baseLayer[x].layer) removeTileLayer(layerPackages[id].baseLayer[x].layer);
+                }
+                for(x in layerPackages[id].overlayLayer){
+                    if(layerPackages[id].overlayLayer[x].layer) removeTileLayer(layerPackages[id].overlayLayer[x].layer);
+                }
+                if(layerPackages[id].featureLayer.layer){
+                    removeFeatureLayer(layerPackages[id].featureLayer.layer);
+                    if(layerPackages[id].featureLayer.hasLabel){
+                        $('.mapLabel').remove();
+                        OLmap.events.remove('zoomend');
+                    }
+                }
+
+                nextZindexTop = 200;
+                for(x in layerPackages){
+                    if((layerPackages[x] != layerPackages[id]) && nextZindexTop < layerPackages[x].zIndexBase)
+                        nextZindexTop = layerPackages[x].zIndexBase;
+                }
+                if(nextZindexTop < 900) nextZindexTop = 900;
+                nextZindexTop = nextZindexTop + 100;
+
+                delete layerPackages[id];
+            }
+        };
+
         // Public API here
         return {
             resetMap : function(){
                 OpenLayersMap.resetMap();
             },
+            clearAllLayers : function(){
+                layerPackages = {};
+            },
             selectfeature : function(feature){
                 for(var x in layerPackages){
-                    for(var y in layerPackages[x].featureLayer.layer.features){
+                    for(var y = 0; y < layerPackages[x].featureLayer.layer.features.length; y++){
                         if(layerPackages[x].featureLayer.layer.features[y].attributes.id == feature.id){
                             layerPackages[x].featureLayer.layer.selectControl.select(layerPackages[x].featureLayer.layer.features[y]);
                             break;
@@ -371,6 +469,8 @@ angular.module('udm.map')
             },
             addInfoEinheit : function(infoEinheit,position){
 
+                if(layerPackages[infoEinheit.id]) removeInfoEinheit(infoEinheit.id);
+
                 var layerPackage = {};
                 layerPackage.baseLayer = {};
                 layerPackage.overlayLayer = {};
@@ -378,97 +478,270 @@ angular.module('udm.map')
                 layerPackage.infoEinheit = infoEinheit;
                 calculateZindex(layerPackage,infoEinheit,position);
 
-
+                var x;
                 if(position == 'top'){
                     //0 is on top
                     layerPackage.infoEinheit.layerStackPosition = 0;
-                    for(var x in layerPackages){
+                    for(x in layerPackages){
                         layerPackages[x].infoEinheit.layerStackPosition = layerPackages[x].infoEinheit.layerStackPosition + 1;
                     }
                 }
 
-                infoEinheit.hasFeatureLayer = false;
                 infoEinheit.overlayLayer = {};
                 infoEinheit.featureLayer = {};
                 infoEinheit.baseLayer = {};
 
-                for(var x in infoEinheit.features){
-                    if(infoEinheit.features[x].typ == 'plan'){
+                for(x = 0; x < infoEinheit.features.length; x++){
+                    if(infoEinheit.features[x].typ == 'plan' && !infoEinheit.features[x].hideInMap){
                         layerPackage.baseLayer[infoEinheit.features[x].id].layer = addTileLayer(infoEinheit.features[x].feature,layerPackage.baseLayer[infoEinheit.features[x].id].zIndex);
 
                         infoEinheit.baseLayer.visible = true;
-                        infoEinheit.baseLayer.opacity = 1;
+                        if(typeof infoEinheit.features[x].opacity !== 'undefined'){
+                            infoEinheit.baseLayer.opacity = infoEinheit.features[x].opacity;
+                            layerPackage.baseLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.baseLayer.opacity);
+                        }
+                        else{
+                            infoEinheit.baseLayer.opacity = 1;
+                        }
                     }
-                    else if(infoEinheit.features[x].typ == 'planOverlay'){
+                    else if(infoEinheit.features[x].typ == 'planOverlay' && !infoEinheit.features[x].hideInMap){
                         layerPackage.overlayLayer[infoEinheit.features[x].id].layer = addTileLayer(infoEinheit.features[x].feature,layerPackage.overlayLayer[infoEinheit.features[x].id].zIndex);
 
                         infoEinheit.overlayLayer[infoEinheit.features[x].id] = {};
                         infoEinheit.overlayLayer[infoEinheit.features[x].id].visible = true;
-                        infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity = 1;
+                        if(typeof infoEinheit.features[x].opacity  !== 'undefined'){
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity = infoEinheit.features[x].opacity;
+                            layerPackage.overlayLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity);
+                        }
+                        else{
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity = 1;
+                        }
+
                     }
-                    else{
+                    else if(!infoEinheit.features[x].hideInMap){
                         if(!layerPackage.featureLayer.layer){
                             layerPackage.featureLayer.layer = createFeatureLayer(layerPackage.featureLayer.zIndex);
 
-                            infoEinheit.hasFeatureLayer = true;
                             infoEinheit.featureLayer.visible = true;
                             infoEinheit.featureLayer.opacity = 1;
                         }
                         addFeatureToLayer(infoEinheit.features[x].feature,layerPackage.featureLayer.layer);
+                        if(infoEinheit.features[x].typ == 'start'){
+                            layerPackage.featureLayer.layer.selectControl.deactivate();
+                            layerPackage.featureLayer.hasLabel = true;
+                        }
                     }
                 }
 
                 if(layerPackage.featureLayer.layer) addFeatureLayer(layerPackage.featureLayer.layer);
 
-                for(var x in infoEinheit.features){
-                    if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
-                        addTooltip(infoEinheit.features[x]);
+                if(layerPackage.featureLayer.hasLabel){
+                    $('.mapLabel').remove();
+                    for(x=0; x < infoEinheit.features.length; x++){
+                        if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                            addLabel(infoEinheit.features[x]);
+                        }
+                    }
+
+                    OLmap.events.register('zoomend', this, function(){
+                        $('.mapLabel').remove();
+                        for(x=0; x < infoEinheit.features.length; x++){
+                            if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                                addLabel(infoEinheit.features[x]);
+                            }
+                        }
+                    });
+                }
+                else{
+                    for(x=0; x < infoEinheit.features.length; x++){
+                        if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                            addTooltip(infoEinheit.features[x]);
+                        }
                     }
                 }
 
 
                 layerPackages[infoEinheit.id] = layerPackage;
             },
-            removeInfoEinheit : function(id){
-                if(layerPackages[id]){
-                    for(var x in layerPackages[id].baseLayer){
-                        removeTileLayer(layerPackages[id].baseLayer[x].layer);
-                    }
-                    for(var x in layerPackages[id].overlayLayer){
-                        removeTileLayer(layerPackages[id].overlayLayer[x].layer);
-                    }
-                    if(layerPackages[id].featureLayer.layer) removeFeatureLayer(layerPackages[id].featureLayer.layer);
+            changeInfoEinheit : function(infoEinheit,position){
+                var x;
+                if(!layerPackages[infoEinheit.id]){
+                    var layerPackage = {};
+                    layerPackage.baseLayer = {};
+                    layerPackage.overlayLayer = {};
+                    layerPackage.featureLayer = {};
+                    layerPackage.infoEinheit = infoEinheit;
+                    calculateZindex(layerPackage,infoEinheit,position);
 
-                    nextZindexTop = 200;
-                    for(var x in layerPackages){
-                        if((layerPackages[x] != layerPackages[id]) && nextZindexTop < layerPackages[x].zIndexBase)
-                            nextZindexTop = layerPackages[x].zIndexBase;
-                    }
-                    if(nextZindexTop < 900) nextZindexTop = 900;
-                    nextZindexTop = nextZindexTop + 100;
 
-                    delete layerPackages[id];
+                    if(position == 'top'){
+                        //0 is on top
+                        layerPackage.infoEinheit.layerStackPosition = 0;
+                        for(x in layerPackages){
+                            layerPackages[x].infoEinheit.layerStackPosition = layerPackages[x].infoEinheit.layerStackPosition + 1;
+                        }
+                    }
+
+                    layerPackages[infoEinheit.id] = layerPackage;
                 }
+
+                infoEinheit.overlayLayer = {};
+                infoEinheit.featureLayer = {};
+                infoEinheit.baseLayer = {};
+
+                $('.mapLabel').remove();
+                OLmap.events.remove('zoomend');
+
+                for(x in layerPackages[infoEinheit.id].baseLayer){
+                    if(layerPackages[infoEinheit.id].baseLayer[x].layer)
+                        layerPackages[infoEinheit.id].baseLayer[x].remove = true;
+                }
+                for(x in layerPackages[infoEinheit.id].overlayLayer){
+                    if(layerPackages[infoEinheit.id].overlayLayer[x].layer)
+                        layerPackages[infoEinheit.id].overlayLayer[x].remove = true;
+                }
+                if(layerPackages[infoEinheit.id].featureLayer.layer){
+                    for(x=0; x < layerPackages[infoEinheit.id].featureLayer.layer.features.length; x++){
+                        layerPackages[infoEinheit.id].featureLayer.layer.selectControl.unselect(layerPackages[infoEinheit.id].featureLayer.layer.features[x]);
+                        layerPackages[infoEinheit.id].featureLayer.layer.features[x].remove = true;
+                    }
+                }
+
+                for(x=0; x < infoEinheit.features.length; x++){
+                    if(infoEinheit.features[x].typ == 'plan' && !infoEinheit.features[x].hideInMap){
+                        if(!layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].layer){
+                            layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].layer = addTileLayer(infoEinheit.features[x].feature,layerPackage.baseLayer[infoEinheit.features[x].id].zIndex);
+
+                            layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].remove = false;
+
+                            infoEinheit.baseLayer.visible = true;
+                            if(typeof infoEinheit.features[x].opacity !== 'undefined'){
+                                infoEinheit.baseLayer.opacity = infoEinheit.features[x].opacity;
+                                layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.baseLayer.opacity);
+                            }
+                            else{
+                                infoEinheit.baseLayer.opacity = 1;
+                            }
+                        }
+                        else{
+                            layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].remove = false;
+                        }
+                    }
+                    else if(infoEinheit.features[x].typ == 'planOverlay' && !infoEinheit.features[x].hideInMap){
+                        if(!layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].layer){
+                            layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].layer = addTileLayer(infoEinheit.features[x].feature,layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].zIndex);
+
+                            layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].remove = false;
+
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id] = {};
+                            infoEinheit.overlayLayer[infoEinheit.features[x].id].visible = true;
+                            if(typeof infoEinheit.features[x].opacity  !== 'undefined'){
+                                infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity = infoEinheit.features[x].opacity;
+                                layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity);
+                            }
+                            else{
+                                infoEinheit.overlayLayer[infoEinheit.features[x].id].opacity = 1;
+                            }
+                        }
+                        else{
+                            layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].remove = false;
+                        }
+
+                    }
+                    else if(!infoEinheit.features[x].hideInMap){
+                        if(!layerPackages[infoEinheit.id].featureLayer.layer){
+                            layerPackages[infoEinheit.id].featureLayer.layer = createFeatureLayer(layerPackages[infoEinheit.id].featureLayer.zIndex);
+
+                            var newFeatureLayer = true;
+                        }
+
+                        infoEinheit.featureLayer.visible = true;
+                        infoEinheit.featureLayer.opacity = 1;
+
+                        var featureInMap = false;
+                        for(var y = 0; y < layerPackages[infoEinheit.id].featureLayer.layer.features.length; y++){
+                            if(layerPackages[infoEinheit.id].featureLayer.layer.features[y].attributes.id == infoEinheit.features[x].id){
+                                featureInMap = true;
+                                layerPackages[infoEinheit.id].featureLayer.layer.features[y].remove = false;
+                            }
+                        }
+
+                        if(!featureInMap){
+                            addFeatureToLayer(infoEinheit.features[x].feature,layerPackages[infoEinheit.id].featureLayer.layer);
+                            if(infoEinheit.features[x].typ == 'start'){
+                                layerPackages[infoEinheit.id].featureLayer.layer.selectControl.deactivate();
+                                layerPackages[infoEinheit.id].featureLayer.hasLabel = true;
+                            }
+                        }
+                    }
+                }
+
+                if(newFeatureLayer) addFeatureLayer(layerPackages[infoEinheit.id].featureLayer.layer);
+
+                if(layerPackages[infoEinheit.id].featureLayer.hasLabel){
+                    $('.mapLabel').remove();
+                    for(x=0; x < infoEinheit.features.length; x++){
+                        if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                            addLabel(infoEinheit.features[x]);
+                        }
+                    }
+
+                    OLmap.events.register('zoomend', this, function(value){
+                        $('.mapLabel').remove();
+                        for(x=0; x < infoEinheit.features.length; x++){
+                            if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                                addLabel(infoEinheit.features[x]);
+                            }
+                        }
+                    });
+                }
+                else{
+                    for(x=0; x < infoEinheit.features.length; x++){
+                        if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
+                            addTooltip(infoEinheit.features[x]);
+                        }
+                    }
+                }
+
+                //Remove old stuff
+                for(x in layerPackages[infoEinheit.id].baseLayer){
+                    if(layerPackages[infoEinheit.id].baseLayer[x].remove){
+                        removeTileLayer(layerPackages[infoEinheit.id].baseLayer[x].layer);
+                        layerPackages[infoEinheit.id].baseLayer[x].layer = null;
+                        layerPackages[infoEinheit.id].baseLayer[x].remove = false;
+                    }
+                }
+                for(x in layerPackages[infoEinheit.id].overlayLayer){
+                    if(layerPackages[infoEinheit.id].overlayLayer[x].remove){
+                        removeTileLayer(layerPackages[infoEinheit.id].overlayLayer[x].layer);
+                        layerPackages[infoEinheit.id].overlayLayer[x].layer = null;
+                        layerPackages[infoEinheit.id].overlayLayer[x].remove = false;
+                    }
+                }
+                if(layerPackages[infoEinheit.id].featureLayer.layer){
+                    for(x = 0; x < layerPackages[infoEinheit.id].featureLayer.layer.features.length; x++){
+                        if(layerPackages[infoEinheit.id].featureLayer.layer.features[x].remove)
+                            layerPackages[infoEinheit.id].featureLayer.layer.removeFeatures([layerPackages[infoEinheit.id].featureLayer.layer.features[x]]);
+                    }
+                    if(layerPackages[infoEinheit.id].featureLayer.layer.features.length == 0){
+                        removeFeatureLayer(layerPackages[infoEinheit.id].featureLayer.layer);
+                        if(layerPackages[infoEinheit.id].featureLayer.hasLabel){
+                            $('.mapLabel').remove();
+                            OLmap.events.remove('zoomend');
+                        }
+                        layerPackages[infoEinheit.id].featureLayer.layer = null;
+                    }
+                }
+
+
+
+            },
+            removeInfoEinheit : function(id){
+                removeInfoEinheit(id);
             },
             removeAllInfoEinheiten : function(){
                 for(var id in layerPackages){
-                    for(var x in layerPackages[id].baseLayer){
-                        removeTileLayer(layerPackages[id].baseLayer[x].layer);
-                    }
-                    for(var x in layerPackages[id].overlayLayer){
-                        removeTileLayer(layerPackages[id].overlayLayer[x].layer);
-                    }
-                    if(layerPackages[id].featureLayer.layer) removeFeatureLayer(layerPackages[id].featureLayer.layer);
-
-                    nextZindexTop = 200;
-                    for(var x in layerPackages){
-                        if((layerPackages[x] != layerPackages[id]) && nextZindexTop < layerPackages[x].zIndexBase)
-                            nextZindexTop = layerPackages[x].zIndexBase;
-                    }
-                    if(nextZindexTop < 900) nextZindexTop = 900;
-                    nextZindexTop = nextZindexTop + 100;
-
-                    delete layerPackages[id];
+                    removeInfoEinheit(id);
                 }
             },
             setOpacity : function(typ,infoEinheitId,featureId,value){
@@ -493,8 +766,9 @@ angular.module('udm.map')
                 var type = 'fadeIn';
                 if(layerPackages[id].infoEinheit.layerStackPosition < targetLevel) type = 'fadeOut';
 
+                var x;
                 if(layerPackages[id].infoEinheit.layerStackPosition < targetLevel){ //to the back
-                    for(var x in layerPackages){
+                    for(x in layerPackages){
                         if(layerPackages[x].infoEinheit.layerStackPosition == targetLevel+1) below = layerPackages[x].zIndexBase;
                         if(layerPackages[x].infoEinheit.layerStackPosition == targetLevel) above = layerPackages[x].zIndexBase;
 
@@ -505,7 +779,7 @@ angular.module('udm.map')
                     }
                     if(below == null){
                         zIndex = 2000;
-                        for(var x in layerPackages){
+                        for(x in layerPackages){
                             if(layerPackages[x].zIndexBase < zIndex) zIndex = layerPackages[x].zIndexBase;
                         }
                         zIndex = zIndex - 100;
@@ -518,7 +792,7 @@ angular.module('udm.map')
                     }
                 }
                 if(layerPackages[id].infoEinheit.layerStackPosition > targetLevel){ //to the front
-                    for(var x in layerPackages){
+                    for(x in layerPackages){
                         if(layerPackages[x].infoEinheit.layerStackPosition == targetLevel) below = layerPackages[x].zIndexBase;
                         if(layerPackages[x].infoEinheit.layerStackPosition == targetLevel-1) above = layerPackages[x].zIndexBase;
 
@@ -542,10 +816,10 @@ angular.module('udm.map')
                 layerPackages[id].infoEinheit.layerStackPosition = targetLevel;
                 layerPackages[id].zIndexBase = zIndex;
 
-                for(var x in layerPackages[id].baseLayer){
+                for(x in layerPackages[id].baseLayer){
                     layerPackages[id].baseLayer[x].zIndex = zIndex;
                 }
-                for(var x in layerPackages[id].overlayLayer){
+                for(x in layerPackages[id].overlayLayer){
                     layerPackages[id].overlayLayer[x].zIndex = zIndex + 1;
                 }
                 layerPackages[id].featureLayer.zIndex = zIndex + 2;
@@ -553,15 +827,24 @@ angular.module('udm.map')
 
                 setZindexPackage(layerPackages[id],type);
             },
-            removeTileLayer : function(tileLayer){
-                OLmap.removeLayer(tileLayer);
-            },
             removeFeature : function(feature,layer){
                 layer.removeFeatures([feature.geom]);
             },
             removeAllFeatures : function(layer){
                 layer.removeAllFeatures();
 
+            },
+            getMapView : function(){
+                var zoom = OLmap.getZoom();
+                var center = OLmap.getCenter();
+                var wkt = util.featureToWKT(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(center.lon,center.lat)),'POINT');
+
+                return {zoom:zoom, wkt:wkt}
+            }
+            ,
+            setMapView : function(mapView){
+                var center = util.WKTToFeature(mapView.wkt);
+                OLmap.moveTo(new OpenLayers.LonLat(center.geometry.x,center.geometry.y),mapView.zoom);
             }
         };
     });

@@ -12,6 +12,7 @@ angular.module('udm.map')
         var CPId = 0;
         var CP = [];
         var CPControl = null;
+        var SelectControl = null;
 
         var firstPoint = null;
         var secondPoint = null;
@@ -24,15 +25,74 @@ angular.module('udm.map')
         var OLmap = OpenLayersMap.getMap();
         var moveEventCurrentZoom = 999;
 
+
+        var styleMap = new OpenLayers.StyleMap({
+            'default': {},
+            'select': {},
+            temporary: {
+                graphicName: 'cross',
+                pointRadius: 8,
+                strokeColor: '#FF0000',
+                strokeWidth: 2,
+                fillColor: '#000000'
+            }
+
+        });
+
+        var lookupDefault = {
+            "first": {
+                graphicName: 'cross',
+                pointRadius: '8',
+                fillColor: '#0000FF'
+            },
+            "firstSmall": {
+                graphicName: 'circle',
+                pointRadius: '3',
+                fillColor: '#0000FF'
+            },
+            "second": {
+                graphicName: 'cross',
+                pointRadius: '8',
+                fillColor: '#00FF00'
+            },
+            "line": {
+                fillColor: '#000000'
+            }
+        };
+
+        styleMap.addUniqueValueRules("default", "type", lookupDefault);
+
+        var lookupSelect = {
+            "first": {
+                graphicName: 'cross',
+                pointRadius: '8',
+                fillColor: '#0000FF',
+                strokeColor: '#FF0000',
+                strokeWidth: 2
+            },
+            "second": {
+                graphicName: 'cross',
+                pointRadius: '8',
+                fillColor: '#00FF00',
+                strokeColor: '#FF0000',
+                strokeWidth: 2
+            },
+            "line": {
+                fillColor: '#FF0000',
+                strokeColor: '#FF0000'
+            }
+        };
+
+        styleMap.addUniqueValueRules("select", "type", lookupSelect);
+
         var addMoveEvent = function(){
-            OLmap.events.register('movestart', this, function(value){
+            OLmap.events.register('movestart', this, function(){
                 imgPixelPoint = OLmap.getViewPortPxFromLonLat(new OpenLayers.LonLat(imgPoint.x,imgPoint.y));
             });
 
             moveEventCurrentZoom = OLmap.getZoom();
             OLmap.events.register('move', this, function(value){
                 if(value.object.zoom == moveEventCurrentZoom){
-                    moveEventCurrentZoom = value.object.zoom;
                     var point = OLmap.getLonLatFromViewPortPx(imgPixelPoint);
                     imgPoint.x = point.lon;
                     imgPoint.y = point.lat;
@@ -40,12 +100,12 @@ angular.module('udm.map')
                 }
                 moveEventCurrentZoom = value.object.zoom;
             });
-        }
+        };
 
         var removeMoveEvent = function(){
             OLmap.events.remove('movestart');
             OLmap.events.remove('move');
-        }
+        };
 
         // Public API here
         return {
@@ -145,57 +205,15 @@ angular.module('udm.map')
 
                 if(!CPlayer){
 
-                    var styleMap = new OpenLayers.StyleMap({
-                        'default': {
-
-                        },
-                        'select': {
-                            graphicName: '${graphic}',
-                            pointRadius: '${size}',
-                            strokeColor: '#FF231A',
-                            strokeWidth: 2,
-                            fillColor: 'lime'
-                        },
-                        temporary: {
-                            graphicName: 'cross',
-                            pointRadius: 8,
-                            strokeColor: '#FF0000',
-                            strokeWidth: 2,
-                            fillColor: '#000000'
-                        }
-
-                    });
-
-                    var lookup = {
-                        "first": {
-                            graphicName: 'cross',
-                            pointRadius: '8',
-                            fillColor: '#0000FF'
-                        },
-                        "firstSmall": {
-                            graphicName: 'circle',
-                            pointRadius: '3',
-                            fillColor: '#0000FF'
-                        },
-                        "second": {
-                            graphicName: 'cross',
-                            pointRadius: '8',
-                            fillColor: '#00FF00'
-                        },
-                        "line": {
-                            fillColor: '#000000'
-                        }
-                    }
-
-                    styleMap.addUniqueValueRules("default", "type", lookup);
-
                     CPlayer = new OpenLayers.Layer.Vector('CP', {
                         styleMap: styleMap
                     });
 
                     CPControl = new OpenLayers.Control.DrawFeature(CPlayer,OpenLayers.Handler.Point);
+                    SelectControl = new OpenLayers.Control.SelectFeature(CPlayer);
 
                     OLmap.addControl(CPControl);
+                    OLmap.addControl(SelectControl);
                     OLmap.addLayers([CPlayer]);
                 }
 
@@ -211,6 +229,7 @@ angular.module('udm.map')
                         imgPointFeature.attributes.opacity = 0.4;
                         imgLayer.redraw();
                         if(digest) digest();
+                        return true;
                     }
                     else{
                         secondPoint = feature.feature;
@@ -248,6 +267,7 @@ angular.module('udm.map')
                     if(line < 0 || pixel < 0 || line > img.realHeight || pixel > img.realWidth){
                         alert('outside');
                         CPlayer.removeFeatures(firstPoint);
+                        callback(null);
                         return false;
                     }
 
@@ -279,15 +299,33 @@ angular.module('udm.map')
                 }
             },
             removeCP: function(id){
-                for(var x in CP){
+                for(var x = 0; x < CP.length; x++){
                     if(CP[x].id == id){
                         CPlayer.removeFeatures([CP[x].imgPoint,CP[x].worldPoint,CP[x].line])
                     }
                 }
             },
-            clearCP: function(id){
+            clearCP: function(){
                 if(CPControl) CPControl.deactivate();
                 if(CPlayer) CPlayer.removeAllFeatures();
+            },
+            highlightCP: function(id){
+                for(var x = 0; x < CP.length; x++){
+                    if(CP[x].id == id){
+                        SelectControl.select(CP[x].imgPoint);
+                        SelectControl.select(CP[x].worldPoint);
+                        SelectControl.select(CP[x].line);
+                    }
+                }
+            },
+            unhighlightCP: function(id){
+                for(var x = 0; x < CP.length; x++){
+                    if(CP[x].id == id){
+                        SelectControl.unselect(CP[x].imgPoint);
+                        SelectControl.unselect(CP[x].worldPoint);
+                        SelectControl.unselect(CP[x].line);
+                    }
+                }
             },
             hideEditLayers: function(){
                 if(CPlayer) CPlayer.setVisibility(false);
@@ -325,7 +363,7 @@ angular.module('udm.map')
                     OLmap.zoomTo(metaData.TileSet.maxZoom);
                 }
             },
-            destroyResultLayer: function(metaData){
+            destroyResultLayer: function(){
                 if(resultLayer)  OLmap.removeLayer(resultLayer);
                 resultLayer = null;
             },

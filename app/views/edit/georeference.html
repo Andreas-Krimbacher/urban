@@ -42,7 +42,7 @@
 
             <div class="cpTable">
                 <table>
-                    <tr ng-repeat="point in CP">
+                    <tr ng-repeat="point in CP" ng-mouseenter="mouseEnter(point.id)" ng-mouseleave="mouseLeave(point.id)">
                         <td><div class="infotext">CP {{$index+1}}</div></td>
                         <td><div class="coord image">Pixel: {{point.imgPoint.pixel}}</div><div class="coord image">Line: {{point.imgPoint.line}}</div></td>
                         <td><div class="coord world">Länge: {{point.worldPoint.lon|number:0}}</div><div class="coord world">Breite: {{point.worldPoint.lat|number:0}}</div></td>

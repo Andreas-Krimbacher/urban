@@ -1,4 +1,4 @@
 'use strict';
 
-angular.module('udm.map', ['ui.bootstrap.dropdownToggle']);
+angular.module('udm.map', ['ui.bootstrap.dropdownToggle','udm.util']);
 

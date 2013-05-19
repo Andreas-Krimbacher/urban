@@ -1,66 +1,91 @@
-<div id="editLernEinheit" ng-controller="EditLernEinheitCtrl">
+<div ng-controller="EditLernEinheitCtrl">
     <infoControls></infoControls>
 
-    <div id="editLernEinheitTop">
-        <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
-        <div class="topBarText">{{topTitle}}</div>
-    </div>
-
-    <table class="table table-striped lernEinheitTable" ng-show="mode=='list'">
-        <tr>
-            <td colspan="3"><input type="text" name="input" placeholder="Neue Lern-Einheit …" ng-model="newLernEinheitTitle" required></td><td><div class="button-icon" ng-click="editLernEinheitMode(-1)"><i class="icon-plus"></i></div></td>
-        </tr>
-        <tr ng-repeat="item in lernEinheiten">
-            <td><i class="icon-book icon"></i></td>
-            <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
-            <td class="noPadding"><div class="button-icon edit" ng-click="editLernEinheitMode($index)"><i class="icon-pencil"></i></div></td>
-            <td><div class="button-icon trash" ng-click="deleteLernEinheit($index)"><i class="icon-trash"></i></div></td>
-        </tr>
-    </table>
-
-    <form name="editLernEinheitForm" id="editLernEinheitForm" ng-show="mode=='editLernEinheit'">
-        <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernEinheitForm.title.$invalid]">Title:</span>
-        <input type="text" class="title" name="title" ng-model="editLernEinheit.title" required>
-
-        <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernEinheitForm.info.$invalid]">Info:</span>
-        <textarea type="text" rows="8" cols="50" class="info" name="info" ng-model="editLernEinheit.info" required></textarea>
-
-        <span class="label label-inverse heading">Lern-Lektionen</span>
-
-        <div class="lektionenTable">
-            <table class="table table-striped">
-                <tr>
-                    <td colspan="3"><input type="text" name="input" placeholder="Neues Lern-Lektion …" ng-model="newLernLektionTitle"></td>
-                    <td><div class="button-icon new" ng-click="editLernLektionMode(-1)"><i class="icon-plus"></i></div></td>
-                </tr>
-                <tr ng-repeat="item in lernLektionen">
-                    <td><i class="icon-file icon"></i></td>
-                    <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
-                    <td><div class="button-icon edit" ng-click="editLernLektionMode($index)"><i class="icon-pencil"></i></div></td>
-                    <td><div class="button-icon trash" ng-click="deleteLernLektion($index)"><i class="icon-trash"></i></div></td>
-                </tr>
-            </table>
+    <div id="editLernEinheit">
+        <div id="editLernEinheitTop">
+            <div class="button-icon back" ng-click="back()"><i class="icon-arrow-left" ng-show="mode != 'list'"></i></div>
+            <div class="topBarText">{{topTitle}}</div>
         </div>
 
-        <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editLernEinheitForm.$invalid ||lernLektionen.length == 0" ng-class="{true:'btn-danger', false:'btn-success'}[editLernEinheitForm.$invalid ||lernLektionen.length == 0]">Speichern</button>
-    </form>
+        <table class="table lernEinheitTable" ng-show="mode=='list'">
+            <tr>
+                <td colspan="3"><input type="text" name="input" placeholder="Neue Lern-Einheit …" ng-model="newLernEinheitTitle" required></td><td><div class="button-icon" ng-click="editLernEinheitMode(-1)"><i class="icon-plus"></i></div></td>
+            </tr>
+            <tr ng-repeat="item in lernEinheiten">
+                <td><i class="icon-book icon"></i></td>
+                <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
+                <td class="noPadding"><div class="button-icon edit" ng-click="editLernEinheitMode($index)"><i class="icon-pencil"></i></div></td>
+                <td><div class="button-icon trash" ng-click="deleteLernEinheit($index)"><i class="icon-trash"></i></div></td>
+            </tr>
+        </table>
 
-    <div class="editLernLektion" ng-show="mode=='editLernLektion'">
-        <form name="editLernLektionForm" id="editLernLektionForm">
+        <form name="editLernEinheitForm" id="editLernEinheitForm" ng-show="mode=='editLernEinheit'">
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernEinheitForm.title.$invalid]">Title:</span>
+            <input type="text" class="title" name="title" ng-model="editLernEinheit.title" required>
+
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernEinheitForm.info.$invalid]">Info:</span>
+            <textarea type="text" rows="8" cols="50" class="info" name="info" ng-model="editLernEinheit.info" required></textarea>
+
+            <span class="label label-inverse heading">Lern-Lektionen</span>
+
+            <div class="lektionenTable">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <td colspan="3"><input type="text" name="input" placeholder="Neues Lern-Lektion …" ng-model="newLernLektionTitle"></td>
+                        <td><div class="button-icon new" ng-click="editLernLektionMode(-1)"><i class="icon-plus"></i></div></td>
+                    </tr>
+                    </thead>
+                    <tbody ui-sortable ng-model="lernLektionen">
+                    <tr ng-repeat="item in lernLektionen">
+                        <td><i class="icon-file icon"></i></td>
+                        <td><div class="infotext">{{item.title}}</div><div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div></td>
+                        <td><div class="button-icon edit" ng-click="editLernLektionMode($index)"><i class="icon-pencil"></i></div></td>
+                        <td><div class="button-icon trash" ng-click="deleteLernLektion($index)"><i class="icon-trash"></i></div></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editLernEinheitForm.$invalid ||lernLektionen.length == 0" ng-class="{true:'btn-danger', false:'btn-success'}[editLernEinheitForm.$invalid ||lernLektionen.length == 0]">Speichern</button>
+        </form>
+
+
+        <form name="editLernLektionForm" id="editLernLektionForm" ng-show="mode=='editLernLektion'">
             <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernLektionForm.title.$invalid]">Title:</span>
             <input type="text" class="title" name="title" ng-model="editLernLektion.title" required>
+
+            <span class="label label-inverse heading">Lern-Feature</span>
+
+            <div class="addLernFeature" ng-show="!featureEditing">
+                <div class="button-icon" ng-click="editLernFeatureMode(-1)"><i class="icon-plus"></i></div>
+                <span>Lern-Feature Hinzufügen</span>
+            </div>
+
+            <div class="featureTable">
+                <span class="noFeature" ng-show="editLernLektion.lernFeature.length == 0">Keine Lern-Feature vorhanden.</span>
+                <table class="table " ng-show="editLernLektion.lernFeature.length > 0">
+                    <tbody ui-sortable ng-model="editLernLektion.lernFeature">
+                    <tr ng-repeat="item in editLernLektion.lernFeature">
+                        <td ng-switch="item.typ">
+                            <i ng-switch-when="infoEinheit" class="icon-th icon typIcon"></i>
+                            <i ng-switch-when="planVgl" class=" icon-tasks icon typIcon"></i>
+                            <i ng-switch-when="feature" class="icon-map-marker icon typIcon"></i>
+                        </td>
+                        <td><div ng-repeat="title in item.title" class="infotext">{{title}}</div></td>
+                        <td><div class="button-icon edit" ng-click="editLernFeatureMode($index)"><i class="icon-pencil"></i></div></td>
+                        <td><div class="button-icon trash" ng-click="deleteLernFeature($index)"><i class="icon-trash"></i></div></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <button class="btn btn-small send sendLektion" type="button" ng-click="saveLernLektion()" ng-disabled="editLernLektionForm.$invalid || (editLernLektion.lernFeature.length == 0)" ng-class="{true:'btn-danger', false:'btn-success'}[editLernLektionForm.$invalid || (editLernLektion.lernFeature.length == 0)]">Speichern</button>
         </form>
 
-        <span class="label label-inverse heading">Lern-Feature</span>
 
-        <div class="addLernFeature" ng-show="!featureEditing">
-            <div class="button-icon" ng-click="editLernFeatureMode(-1)"><i class="icon-plus"></i></div>
-            <span>Lern-Feature Hinzufügen</span>
-        </div>
 
-        <form name="editLernFeatureForm" id="editLernFeatureForm" ng-show="featureEditing">
+        <form name="editLernFeatureForm" id="editLernFeatureForm" ng-show="mode=='editLernFeature'">
 
             <span class="label" ng-class="{true:'label-important', false:'label-success'}[editLernFeatureForm.typ.$invalid]">Typ:</span>
             <select class="typ" name="typ"  ng-model="editLernFeature.typ" ng-change="setLernFeatureTyp()" required>
@@ -82,12 +107,31 @@
                 </select>
             </div>
 
-            <div ng-show="editLernFeature.typ == 'feature' && editLernFeature.infoEinheit">
-                <span class="label select2Label" ng-class="{true:'label-important', false:'label-success'}[editLernFeature.feature == '']">Feature:</span>
-                <select id="select2Feature" ui-select2 ng-model="editLernFeature.feature" data-placeholder="-- Select One --" ng-change="setLernFeatureFeature()" style="width:168px">
-                    <option></option>
-                    <option ng-repeat="item in feature" value="{{item.id}}">{{item.title}}</option>
-                </select>
+
+            <div ng-show="(editLernFeature.typ == 'infoEinheit' || editLernFeature.typ == 'feature') && editLernFeature.infoEinheit && feature.length > 0">
+                <span class="label select2Label featureLabel" ng-class="{true:'label-important', false:'label-success'}[editLernFeature.feature == '']">Feature:</span>
+                <div class="placeholder">
+                    <i class="icon-info-sign icon selectedFeature" ng-show="editLernFeature.typ == 'feature'" title="Zeige in Infobox"></i>
+                    <i class="icon-eye-open icon visibility" title="Sichtbarkeit"></i>
+                </div>
+
+                <div class="selectFeatureTable featureTable">
+                    <table class="table">
+                        <tr ng-repeat="item in feature">
+                            <td ng-switch="item.typ">
+                                <i ng-switch-when="plan" class="icon-th icon firstRow"></i>
+                                <i ng-switch-when="planOverlay" class="icon-th-large icon firstRow"></i>
+                                <i ng-switch-when="point" class="icon-map-marker icon firstRow"></i>
+                                <i ng-switch-when="pointOri" class="icon-map-marker icon firstRow"></i>
+                                <i ng-switch-when="line" class="icon-map-marker icon firstRow"></i>
+                                <i ng-switch-when="poly" class="icon-map-marker icon firstRow"></i>
+                            </td>
+                            <td><div class="infotext">{{item.title}}</div></td>
+                            <td><input type="checkbox" ng-model="editLernFeature.visible[item.id]" ng-disabled="checkLastVisibleItem(item.id) || item.id == editLernFeature.feature" ng-change="changeVisibility(item)"></td>
+                            <td ng-show="editLernFeature.typ == 'feature'"><input type="radio"  ng-disabled="!editLernFeature.visible[item.id]" ng-change="selectFeature()" ng-value="item.id" ng-model="editLernFeature.feature" name="selectedFeature"></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <div ng-show="editLernFeature.typ == 'planVgl'">
@@ -118,21 +162,7 @@
 
         </form>
 
-        <div class="featureTable">
-            <span class="noFeature" ng-show="editLernLektion.lernFeature.length == 0">Keine Lern-Feature vorhanden.</span>
-            <table class="table table-striped" ng-show="editLernLektion.lernFeature.length > 0">
-                <tr ng-repeat="item in editLernLektion.lernFeature">
-                    <td ng-switch="item.typ">
-                        <i ng-switch-when="infoEinheit" class="icon-th icon typIcon"></i>
-                        <i ng-switch-when="planVgl" class=" icon-tasks icon typIcon"></i>
-                        <i ng-switch-when="feature" class="icon-map-marker icon typIcon"></i>
-                    </td>
-                    <td><div ng-repeat="title in item.title" class="infotext">{{title}}</div></td>
-                    <td><div class="button-icon edit" ng-click="editLernFeatureMode($index)"><i class="icon-pencil"></i></div></td>
-                    <td><div class="button-icon trash" ng-click="deleteLernFeature($index)"><i class="icon-trash"></i></div></td>
-                </tr>
-            </table>
-        </div>
-    </div>
 
+
+    </div>
 </div>

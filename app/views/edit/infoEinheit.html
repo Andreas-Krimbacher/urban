@@ -6,7 +6,7 @@
         <div class="button-icon img" ng-click="uploadImg()"><i class="icon-picture" ng-show="mode != 'list'"></i></div>
     </div>
 
-    <table class="table table-striped infoEinheitTable" ng-show="mode=='list'">
+    <table class="table  infoEinheitTable" ng-show="mode=='list'">
         <tr>
             <td colspan="3"><input type="text" name="input" placeholder="Neue Info-Einheit …" ng-model="newInfoEinheitTitle" required></td><td><div class="button-icon" ng-click="editInfoEinheitMode(-1)"><i class="icon-plus"></i></div></td>
         </tr>
@@ -25,7 +25,7 @@
 
         <span class="label" ng-class="{true:'label-important', false:'label-success'}[editInfoEinheitForm.start.$invalid]">Von:</span>
         <input type="number" class="start" name="start" ng-model="editInfoEinheit.start" min="-9999" max="9999" required/>
-        <span class="label label-success">Bis:</span>
+        <span class="label" ng-class="{true:'label-success', false:'label-important'}[!editInfoEinheit.end || (editInfoEinheit.end > editInfoEinheit.start)]">Bis:</span>
         <input type="number" class="end" name="end" ng-model="editInfoEinheit.end" min="-9999" max="9999"/>
 
         <span class="label label-success">Info:</span>
@@ -41,7 +41,7 @@
         <span class="label label-inverse heading">Elemente</span>
 
         <div class="featureTable">
-            <table class="table table-striped">
+            <table class="table ">
                 <tr>
                     <td colspan="3"><input type="text" name="input" placeholder="Neues Feature …" ng-model="newFeatureTitle"></td>
                     <td><div class="button-icon new" ng-click="editFeatureMode(-1)"><i class="icon-plus"></i></div></td>
@@ -62,17 +62,19 @@
             </table>
         </div>
 
-        <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editInfoEinheitForm.$invalid ||features.length == 0" ng-class="{true:'btn-danger', false:'btn-success'}[editInfoEinheitForm.$invalid ||features.length == 0]">Speichern</button>
+        <button class="btn btn-small send" type="button" ng-click="save()" ng-disabled="editInfoEinheitForm.$invalid ||features.length == 0 || (editInfoEinheit.end && (editInfoEinheit.end < editInfoEinheit.start))" ng-class="{true:'btn-danger', false:'btn-success'}[editInfoEinheitForm.$invalid ||features.length == 0 || (editInfoEinheit.end && (editInfoEinheit.end < editInfoEinheit.start))]">Speichern</button>
     </form>
 
     <form name="editFeatureForm" id="editFeatureForm" ng-show="mode=='editFeature'">
-        <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.title.$invalid]">Title:</span>
-        <input type="text" class="title" name="title" ng-model="editFeature.title" required>
+        <div ng-show="editFeature.typ != 'plan'">
+            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.title.$invalid]">Title:</span>
+            <input type="text" class="title" name="title" ng-model="editFeature.title" required>
+        </div>
 
         <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.typ.$invalid]">Typ:</span>
-        <select class="typ" name="typ"  ng-model="editFeature.typ" ng-change="typChange()" required>
+        <select class="typ" name="typ" ng-model="editFeature.typ" ng-change="typChange()" required>
             <option value="" disabled selected>-- Select One --</option>
-            <option value="plan">Plan Hintergrund</option>
+            <option value="plan">Grundplan</option>
             <option value="planOverlay">Plan im Plan</option>
             <option value="point">Punkt-Element</option>
             <option value="pointOri">Punkt mit Richtung</option>
@@ -103,7 +105,7 @@
         <div ng-show="editFeature.typ == 'point' || editFeature.typ == 'pointOri' || editFeature.typ == 'line' || editFeature.typ == 'poly' || editFeature.typ == 'planOverlay'">
             <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.start.$invalid]">Von:</span>
             <input type="number" class="start" name="start" ng-model="editFeature.start" min="-9999" max="9999"/>
-            <span class="label" ng-class="{true:'label-important', false:'label-success'}[editFeatureForm.end.$invalid]">Bis:</span>
+            <span class="label label-success">Bis:</span>
             <input type="number" class="end" name="end" ng-model="editFeature.end" min="-9999" max="9999"/>
 
             <span class="label label-success">Info:</span>

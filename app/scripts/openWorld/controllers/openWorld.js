@@ -5,18 +5,24 @@ angular.module('udm.openWorld')
 
         $scope.$emit('$clearMap');
 
+        mapInfoEinheit.clearAllLayers();
+
         var infoEinheitenInMap = [];
 
         $http.get('/pg/getInfoEinheitenList').
-            success(function(data, status, headers, config) {
+            success(function(data) {
 
-                for(var x in data.list){
-                    (function( infoEinheit ) {
-                        infoEinheit.onClick = function(){
+                for(var x = data.list.length - 1; x >= 0; x--){
+                    if(data.list[x].start == data.list[x].end){
+                        data.list.splice(x,1);
 
-                            showInfoEinheit(infoEinheit.id);
-                        }
-                    })( data.list[x] );
+                    }
+                        (function( infoEinheit ) {
+                            infoEinheit.onClick = function(){
+
+                                showInfoEinheit(infoEinheit.id);
+                            }
+                        })( data.list[x] );
                 }
 
 
@@ -29,8 +35,8 @@ angular.module('udm.openWorld')
             });
 
         var showInfoEinheit = function(infoEinheit,selectFeature){
-
-            for(var x in infoEinheitenInMap){
+            var x;
+            for(x=0; x < infoEinheitenInMap.length ; x++){
                 if(infoEinheitenInMap[x].id == infoEinheit){
                     $scope.$broadcast('selectItem',{type:'infoEinheit',id:infoEinheitenInMap[x].id});
                     $scope.$broadcast('showInfo',{data:infoEinheitenInMap[x],mode:'openWorld'});
@@ -40,31 +46,40 @@ angular.module('udm.openWorld')
             }
 
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
-                success(function(data, status, headers, config) {
+                success(function(data) {
 
                     var infoEinheit = data.infoEinheit;
 
-                    for(var x in infoEinheit.features){
+                    infoEinheit.hasBaseLayer = false;
+                    infoEinheit.hasFeatureLayer = false;
+
+                    var attr;
+                    for(x=0; x < infoEinheit.features.length; x++){
                         if(infoEinheit.features[x].typ != 'plan' && infoEinheit.features[x].typ != 'planOverlay'){
-                            infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature);
-                            infoEinheit.features[x].feature.attributes.id = infoEinheit.features[x].id;
-                            infoEinheit.features[x].feature.attributes.infoEinheit = infoEinheit.id;
-                            infoEinheit.features[x].feature.attributes.element = infoEinheit.features[x];
-                            infoEinheit.features[x].feature.attributes.typ = infoEinheit.features[x].typ;
-                            infoEinheit.features[x].feature.attributes.rot = infoEinheit.features[x].rot;
-                            infoEinheit.features[x].feature.attributes.onSelect = function(feature){
-                                $scope.$broadcast('featureSelected',feature);
-                            }
+                            infoEinheit.hasFeatureLayer = true;
+
+                            attr = {typ : infoEinheit.features[x].typ,
+                                id : infoEinheit.features[x].id,
+                                infoEinheit : infoEinheit.id,
+                                element : infoEinheit.features[x],
+                                onSelect : function(feature){
+                                    $scope.$broadcast('featureSelected',feature);
+                                }};
+                            if(infoEinheit.features[x].typ == 'pointOri') attr.rot = infoEinheit.features[x].rot;
+                            else attr.color = infoEinheit.features[x].color;
+
+                            infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature,attr);
                         }
                     }
 
                     mapInfoEinheit.addInfoEinheit(infoEinheit,'top');
                     infoEinheitenInMap.push(infoEinheit);
 
-                    for(var x in infoEinheit.features){
+                    for(x=0; x < infoEinheit.features.length; x++){
                         if(infoEinheit.features[x].typ == 'plan'){
                             infoEinheit.baseLayer.title = infoEinheit.features[x].title;
                             infoEinheit.baseLayer.id = infoEinheit.features[x].id;
+                            infoEinheit.hasBaseLayer = true;
                         }
                         else if(infoEinheit.features[x].typ == 'planOverlay'){
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].title = infoEinheit.features[x].title;
@@ -89,7 +104,7 @@ angular.module('udm.openWorld')
         };
 
         $scope.$on('infoEinheitRemoved', function(e,id) {
-            for(var x in infoEinheitenInMap){
+            for(var x=0; x < infoEinheitenInMap.length ; x++){
                 if(infoEinheitenInMap[x].id == id) infoEinheitenInMap.splice(x,1);
             }
         });

@@ -1,11 +1,13 @@
 <div id="infobox">
     <h3>{{info.title}}</h3><div class="year">{{info.start}}</div><span ng-show="info.end"> - </span><div class="year">{{info.end}}</div>
     <div class="seperator-line"></div>
-    <div class="infotext">{{info.info}}</div>
+    <div class="text">
+        <div class="lerntext" ng-show="info.lernInfo">{{info.lernInfo}}</div>
+        <div class="seperator-line" ng-show="info.lernInfo"></div>
+        <div class="infotext">{{info.info}}</div>
+    </div>
     <div class="seperator-line"></div>
-    <div class="bottom">
-        <div class="button-icon deeplink-btn disabled"><i class="icon-share-alt"></i></div>
-        <div class="button-icon learn-list-btn" ng-class="{'disabled':editMode == 'lern'}"><i class="icon-book"></i></div>
-        <div class="button-icon picture-btn" ng-class="{'disabled':info.img.length == 0}" ng-click="showImgSlider()"><i class="icon-picture"></i></div>
+    <div ng-class="{true:'bottomDisabled', false:'bottomEnabled'}[info.img.length == 0]" ng-click="showImgSlider()">
+        <i class="glyph-big-picture"></i>
     </div>
 </div>

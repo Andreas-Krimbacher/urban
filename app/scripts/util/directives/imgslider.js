@@ -5,7 +5,7 @@ angular.module('udm.util')
         return {
             templateUrl: '../views/util/imgslider.html',
             restrict: 'E',
-            link: function postLink(scope, element, attrs) {
+            link: function postLink(scope) {
 
                 var host = 'http://localhost:9000';
 
@@ -15,7 +15,7 @@ angular.module('udm.util')
                 scope.$on('setImg', function(e,value) {
                     scope.slides = [];
 
-                    for(var img in value){
+                    for(var img = 0; img < value.length; img++){
                         scope.slides.push({
                             image: host+ value[img]
                         });
@@ -25,7 +25,7 @@ angular.module('udm.util')
                 });
 
                 scope.close = function(){
-                    scope.hideImageSlider(false);
+                    scope.hideImageSlider();
                 }
 
             }

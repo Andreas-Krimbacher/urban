@@ -15,9 +15,10 @@ var parser = new xml2js.Parser();
 
 module.exports = function(req, res) {
     var queryData = url.parse(req.url, true).query;
+    var tileDB;
     if(queryData.action == 'save'){
 
-        var tileDB = queryData.tileDB;
+        tileDB = queryData.tileDB;
 
         fs.renameSync(filePaths.tiles.baseDir + '/' + 'tmp_' + tileDB + '.mbtiles', filePaths.tiles.baseDir + '/' + tileDB + '.mbtiles');
 	    fs.renameSync(filePaths.tiles.baseDir + '/' + 'tmp_' + tileDB + '.json', filePaths.tiles.baseDir + '/' + tileDB + '.json');
@@ -31,7 +32,7 @@ module.exports = function(req, res) {
     }
     if(queryData.action == 'deleteTmp'){
 
-        var tileDB = queryData.tileDB;
+        tileDB = queryData.tileDB;
 
         var file = filePaths.tiles.baseDir + '/' + 'tmp_' + tileDB + '.mbtiles';
         if (fs.existsSync(file)) { // or fs.existsSync
@@ -170,7 +171,8 @@ module.exports = function(req, res) {
 var addGCP = function(fileSrc,fileDst,gcp,res,callback){
     var cmd = 'gdal_translate ';
     var coords;
-    for(var x in gcp){
+    var x;
+    for(x = 0; x < gcp.length; x++){
         coords = gcp[x].split(',');
         cmd += '-gcp ';
         cmd += coords[0] + ' ';
@@ -224,7 +226,7 @@ var createGeoTiff = function(fileSrc,fileDst,res,callback){
 };
 
 var createTiles = function(fileSrc,fileDst,res,callback){
-    var cmd = 'gdal2tiles.py -z 10-14 --s_srs EPSG:900913 -a 0 -w none ';
+    var cmd = 'gdal2tiles.py -z 10-18 --s_srs EPSG:900913 -a 0 -w none ';
     cmd += fileSrc + ' ';
     cmd += fileDst;
 
@@ -296,7 +298,7 @@ var moveFile = function(fileSrc,fileDst,keepSrc){
         fs.unlinkSync(fileDst);
     }
 
-    var is = fs.createReadStream(fileSrc)
+    var is = fs.createReadStream(fileSrc);
     var os = fs.createWriteStream(fileDst);
 
     util.pump(is, os, function() {
