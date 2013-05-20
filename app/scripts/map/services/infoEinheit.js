@@ -355,7 +355,7 @@ angular.module('udm.map')
 
         var addLabel = function(feature){
             var center = feature.feature.geometry.getBounds().getCenterLonLat();
-            var position = OLmap.getViewPortPxFromLonLat(center);
+            var position = OLmap.getLayerPxFromViewPortPx(OLmap.getViewPortPxFromLonLat(center));
             $('[id="OpenLayers.Map_2_OpenLayers_Container"]').append('<div id="label_'+feature.id+'" class="mapLabel">'+feature.title+'</div>');
             $('#label_'+feature.id).css('top',position.y-15+'px').css('left',position.x-60+'px');
         };

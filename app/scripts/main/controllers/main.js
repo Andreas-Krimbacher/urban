@@ -4,12 +4,25 @@ angular.module('udm')
   .controller('MainCtrl', function ($scope,$location,$route,OpenLayersMap) {
         $scope.setRoute = function(path){
             OpenLayersMap.setNumZoomLevel(18);
-            $location.path(path);
-            $route.reload();
+
+            if($location.path() == path) $route.reload();
+            else{
+                if(!$scope.$$phase) $scope.$apply($location.path(path));
+                else $location.path(path);
+            }
+
         };
 
         $scope.home = function(){
             OpenLayersMap.setCenter(2.3408,48.8567,14);
+        };
+
+        $scope.showInfo = function(){
+            $('#info').modal();
+        };
+
+        $scope.closeInfo = function(){
+            $('#info').modal('hide');
         };
 
 

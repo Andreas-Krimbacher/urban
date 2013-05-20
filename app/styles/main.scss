@@ -64,12 +64,11 @@ $green:  #5bb75b;
 [class^="glyph-big-"],
 [class*=" glyph-big-"] {
   display: inline-block;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
   vertical-align: text-top;
   background-repeat: no-repeat;
-  margin-top: 1px;
   cursor: pointer;
 }
 
@@ -85,6 +84,10 @@ $green:  #5bb75b;
 .glyph-big-picture{
   background-image: url("images/glyph-big/picture.png");
 }
+.glyph-big-question{
+  background-image: url("images/glyph-big/question_mark.png");
+}
+
 
 //Overall classes
 
@@ -199,6 +202,23 @@ div.olControlZoom a {
     margin-right: 21px;
   }
 }
+
+#info{
+  z-index: 3000;
+  width: 1000px;
+  height: 630px;
+  margin-left: -500px;
+  margin-top: -320px;
+  img{
+    margin-top: 10px;
+  }
+  .close-btn{
+    position: absolute;
+    top: 5px;
+    right: 8px;
+  }
+}
+
 
 #map {
   width: 100%;
@@ -332,10 +352,14 @@ div.olControlZoom a {
   position: absolute;
   top: 610px;
   z-index: 2500;
+  .lektionContainer{
+    padding-left: 240px;
+    height: 100px;
+  }
   .start{
-    position: relative;
-    left: 200px;
-    top: -75px;
+    position: absolute;
+    left: 140px;
+    top: 15px;
   }
   .lektion{
     display: inline-block;
@@ -369,8 +393,9 @@ div.olControlZoom a {
   }
   .lernLineTitle{
     display: inline-block;
-    position: relative;
-    top: -30px;
+    position: absolute;
+    top: 60px;
+    left: 20px;
     font-size: 3em;
     font-weight: 700;
     margin-right: 30px;
@@ -1219,6 +1244,9 @@ div.olControlZoom a {
   z-index:2500;
   .timeline-event-tape{
     @include border-radius($borderRadius);
+  }
+  .timeline-event-label{
+    font-weight: 700;
   }
   .timeline-band-1{
     .timeline-date-label{

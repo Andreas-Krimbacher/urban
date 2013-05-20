@@ -48,12 +48,16 @@
     <div id="container">
         <div ng-controller="MainCtrl">
             <div id="top-bar"><h2 ng-click="home()">Discover Urban Design History</h2>
-                <a id="topEdit" class="lastIcon"  title="Edit" ng-click="setRoute('/edit')"><i class="glyph-big-pencil"></i></a>
+                <a id="topQuestion" class="lastIcon"  title="Hilfe" ng-click="showInfo()"><i class="glyph-big-question"></i></a>
                 <a id="topLern"  title="Lern-Einheiten" ng-click="setRoute('/lern')"><i class="glyph-big-book"></i></a>
                 <a id="topWorld"  title="Open-World" ng-click="setRoute('/world')"><i class="glyph-big-world"></i></a>
             </div>
             <map></map>
             <div ng-view></div>
+            <div id="info" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <img src="styles/images/info.png">
+                    <div class="button-icon close-btn" ng-click="closeInfo()"><i class="icon-remove"></i></div>
+            </div>
         </div>
     </div>
 

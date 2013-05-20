@@ -23,14 +23,27 @@ angular.module('udm.lern')
                     $scope.lernEinheiten[x].longInfo = $scope.lernEinheiten[x].info.substring(split+2,$scope.lernEinheiten[x].info.length);
                 }
 
-                $('#lernEinheitDialog').modal();
+                $('#lernEinheitDialog').modal().on('hidden', function () {
+                    $scope.checkLernEinheitSelected();
+                    selected = true;
+                });
             }).
             error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
             });
 
+        var selected = false;
+        $scope.checkLernEinheitSelected = function(){
+            if(!selected){
+                $scope.setRoute('/world');
+            }
+            selected = true;
+        };
+
         $scope.open = function(index){
+           selected = true;
+
             $http.get('/pg/getLernEinheit/'+$scope.lernEinheiten[index].id).
                 success(function(data) {
                     $scope.lernEinheit =  data.lernEinheit;
