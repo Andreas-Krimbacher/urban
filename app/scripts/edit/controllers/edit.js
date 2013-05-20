@@ -17,8 +17,8 @@ angular.module('udm.edit')
         $scope.setMode = function(mode){
             OpenLayersMap.resetMap();
 
-            if(mode == 'georef') OpenLayersMap.setNumZoomLevel(18);
-            else OpenLayersMap.setNumZoomLevel(18);
+            if(mode == 'georef') OpenLayersMap.setMaxZoomLevel(20);
+            else OpenLayersMap.setMaxZoomLevel(18);
 
             $scope.editView = mode;
         };

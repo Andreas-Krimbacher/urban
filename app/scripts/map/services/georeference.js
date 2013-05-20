@@ -87,7 +87,7 @@ angular.module('udm.map')
 
         var addMoveEvent = function(){
             OLmap.events.register('movestart', this, function(){
-                imgPixelPoint = OLmap.getViewPortPxFromLonLat(new OpenLayers.LonLat(imgPoint.x,imgPoint.y));
+                imgPixelPoint = OLmap.getLayerPxFromViewPortPx(OLmap.getViewPortPxFromLonLat(new OpenLayers.LonLat(imgPoint.x,imgPoint.y)));
             });
 
             moveEventCurrentZoom = OLmap.getZoom();

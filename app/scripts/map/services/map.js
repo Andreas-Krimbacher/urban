@@ -9,6 +9,8 @@ angular.module('udm.map')
         var _basemaps = {};
         var _currentBasemap = null;
 
+        var _currentMaxZoomLevel = 19;
+
         function _setBasemap(id){
             if(_currentBasemap){
                 map.removeLayer(_currentBasemap.map);
@@ -17,6 +19,18 @@ angular.module('udm.map')
             map.addLayer(_basemaps[id].map);
             _basemaps[id].active = true;
             _currentBasemap = _basemaps[id];
+        }
+
+        function _setMaxZoomLevel(zoomLevel){
+            if( _currentBasemap.map.maxZoomLevelGeoref < (zoomLevel)){
+                zoomLevel = _currentBasemap.map.maxZoomLevelGeoref;
+            }
+
+            if(map.getZoom() > zoomLevel)
+                map.zoomTo(zoomLevel);
+
+            map.numZoomLevels = zoomLevel+1;
+            _currentBasemap.map.numZoomLevels = zoomLevel+1;
         }
 
         // Public API here
@@ -28,7 +42,7 @@ angular.module('udm.map')
                 var options = {
                     projection: "EPSG:900913",
                     units: 'm',
-                    numZoomLevels: 18
+                    numZoomLevels: 19
                 };
                 map = new OpenLayers.Map(divId,options);
 
@@ -43,23 +57,23 @@ angular.module('udm.map')
                 if(!offline){
                     var gphy = new OpenLayers.Layer.Google(
                         "Google Physical",
-                        {type: google.maps.MapTypeId.TERRAIN}
+                        {type: google.maps.MapTypeId.TERRAIN,maxZoomLevelGeoref: 15}
                     );
                     _basemaps.gphy = {name:'Google Gelände',map:gphy,active:false};
 
-                    var gmap = new OpenLayers.Layer.Google("Google Streets"
+                    var gmap = new OpenLayers.Layer.Google("Google Streets",{maxZoomLevelGeoref: 18}
                     );
                     _basemaps.gmap = {name:'Google Streets',map:gmap,active:false};
 
                     var ghyb = new OpenLayers.Layer.Google(
                         "Google Hybrid",
-                        {type: google.maps.MapTypeId.HYBRID}
+                        {type: google.maps.MapTypeId.HYBRID,maxZoomLevelGeoref: 18}
                     );
                     _basemaps.ghyb = {name:'Google Hybrid',map:ghyb,active:false};
 
                     var gsat = new OpenLayers.Layer.Google(
                         "Google Satellite",
-                        {type: google.maps.MapTypeId.SATELLITE}
+                        {type: google.maps.MapTypeId.SATELLITE,maxZoomLevelGeoref: 18}
                     );
                     _basemaps.gsat = {name:'Google Luftbild',map:gsat,active:false};
 
@@ -89,6 +103,7 @@ angular.module('udm.map')
             },
             setBasemap: function(id){
                 _setBasemap(id);
+                _setMaxZoomLevel(_currentMaxZoomLevel);
             },
             resetMap: function(){
                 if(!map) return;
@@ -117,11 +132,9 @@ angular.module('udm.map')
 
                 map.addLayer(featureLayer);
             },
-            setNumZoomLevel : function(zoomLevel){
-                if(map.getZoom() > zoomLevel)
-                    map.zoomTo(zoomLevel);
-                map.numZoomLevels = zoomLevel+1;
-                _currentBasemap.map.numZoomLevels = zoomLevel+1;
+            setMaxZoomLevel : function(zoomLevel){
+                _setMaxZoomLevel(zoomLevel);
+                _currentMaxZoomLevel = zoomLevel;
             }
         }
     });
