@@ -172,10 +172,12 @@ angular.module('udm.map')
 
 
         var calculateZindex = function(layerPackage,infoEinheit,position){
+            var adjustZindexFlag = false;
+
             if(position == 'top'){
                 var zIndexBase = nextZindexTop;
                 nextZindexTop = nextZindexTop + 100;
-                if(nextZindexTop > 2000) alert('redrawLayers');
+                if(nextZindexTop > 2000)  adjustZindexFlag = true;
             }
 
             layerPackage.zIndexBase = zIndexBase;
@@ -194,6 +196,33 @@ angular.module('udm.map')
                 }
             }
 
+            return adjustZindexFlag;
+
+        };
+
+        var adjustZindex = function(){
+
+            var y;
+            var length = 0;
+            for(var x in layerPackages){
+                length++;
+            }
+
+            var topZindex = 1000 + (length-1)*100;
+
+            for(x in layerPackages){
+                layerPackages[x].zIndexBase = topZindex - layerPackages[x].infoEinheit.layerStackPosition * 100;
+                nextZindexTop = nextZindexTop + 100;
+                for(y in layerPackages[x].baseLayer){
+                    if(layerPackages[x].baseLayer[y].zIndex) layerPackages[x].baseLayer[y].zIndex = layerPackages[x].zIndexBase;
+                }
+                for(y in layerPackages[x].overlayLayer){
+                    if(layerPackages[x].overlayLayer[y].zIndex) layerPackages[x].overlayLayer[y].zIndex = layerPackages[x].zIndexBase+1;
+                }
+                if(layerPackages[x].featureLayer.zIndex) layerPackages[x].featureLayer.zIndex = layerPackages[x].zIndexBase+2;
+
+                setZindexPackage(layerPackages[x]);
+            }
         };
 
         var addTileLayer = function(metaData,zIndex){
@@ -409,13 +438,13 @@ angular.module('udm.map')
         var setZindexPackage = function(layerPackage,type){
             var x;
             for(x in layerPackage.baseLayer){
-                setZindexLayer(layerPackage.baseLayer[x].layer,layerPackage.baseLayer[x].zIndex,type);
+                if(layerPackage.baseLayer[x].zIndex) setZindexLayer(layerPackage.baseLayer[x].layer,layerPackage.baseLayer[x].zIndex,type);
             }
             for(x in layerPackage.overlayLayer){
-                setZindexLayer(layerPackage.overlayLayer[x].layer,layerPackage.overlayLayer[x].zIndex,type);
+                if(layerPackage.overlayLayer[x].zIndex) setZindexLayer(layerPackage.overlayLayer[x].layer,layerPackage.overlayLayer[x].zIndex,type);
             }
             if(layerPackage.featureLayer.layer){
-                setZindexLayer(layerPackage.featureLayer.layer,layerPackage.featureLayer.zIndex,type);
+                if(layerPackage.featureLayer.zIndex) setZindexLayer(layerPackage.featureLayer.layer,layerPackage.featureLayer.zIndex,type);
             }
 
         };
@@ -467,6 +496,21 @@ angular.module('udm.map')
                     }
                 }
             },
+            removeBottomInfoEinheit : function(){
+                var id = null;
+                var position = 0;
+
+                var x;
+                for(x in layerPackages){
+                    if(layerPackages[x].infoEinheit.layerStackPosition > position){
+                        position = layerPackages[x].infoEinheit.layerStackPosition;
+                        id = x;
+                    }
+                }
+
+                if(id) removeInfoEinheit(id);
+                return id;
+            },
             addInfoEinheit : function(infoEinheit,position){
 
                 if(layerPackages[infoEinheit.id]) removeInfoEinheit(infoEinheit.id);
@@ -476,7 +520,7 @@ angular.module('udm.map')
                 layerPackage.overlayLayer = {};
                 layerPackage.featureLayer = {};
                 layerPackage.infoEinheit = infoEinheit;
-                calculateZindex(layerPackage,infoEinheit,position);
+                var adjustZindexFlag = calculateZindex(layerPackage,infoEinheit,position);
 
                 var x;
                 if(position == 'top'){
@@ -562,8 +606,12 @@ angular.module('udm.map')
 
 
                 layerPackages[infoEinheit.id] = layerPackage;
+
+                if(adjustZindexFlag) adjustZindex();
             },
             changeInfoEinheit : function(infoEinheit,position){
+                var adjustZindexFlag = false;
+
                 var x;
                 if(!layerPackages[infoEinheit.id]){
                     var layerPackage = {};
@@ -571,7 +619,7 @@ angular.module('udm.map')
                     layerPackage.overlayLayer = {};
                     layerPackage.featureLayer = {};
                     layerPackage.infoEinheit = infoEinheit;
-                    calculateZindex(layerPackage,infoEinheit,position);
+                    adjustZindexFlag = calculateZindex(layerPackage,infoEinheit,position);
 
 
                     if(position == 'top'){
@@ -733,8 +781,7 @@ angular.module('udm.map')
                     }
                 }
 
-
-
+                if(adjustZindexFlag) adjustZindex();
             },
             removeInfoEinheit : function(id){
                 removeInfoEinheit(id);
@@ -756,6 +803,8 @@ angular.module('udm.map')
                     }
             },
             changeOrder : function(id,targetLevel){
+
+                var  adjustZindexFlag = false;
 
                 if(targetLevel == layerPackages[id].infoEinheit.layerStackPosition) return;
 
@@ -783,11 +832,11 @@ angular.module('udm.map')
                             if(layerPackages[x].zIndexBase < zIndex) zIndex = layerPackages[x].zIndexBase;
                         }
                         zIndex = zIndex - 100;
-                        if(zIndex < 300) alert('redrawLayers');
+                        if(zIndex < 300)  adjustZindexFlag = true;
                     }
                     else{
                         zIndex = above - below;
-                        if(zIndex < 10) alert('redrawLayers');
+                        if(zIndex < 10)  adjustZindexFlag = true;
                         zIndex = Math.round(below + zIndex/2);
                     }
                 }
@@ -804,11 +853,11 @@ angular.module('udm.map')
                     if(above == null){
                         zIndex = nextZindexTop;
                         nextZindexTop = nextZindexTop + 100;
-                        if(nextZindexTop > 2000) alert('redrawLayers');
+                        if(nextZindexTop > 2000)  adjustZindexFlag = true;
                     }
                     else{
                         zIndex = above - below;
-                        if(zIndex < 10) alert('redrawLayers');
+                        if(zIndex < 10) adjustZindexFlag = true;
                         zIndex = Math.round(below + zIndex/2);
                     }
                 }
@@ -826,6 +875,9 @@ angular.module('udm.map')
 
 
                 setZindexPackage(layerPackages[id],type);
+
+
+                if(adjustZindexFlag) adjustZindex();
             },
             removeFeature : function(feature,layer){
                 layer.removeFeatures([feature.geom]);
@@ -837,7 +889,7 @@ angular.module('udm.map')
             getMapView : function(){
                 var zoom = OLmap.getZoom();
                 var center = OLmap.getCenter();
-                var wkt = util.featureToWKT(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(center.lon,center.lat)),'POINT');
+                var wkt = util.featureToWKT(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(center.lon,center.lat)));
 
                 return {zoom:zoom, wkt:wkt}
             }

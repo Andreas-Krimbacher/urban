@@ -86,6 +86,27 @@ angular.module('udm.util')
                     scope.layers.splice(index,1);
                 };
 
+                scope.$on('removeInfoEinheitFromLayerList', function(e,id) {
+                    var x;
+                    var index;
+
+                    for(x = 0; x < scope.layers.length; x++){
+                        if(scope.layers[x].id ==  id){
+                            index = x;
+                            break;
+                        }
+                    }
+
+                    for(x = 0; x < scope.layers[index].features.length; x++){
+                        if(scope.selectedId ==  scope.layers[index].features[x].id){
+                            scope.selectedId = null;
+                            scope.$emit('hideInfoBox');
+                            break;
+                        }
+                    }
+                    scope.layers.splice(index,1);
+                });
+
                 scope.toogleFeatureLayer = function(index){
                     scope.$emit('toogleFeatureLayer',scope.layers[index]);
                     scope.layers[index].featureLayer.visible = !scope.layers[index].featureLayer.visible;

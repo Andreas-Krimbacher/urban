@@ -45,6 +45,17 @@ angular.module('udm.openWorld')
                 }
             }
 
+            if(infoEinheitenInMap.length > 2){
+                var removedId = mapInfoEinheit.removeBottomInfoEinheit();
+                for(x=0; x < infoEinheitenInMap.length ; x++){
+                    if(infoEinheitenInMap[x].id == removedId){
+                        infoEinheitenInMap.splice(x,1);
+                        $scope.$broadcast('removeInfoEinheitFromLayerList',removedId);
+                        break;
+                    }
+                }
+            }
+
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
                 success(function(data) {
 
