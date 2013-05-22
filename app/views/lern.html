@@ -1,0 +1,61 @@
+<infoControls></infoControls>
+
+<div id="lernEinheitDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-header">
+        <h3>Lerneinheiten</h3>
+    </div>
+    <div class="modal-body">
+
+        <table class="table table-striped lernEinheitTable">
+            <tr ng-repeat="item in lernEinheiten">
+                <td><i class="icon-book icon"></i></td>
+                <td><div class="title">{{item.title}}</div>
+                    <!--<div class="date">{{item.start}}</div> - <div class="date">{{item.end}}</div>-->
+                </td>
+                <td><div class="info">{{item.shortInfo}}</div></td>
+                <td><button class="btn btn-success lern" ng-click="open($index)">Auswählen</button></td>
+            </tr>
+        </table>
+
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>
+
+<div id="lernEinheitInfoDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <h3>{{lernEinheit.title}}</h3>
+    </div>
+    <div class="modal-body">
+        {{lernEinheit.longInfo}}
+    </div>
+    <div class="modal-footer">
+        <span class="tip">{{tip}}</span>
+        <button class="btn btn-success " data-dismiss="modal" >Los</button>
+    </div>
+</div>
+
+<div id="lernNavigation" class="btn-toolbar" ng-show="lernLektionen">
+    <div class="btn-group">
+        <a class="btn btn-inverse" ng-class="{'disabledWithBackground':first}" ng-click="previous()"><i class="icon-chevron-left icon-white"></i></a>
+        <a class="btn" ng-class="{'disabledWithBackground':last,'btn-inverse':currentLektion != -1,'btn-success':currentLektion == -1}" ng-click="next()">
+            <span ng-show="currentLektion == -1">Start</span>
+            <i class="icon-chevron-right icon-white"></i></a>
+    </div>
+</div>
+
+<div id="lernLine">
+    <button class="btn btn-small start" type="button" ng-click="startAtLektion(-1)" ng-show="startLektion" ng-class="{'btn-info':currentLektion == -1 || hoverStart}" ng-class="overclass" ng-mouseenter="hoverStart = true" ng-mouseleave="hoverStart = false">Übersicht</button>
+    <div class="lernLineTitle" ng-show="lernLektionen">Lektionen.</div>
+    <div class="lektionContainer">
+    <div class="lektion" ng-repeat="(keyL,valL) in lernLektionen">
+        <div class="lektionBox" ng-click="startAtLektion(keyL)">
+            <div class="feature" ng-repeat="(keyF,valF) in valL.lernFeature" style="width:{{100/valL.lernFeature.length}}px;" ng-class="{'green':currentLektion > keyL || (currentLektion == keyL) && (currentFeature >= keyF)}">
+            </div>
+        </div>
+        <div class="lektionTitle">{{valL.title}}</div>
+        <div class="lektionNumber" ng-click="startAtLektion(keyL)">{{keyL+1}}</div>
+    </div>
+    </div>
+</div>

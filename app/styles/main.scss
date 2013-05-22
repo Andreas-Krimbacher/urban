@@ -319,17 +319,22 @@ div.olControlZoom a {
   top: 520px;
   left: 580px;
   z-index: 2500;
+  span{
+    font-weight: 700;
+  }
   .disabledWithBackground{
     opacity: 0.7;
     cursor: default !important;
-    &hover{
-      background-color: #373737 !important;
-    }
-    &active{
-      background-color: #373737 !important;
-    }
+    background-color: #373737 !important;
+    background-image: none !important;
+    -webkit-box-shadow: none  !important;
+    -moz-box-shadow: none  !important;
+    box-shadow: none  !important;
+    z-index: 0 !important;
   }
 }
+
+
 
 
 #lernInfo{
