@@ -113,7 +113,7 @@ angular.module('udm.lern')
         };
 
 
-        var showInfoEinheit = function(infoEinheit,selectFeature,visibility,lernInfo,onlyAdjust){
+        var showInfoEinheit = function(infoEinheit,selectFeatureId,visibility,lernInfo,onlyAdjust){
 
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
                 success(function(data) {
@@ -122,6 +122,8 @@ angular.module('udm.lern')
 
                     infoEinheit.hasBaseLayer = false;
                     infoEinheit.hasFeatureLayer = false;
+
+                    var selectFeature = null;
 
 
                     infoEinheit.lernInfo = lernInfo;
@@ -140,7 +142,9 @@ angular.module('udm.lern')
                                 infoEinheit : infoEinheit.id,
                                 element : infoEinheit.features[x],
                                 onSelect : function(feature){
-                                    $scope.$broadcast('featureSelected',feature);
+                                    var data = null;
+                                    if(feature) data = feature.attributes.element;
+                                    $scope.$broadcast('selectFeature',data);
                                 }};
                             if(infoEinheit.features[x].typ == 'pointOri') attr.rot = infoEinheit.features[x].rot;
                             else attr.color = infoEinheit.features[x].color;
@@ -168,23 +172,24 @@ angular.module('udm.lern')
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
                         }
-                        if(selectFeature && infoEinheit.features[x].id == selectFeature) selectFeature = infoEinheit.features[x];
+                        if(selectFeatureId && infoEinheit.features[x].id == selectFeatureId) selectFeature = infoEinheit.features[x];
                     }
 
                     infoEinheit.selected = false;
 
                     var onlyBase = false;
                     if(visibility == 'plan') onlyBase = true;
-                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,mode:'lern',onlyBase:onlyBase});
+                    $scope.$broadcast('showLayerInList',{infoEinheit:infoEinheit,mode:'lern',onlyBase:onlyBase});
                     $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: true});
 
-                    $scope.$broadcast('showInfo',{data:data.infoEinheit,mode:'lern'});
-                    $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: true});
 
                     if(selectFeature){
-                        $scope.$broadcast('selectItem',{type:'feature', id: selectFeature.id});
-                        $scope.$broadcast('showInfo', {data:selectFeature});
+                        //the feature select on the feature layer triggers the 'featureSelected' event
                         if(selectFeature.typ != 'plan' && selectFeature.typ != 'planOverlay') mapInfoEinheit.selectfeature(selectFeature);
+                        else $scope.$broadcast('selectFeature',selectFeature);
+                    }
+                    else{
+                        $scope.$broadcast('selectInfoEinheit',infoEinheit);
                     }
 
                 }).
@@ -202,6 +207,9 @@ angular.module('udm.lern')
             $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: false});
             $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: false});
             $scope.$broadcast('toogleInfoControlVisibility',{type:'imgslider',state: false});
+
+            $scope.$broadcast('selectInfoEinheit',false);
+            $scope.$broadcast('selectFeature',false);
 
             var feature = $scope.startLektion.lernFeature[0];
             $scope.currentLernFeature = feature;

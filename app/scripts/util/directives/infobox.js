@@ -12,7 +12,6 @@ angular.module('udm.util')
               scope.info = info.data;
               if(scope.info.info == 'null') scope.info.info = '';
               if(scope.info.lernInfo == 'null') scope.info.lernInfo = false;
-              scope.editMode = info.mode;
 
               if(!scope.$$phase) scope.$digest();
           });

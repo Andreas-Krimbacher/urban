@@ -40,7 +40,7 @@ angular.module('udm.edit')
 
         //functions to show and hide features in the map -----------------------------------------------------------------
 
-        var showInfoEinheit = function(infoEinheit,selectFeature, visibility){
+        var showInfoEinheit = function(infoEinheit,selectFeatureId, visibility){
 
 
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
@@ -50,6 +50,8 @@ angular.module('udm.edit')
 
                     infoEinheit.hasBaseLayer = false;
                     infoEinheit.hasFeatureLayer = false;
+
+                    var selectFeature = null;
 
                     infoEinheit.lernInfo = $scope.editLernFeature.info;
                     var attr;
@@ -67,7 +69,9 @@ angular.module('udm.edit')
                                 infoEinheit : infoEinheit.id,
                                 element : infoEinheit.features[x],
                                 onSelect : function(feature){
-                                    $scope.$broadcast('featureSelected',feature);
+                                    var data = null;
+                                    if(feature) data = feature.attributes.element;
+                                    $scope.$broadcast('selectFeature',data);
                                 }};
                             if(infoEinheit.features[x].typ == 'pointOri') attr.rot = infoEinheit.features[x].rot;
                             else attr.color = infoEinheit.features[x].color;
@@ -94,7 +98,7 @@ angular.module('udm.edit')
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
                         }
-                        if(selectFeature && infoEinheit.features[x].id == selectFeature) selectFeature = infoEinheit.features[x];
+                        if(selectFeatureId && infoEinheit.features[x].id == selectFeatureId) selectFeature = infoEinheit.features[x];
                     }
 
                     infoEinheit.selected = false;
@@ -104,13 +108,13 @@ angular.module('udm.edit')
                     $scope.$broadcast('showLayerInList',{infoEinheit:infoEinheit,mode:'lern',onlyBase:onlyBase});
                     $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: true});
 
-                    $scope.$broadcast('showInfo',{data:infoEinheit,mode:'lern'});
-                    $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: true});
-
                     if(selectFeature){
-                        $scope.$broadcast('selectItem',{type:'feature', id: selectFeature.id});
-                        $scope.$broadcast('showInfo', {data:selectFeature});
+                        //the feature select on the feature layer triggers the 'featureSelected' event
                         if(selectFeature.typ != 'plan' && selectFeature.typ != 'planOverlay') mapInfoEinheit.selectfeature(selectFeature);
+                        else $scope.$broadcast('selectFeature',selectFeature);
+                    }
+                    else{
+                        $scope.$broadcast('selectInfoEinheit',infoEinheit);
                     }
 
                 }).

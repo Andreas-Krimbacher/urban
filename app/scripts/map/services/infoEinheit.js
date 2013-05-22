@@ -302,11 +302,24 @@ angular.module('udm.map')
 
             //only top layer can be selected!!!
             var selectControl = new OpenLayers.Control.SelectFeature(featureLayer,{
+                clickout: false,
                 onSelect:function(feature){
-                    feature.attributes.onSelect(feature);
+                    if(!feature.attributes.preventEvent) feature.attributes.onSelect(feature);
+                    else feature.attributes.preventEvent = false;
+                },
+                clickFeature:function(feature){
+                    for(var x = 0; x < feature.layer.selectedFeatures.length; x++){
+                        if(feature.layer.selectedFeatures[x] == feature){
+                            if(!feature.attributes.preventEvent) feature.attributes.onSelect(feature);
+                            else feature.attributes.preventEvent = false;
+                            return;
+                        }
+                    }
+                    feature.layer.selectControl.select(feature);
                 },
                 onUnselect:function(feature){
-                    feature.attributes.onSelect();
+                    if(!feature.attributes.preventEvent) feature.attributes.onSelect();
+                    else feature.attributes.preventEvent = false;
                 }});
             OLmap.addControl(selectControl);
             selectControl.activate();
@@ -317,6 +330,52 @@ angular.module('udm.map')
             featureLayer.setZIndex(zIndex);
 
             return featureLayer;
+        };
+
+        var resetSelectControl = function(featureLayer){
+
+            featureLayer.hoverControl.deactivate();
+            OLmap.removeControl(featureLayer.hoverControl);
+
+            var hoverControl = new OpenLayers.Control.SelectFeature(featureLayer,{hover: true,
+                highlightOnly: true,
+                renderIntent: "temporary"
+            });
+            OLmap.addControl(hoverControl);
+            hoverControl.activate();
+
+            featureLayer.hoverControl = hoverControl;
+
+
+            featureLayer.selectControl.deactivate();
+            OLmap.removeControl(featureLayer.selectControl);
+
+            //only top layer can be selected!!!
+            var selectControl = new OpenLayers.Control.SelectFeature(featureLayer,{
+                clickout: false,
+                onSelect:function(feature){
+                    if(!feature.attributes.preventEvent) feature.attributes.onSelect(feature);
+                    else feature.attributes.preventEvent = false;
+                },
+                clickFeature:function(feature){
+                    for(var x = 0; x < feature.layer.selectedFeatures.length; x++){
+                        if(feature.layer.selectedFeatures[x] == feature){
+                            if(!feature.attributes.preventEvent) feature.attributes.onSelect(feature);
+                            else feature.attributes.preventEvent = false;
+                            return;
+                        }
+                    }
+                    feature.layer.selectControl.select(feature);
+                },
+                onUnselect:function(feature){
+                    if(!feature.attributes.preventEvent) feature.attributes.onSelect();
+                    else feature.attributes.preventEvent = false;
+                }});
+            OLmap.addControl(selectControl);
+            selectControl.activate();
+
+            featureLayer.selectControl = selectControl;
+
         };
 
         var addFeatureLayer = function(layer){
@@ -488,10 +547,25 @@ angular.module('udm.map')
             },
             selectfeature : function(feature){
                 for(var x in layerPackages){
-                    for(var y = 0; y < layerPackages[x].featureLayer.layer.features.length; y++){
-                        if(layerPackages[x].featureLayer.layer.features[y].attributes.id == feature.id){
-                            layerPackages[x].featureLayer.layer.selectControl.select(layerPackages[x].featureLayer.layer.features[y]);
-                            break;
+                    if(layerPackages[x].featureLayer.layer){
+                        for(var y = 0; y < layerPackages[x].featureLayer.layer.features.length; y++){
+                            if(layerPackages[x].featureLayer.layer.features[y].attributes.id == feature.id){
+                                layerPackages[x].featureLayer.layer.selectControl.select(layerPackages[x].featureLayer.layer.features[y]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            },
+            unselectfeature : function(feature,preventEvent){
+                for(var x in layerPackages){
+                    if(layerPackages[x].featureLayer.layer){
+                        for(var y = 0; y < layerPackages[x].featureLayer.layer.features.length; y++){
+                            if(layerPackages[x].featureLayer.layer.features[y].attributes.id == feature.id){
+                                layerPackages[x].featureLayer.layer.features[y].attributes.preventEvent = preventEvent;
+                                layerPackages[x].featureLayer.layer.selectControl.unselect(layerPackages[x].featureLayer.layer.features[y]);
+                                break;
+                            }
                         }
                     }
                 }
@@ -619,6 +693,8 @@ angular.module('udm.map')
                     layerPackage.overlayLayer = {};
                     layerPackage.featureLayer = {};
                     layerPackage.infoEinheit = infoEinheit;
+
+
                     adjustZindexFlag = calculateZindex(layerPackage,infoEinheit,position);
 
 
@@ -672,6 +748,9 @@ angular.module('udm.map')
                             }
                         }
                         else{
+                            infoEinheit.baseLayer = layerPackages[infoEinheit.id].infoEinheit.baseLayer;
+                            infoEinheit.baseLayer.opacity = 1;
+                            layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.baseLayer.opacity);
                             layerPackages[infoEinheit.id].baseLayer[infoEinheit.features[x].id].remove = false;
                         }
                     }
@@ -692,6 +771,10 @@ angular.module('udm.map')
                             }
                         }
                         else{
+                            infoEinheit.overlayLayer = layerPackages[infoEinheit.id].infoEinheit.overlayLayer;
+                            infoEinheit.overlayLayer.opacity = 1;
+                            layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].layer.setOpacity(infoEinheit.overlayLayer.opacity);
+
                             layerPackages[infoEinheit.id].overlayLayer[infoEinheit.features[x].id].remove = false;
                         }
 
@@ -779,6 +862,11 @@ angular.module('udm.map')
                         }
                         layerPackages[infoEinheit.id].featureLayer.layer = null;
                     }
+                }
+
+                //reset select control
+                if(layerPackages[infoEinheit.id].featureLayer.layer){
+                    resetSelectControl(layerPackages[infoEinheit.id].featureLayer.layer);
                 }
 
                 if(adjustZindexFlag) adjustZindex();

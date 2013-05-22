@@ -14,7 +14,7 @@ angular.module('udm.util')
 
                 scope.selectItem = function(infoEinheit,feature){
                     if(scope.editMode == 'lernStart') return;
-                    scope.selectedId = feature;
+
                     var x;
                     var y;
                     for(x = 0; x < scope.layers.length; x++){
@@ -22,14 +22,14 @@ angular.module('udm.util')
                             if(feature){
                                 for(y = 0; y < scope.layers[x].features.length; y++){
                                     if(scope.layers[x].features[y].id == feature){
-                                        if(scope.layers[x].features[y].typ == 'plan') scope.$emit('showInfoPlan',scope.layers[x]);
-                                        else scope.$emit('showInfoPlan',scope.layers[x].features[y]);
+                                        if(scope.layers[x].features[y].typ == 'plan') scope.$emit('selectInfoEinheit',scope.layers[x]);
+                                        else scope.$emit('selectFeature',scope.layers[x].features[y]);
                                         return;
                                     }
                                 }
                             }
                             else{
-                                scope.$emit('showInfoPlan',scope.layers[x]);
+                                scope.$emit('selectInfoEinheit',scope.layers[x]);
                             }
                         }
                     }
@@ -41,35 +41,31 @@ angular.module('udm.util')
                     infoEinheit.editMode = data.mode;
 
                     scope.layers.splice(0,0,infoEinheit);
-                    if(infoEinheit.baseLayer.id) scope.selectedId = infoEinheit.baseLayer.id;
-                    else{
-                        scope.selectedId = infoEinheit.features[0].id;
-                    }
 
                     if(data.onlyBase) scope.toogleFeatureLayer(0);
                 });
 
-                scope.$on('selectItem', function(e,id) {
-                    if(id.type == 'infoEinheit'){
+                scope.$on('selectItem', function(e,data) {
+                    if(data.type == 'infoEinheit'){
                         var idFound = false;
                         var x;
                         for(x = 0; x < scope.layers.length; x++){
-                            if(scope.layers[x].id == id.id){
+                            if(scope.layers[x].id == data.id){
                                 if(scope.layers[x].baseLayer.id){
-                                    id.id = scope.layers[x].baseLayer.id;
+                                    data.id = scope.layers[x].baseLayer.id;
                                     idFound = true;
                                 }
                                 else{
-                                        id.id = scope.layers[x].features[0].id;
+                                    data.id = scope.layers[x].features[0].id;
                                         idFound = true;
                                 }
                                 break;
                             }
                         }
-                        if(!idFound) id.id = null;
+                        if(!idFound) data.id = null;
                     }
-                    if(!scope.$$phase) scope.$apply(scope.selectedId = id.id);
-                    else scope.selectedId = id.id
+                    if(!scope.$$phase) scope.$apply(scope.selectedId = data.id);
+                    else scope.selectedId = data.id
                 });
 
                 scope.removeInfoEinheit = function(index){

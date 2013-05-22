@@ -8,6 +8,7 @@ angular.module('udm.openWorld')
         mapInfoEinheit.clearAllLayers();
 
         var infoEinheitenInMap = [];
+        var showOnlyBaseLayer = true;
 
         $http.get('/pg/getInfoEinheitenList').
             success(function(data) {
@@ -34,7 +35,7 @@ angular.module('udm.openWorld')
                 // or server returns response with an error status.
             });
 
-        var showInfoEinheit = function(infoEinheit,selectFeature){
+        var showInfoEinheit = function(infoEinheit){
             var x;
             for(x=0; x < infoEinheitenInMap.length ; x++){
                 if(infoEinheitenInMap[x].id == infoEinheit){
@@ -74,12 +75,17 @@ angular.module('udm.openWorld')
                                 infoEinheit : infoEinheit.id,
                                 element : infoEinheit.features[x],
                                 onSelect : function(feature){
-                                    $scope.$broadcast('featureSelected',feature);
+                                    var data = null;
+                                    if(feature) data = feature.attributes.element;
+                                    $scope.$broadcast('selectFeature',data);
                                 }};
                             if(infoEinheit.features[x].typ == 'pointOri') attr.rot = infoEinheit.features[x].rot;
                             else attr.color = infoEinheit.features[x].color;
 
                             infoEinheit.features[x].feature =  util.WKTToFeature(infoEinheit.features[x].feature,attr);
+                        }
+                        else if(infoEinheit.features[x].typ == 'planOverlay' && showOnlyBaseLayer){
+                            infoEinheit.features[x].opacity = 0;
                         }
                     }
 
@@ -97,16 +103,16 @@ angular.module('udm.openWorld')
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].id = infoEinheit.features[x].id;
                             infoEinheit.overlayLayer[infoEinheit.features[x].id].selected = false;
                         }
-                        if(selectFeature && infoEinheit.features[x].id == selectFeature) selectFeature = infoEinheit.features[x];
                     }
 
                     infoEinheit.selected = false;
 
-                    $scope.$broadcast('showLayerInList',{infoEinheit:data.infoEinheit,mode:'openWorld'});
+                    var onlyBase = false;
+                    if(showOnlyBaseLayer) onlyBase = true;
+                    $scope.$broadcast('showLayerInList',{infoEinheit:infoEinheit,mode:'openWorld',onlyBase:onlyBase});
                     $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: true});
 
-                    $scope.$broadcast('showInfo',{data:data.infoEinheit,mode:'openWorld'});
-                    $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: true});
+                    $scope.$broadcast('selectInfoEinheit',infoEinheit);
                 }).
                 error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
