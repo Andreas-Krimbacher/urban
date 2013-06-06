@@ -1,14 +1,15 @@
-/* Copyright (c) 2006-2012 by OpenLayers Contributors (see authors.txt for 
- * full list of contributors). Published under the 2-clause BSD license.
- * See license.txt in the OpenLayers distribution or repository for the
- * full text of the license. */
-
-
 /**
+ * TileStream layer object, sam as OpenLayers.Layer.TMS but with a differnt getURL funtion to fit the TileStream format
+ * @name OpenLayersFix:TileStream
+ * @namespace
+ * @author Andreas Krimbacher
+ */
+
+/*
  * @requires OpenLayers/Layer/Grid.js
  */
 
-/**
+/*
  * Class: OpenLayers.Layer.TileStream
  * Create a layer for accessing tiles from services that conform with the
  *     Tile Map Service Specification
@@ -28,13 +29,13 @@
  */
 OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
 
-    /**
+    /*
      * APIProperty: serviceVersion
      * {String} Service version for tile requests.  Default is "1.0.0".
      */
     serviceVersion: "1.0.0",
 
-    /**
+    /*
      * APIProperty: layername
      * {String} The identifier for the <TileMap> as advertised by the service.
      *     For example, if the service advertises a <TileMap> with
@@ -43,7 +44,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     layername: null,
 
-    /**
+    /*
      * APIProperty: type
      * {String} The format extension corresponding to the requested tile image
      *     type.  This is advertised in a <TileFormat> element as the
@@ -53,14 +54,14 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     type: null,
 
-    /**
+    /*
      * APIProperty: isBaseLayer
      * {Boolean} Make this layer a base layer.  Default is true.  Set false to
      *     use the layer as an overlay.
      */
     isBaseLayer: true,
 
-    /**
+    /*
      * APIProperty: tileOrigin
      * {<OpenLayers.LonLat>} Optional origin for aligning the grid of tiles.
      *     If provided, requests for tiles at all resolutions will be aligned
@@ -84,7 +85,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     tileOrigin: null,
 
-    /**
+    /*
      * APIProperty: serverResolutions
      * {Array} A list of all resolutions available on the server.  Only set this
      *     property if the map resolutions differ from the server. This
@@ -100,7 +101,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     serverResolutions: null,
 
-    /**
+    /*
      * APIProperty: zoomOffset
      * {Number} If your cache has more zoom levels than you want to provide
      *     access to with this layer, supply a zoomOffset.  This zoom offset
@@ -114,7 +115,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     zoomOffset: 0,
 
-    /**
+    /*
      * Constructor: OpenLayers.Layer.TileStream
      *
      * Parameters:
@@ -130,7 +131,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
         OpenLayers.Layer.Grid.prototype.initialize.apply(this, newArguments);
     },
 
-    /**
+    /*
      * APIMethod: clone
      * Create a complete copy of this layer.
      *
@@ -157,7 +158,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
         return obj;
     },
 
-    /**
+    /*
      * Method: getURL
      *
      * Parameters:
@@ -185,7 +186,7 @@ OpenLayers.Layer.TileStream = OpenLayers.Class(OpenLayers.Layer.Grid, {
         return url + path;
     },
 
-    /**
+    /*
      * Method: setMap
      * When the layer is added to a map, then we can fetch our origin
      *    (if we don't have one.)

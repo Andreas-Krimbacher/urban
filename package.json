@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "dependencies": {
     "xml2js": "~0.2.6",
-    "express": "3.x",
+    "express": "3.2.0",
     "jquery-file-upload-middleware": "0.0.8",
-    "http-proxy": "0.10.1",
     "pg": "1.0.0",
     "gm": "1.8.2",
     "easyimage": "0.1.3",

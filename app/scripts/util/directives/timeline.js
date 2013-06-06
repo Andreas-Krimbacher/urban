@@ -1,5 +1,10 @@
 'use strict';
-
+/**
+ * Directive for the timeline
+ * @name Directive:timeline
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.util')
     .directive('timeline', function () {
         return {
@@ -7,14 +12,17 @@ angular.module('udm.util')
             restrict: 'E',
             link: function postLink(scope) {
 
+                //create timeline
                 var eventSource = new Timeline.DefaultEventSource();
                 var bandInfos = [
+                    //main band
                     Timeline.createBandInfo({
                         width:          "70%",
                         intervalUnit:   SimileAjax.DateTime.YEAR,
                         intervalPixels: 50,
                         eventSource : eventSource
                     }),
+                    //overview band
                     Timeline.createBandInfo({
                         width:          "30%",
                         intervalUnit:   SimileAjax.DateTime.CENTURY,
@@ -30,7 +38,12 @@ angular.module('udm.util')
                 var tl = Timeline.create(document.getElementById("timeline"), bandInfos);
                 tl.getBand(0).scrollToCenter(SimileAjax.DateTime.parseGregorianDateTime(1800));
 
-
+                /**
+                 * show Info-Einheiten in timeline
+                 * @name Directive:timeline#addInfoElements
+                 * @event
+                 * @param infoElements {Array(object)} Array of Info-Einheiten
+                 */
                 scope.$on('addInfoElements', function(e,infoElements) {
 
                     var x;

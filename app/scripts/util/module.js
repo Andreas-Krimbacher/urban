@@ -1,4 +1,4 @@
 'use strict';
 
-angular.module('udm.util', ['ui.bootstrap.carousel']);
+angular.module('udm.util', ['ui','ui.bootstrap.carousel']);
 

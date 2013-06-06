@@ -1,27 +1,98 @@
 'use strict';
-
+/**
+ * Service for Info-Einheit editing
+ * @name Service:mapEditFeature
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.map')
   .factory('mapEditFeature', function (OpenLayersMap) {
-
+		/**
+         * base plan layer
+         * @name Service:mapEditFeature#baseLayer
+         * @private
+         * @type {object}
+         */
         var baseLayer = null;
+		/**
+         * array for the overlay plan layers
+         * @name Service:mapEditFeature#overlayLayers
+         * @private
+         * @type {Array(object)}
+         */
         var overlayLayers = [];
+		/**
+         * vector feature layer
+         * @name Service:mapEditFeature#featureLayer
+         * @private
+         * @type {object}
+         */
         var featureLayer = null;
+		/**
+         * vector feature edit layer
+         * @name Service:mapEditFeature#editFeatureLayer
+         * @private
+         * @type {object}
+         */
         var editFeatureLayer = null;
+		/**
+         * overlay plan edit layer
+         * @name Service:mapEditFeature#editOverlayLayer
+         * @private
+         * @type {object}
+         */
         var editOverlayLayer = null;
 
+		/**
+         * z-index count for the overlay layers
+         * @name Service:mapEditFeature#overlayLayerZIndexCount
+         * @private
+         * @type {integer}
+         */
         var overlayLayerZIndexCount = 0;
 
+		/**
+         * vector feature draw control
+         * @name Service:mapEditFeature#drawControl
+         * @private
+         * @type {object}
+         */
         var drawControl = null;
+		/**
+         * vector feature modify control
+         * @name Service:mapEditFeature#modifyControl
+         * @private
+         * @type {object}
+         */
         var modifyControl = null;
 
+		//helper function
         var featureAdded = function(feature){
            if(featureAddedCallback) featureAddedCallback(feature);
         };
+		/**
+         * callback when a feature is added
+         * @name Service:mapEditFeature#featureAddedCallback
+         * @private
+         * @type {function}
+         */
         var featureAddedCallback = null;
 
+		/**
+         * openlayers map object
+         * @name Service:mapEditFeature#OLmap
+         * @private
+         * @type {function}
+         */
         var OLmap = OpenLayersMap.getMap();
 
 
+		/**
+         * style for the vector feature
+         * @name Service:mapEditFeature#featureStyle
+         * @private
+         * @type {object}
+         */
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style()
         });
@@ -64,7 +135,12 @@ angular.module('udm.map')
 
         featureStyle.addUniqueValueRules("default", "typ", lookupDefault);
 
-
+		/**
+         * style for the vector feature editing
+         * @name Service:mapEditFeature#featureEditStyle
+         * @private
+         * @type {object}
+         */
         var featureEditStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 strokeColor: '${color}',
@@ -102,6 +178,12 @@ angular.module('udm.map')
             })
         });
 
+		/**
+         * style for the oriented point vector feature editing 
+         * @name Service:mapEditFeature#featureEditStyleOri
+         * @private
+         * @type {object}
+         */
         var featureEditStyleOri = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 fillOpacity: 1,
@@ -111,6 +193,12 @@ angular.module('udm.map')
             })
         });
 
+		/**
+         * style for the vector feature creation 
+         * @name Service:mapEditFeature#featureCreateStyle
+         * @private
+         * @type {object}
+         */
         var featureCreateStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 strokeOpacity: 1,
@@ -120,6 +208,12 @@ angular.module('udm.map')
             })
         });
 
+		/**
+         * style for the oriented point vector feature creation 
+         * @name Service:mapEditFeature#featureCreateStyleOri
+         * @private
+         * @type {object}
+         */
         var featureCreateStyleOri = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 fillOpacity: 1,
@@ -131,6 +225,11 @@ angular.module('udm.map')
 
     // Public API here
     return {
+		/**
+         * set all layer variables to null
+         * @name  Service:mapEditFeature#clearAllLayers
+         * @function
+         */
         clearAllLayer : function(){
             baseLayer = null;
             overlayLayers = [];
@@ -138,8 +237,13 @@ angular.module('udm.map')
             editFeatureLayer = null;
             editOverlayLayer = null;
         },
+		/**
+         * set a base plan layer
+         * @name  Service:mapEditFeature#setBaseLayer
+         * @function
+		 * @param metaData {object} plan metadata
+         */
         setBaseLayer : function(metaData){
-
             if(baseLayer){
                 OLmap.removeLayer(baseLayer);
             }
@@ -164,12 +268,22 @@ angular.module('udm.map')
 
             OLmap.addLayer(baseLayer);
         },
+		/**
+         * remove base plan layer
+         * @name  Service:mapEditFeature#removeBaseLayer
+         * @function
+         */
         removeBaseLayer : function(){
             if(baseLayer) OLmap.removeLayer(baseLayer);
             baseLayer = null;
         },
+		/**
+         * add a overlay plan layer
+         * @name  Service:mapEditFeature#addOverlayLayer
+         * @function
+		 * @param metaData {object} plan metadata
+         */
         addOverlayLayer : function(metaData){
-
             var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
                 metaData.BoundingBox.minx,
                 metaData.BoundingBox.maxy,
@@ -193,6 +307,12 @@ angular.module('udm.map')
 
             OLmap.addLayer(overlayLayer);
         },
+		/**
+         * remove overlay plan layer
+         * @name  Service:mapEditFeature#removeOverlayLayer
+         * @function
+		 * @param metaData {object} plan metadata
+         */
         removeOverlayLayer : function(metaData){
           for(var x = 0; x < overlayLayers.length; x++){
               if(overlayLayers[x].name == metaData.tileDB){
@@ -202,6 +322,11 @@ angular.module('udm.map')
           }
 
         },
+		/**
+         * remove all overlay plan layer
+         * @name  Service:mapEditFeature#removeAllOverlayLayer
+         * @function
+         */
         removeAllOverlayLayer : function(){
             for(var x = 0; x < overlayLayers.length; x++){
                     OLmap.removeLayer(overlayLayers[x].layer);
@@ -209,6 +334,12 @@ angular.module('udm.map')
             overlayLayers = [];
 
         },
+		/**
+         * set the overlay edit plan layer
+         * @name  Service:mapEditFeature#setEditOverlayLayer
+         * @function
+		 * @param metaData {object} plan metadata
+         */
         setEditOverlayLayer : function(metaData){
 
             if(editOverlayLayer){
@@ -235,12 +366,21 @@ angular.module('udm.map')
 
             OLmap.addLayer(editOverlayLayer);
         },
+		/**
+         * remove the overlay edit plan layer
+         * @name  Service:mapEditFeature#removeEditOverlayLayer
+         * @function
+         */
         removeEditOverlayLayer : function(){
             if(editOverlayLayer) OLmap.removeLayer(editOverlayLayer);
             editOverlayLayer = null;
         },
+		/**
+         * initilaize vector feature layer
+         * @name  Service:mapEditFeature#setFeatureLayer
+         * @function
+         */
         setFeatureLayer : function(){
-
             if(featureLayer){
                 OLmap.removeLayer(featureLayer);
             }
@@ -255,19 +395,39 @@ angular.module('udm.map')
             OLmap.addLayer(featureLayer);
 
         },
+		/**
+         * add feature to the vector feature layer
+         * @name  Service:mapEditFeature#addFeature
+         * @function
+		 * @param feature {object} openlayers feature
+         */
         addFeature : function(feature){
-
             if(featureLayer) featureLayer.addFeatures(feature);
-
         },
+		/**
+         * remove feature from the vector feature layer
+         * @name  Service:mapEditFeature#removeFeature
+         * @function
+		 * @param feature {object} openlayers feature
+         */
         removeFeature : function(feature){
             if(featureLayer) featureLayer.removeFeatures([feature]);
 
         },
+		/**
+         * remove all feature from the vector feature layer
+         * @name  Service:mapEditFeature#removeAllFeatures
+         * @function
+         */
         removeAllFeatures : function(){
             if(featureLayer) featureLayer.removeAllFeatures();
 
         },
+		/**
+         * initilaize edit vector feature layer
+         * @name  Service:mapEditFeature#setEditFeatureLayer
+         * @function
+         */
         setEditFeatureLayer : function(){
             if(editFeatureLayer){
                 OLmap.removeLayer(editFeatureLayer);
@@ -302,14 +462,24 @@ angular.module('udm.map')
             OLmap.addControl(modifyControl);
 
         },
+		/**
+         * add feature to the edit vector feature layer
+         * @name  Service:mapEditFeature#addEditFeature
+         * @function
+		 * @param feature {object} openlayers feature
+         */
         addEditFeature : function(feature){
-
             if(feature.typ == 'pointOri') editFeatureLayer.styleMap = featureEditStyleOri;
             else editFeatureLayer.styleMap = featureEditStyle;
 
             if(editFeatureLayer) editFeatureLayer.addFeatures(feature.feature);
-
         },
+		/**
+         * start add feature process on edit vector feature layer
+         * @name  Service:mapEditFeature#drawFeature
+         * @function
+		 * @param type {string} feature type (pointOri,point,line,poly)
+         */
         drawFeature : function(type,colorRot,callback){
 
             featureAddedCallback = callback;
@@ -348,6 +518,11 @@ angular.module('udm.map')
                     break;
             }
         },
+		/**
+         * stop add feature process on edit vector feature layer
+         * @name  Service:mapEditFeature#stopDrawFeature
+         * @function
+         */
         stopDrawFeature : function(type){
             switch (type) {
                 case "point": drawControl.point.deactivate();
@@ -363,24 +538,40 @@ angular.module('udm.map')
                     break;
             }
         },
+		/**
+         * modifyFeature feature on edit vector feature layer
+         * @name  Service:mapEditFeature#modifyFeature
+         * @function
+		 * @param feature {object} openlayers feature
+         */
         modifyFeature : function(feature){
             modifyControl.activate();
             modifyControl.selectFeature(feature);
             editFeatureLayer.redraw();
         },
+		/**
+         * stop modifyFeature feature on edit vector feature layer
+         * @name  Service:mapEditFeature#modifyFeature
+         * @function
+         */
         stopModifyFeature : function(){
             modifyControl.deactivate();
         },
+		/**
+         * remove all feature on edit vector feature layer
+         * @name  Service:mapEditFeature#removeAllEditFeature
+         * @function
+         */
         removeAllEditFeature : function(){
             if(editFeatureLayer) editFeatureLayer.removeAllFeatures();
         },
+		/**
+         * redraw edit vector feature layer
+         * @name  Service:mapEditFeature#redrawEditFeatureLayer
+         * @function
+         */
         redrawEditFeatureLayer : function(){
             if(editFeatureLayer) editFeatureLayer.redraw();
         }
-
-
-
-
-
     };
   });

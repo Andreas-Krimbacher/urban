@@ -1,4 +1,11 @@
 /**
+ * Changed the SVG renderer to prevent reloading externalGraphic of point feature. Used to display the image for georeferencing
+ * @name OpenLayersFix:ExternalGraphicFix
+ * @namespace
+ * @author Andreas Krimbacher
+ */
+
+/*
  * Method: setStyle
  * Use to set all the style attributes to a SVG node.
  *
@@ -57,7 +64,9 @@ OpenLayers.Renderer.SVG.prototype.setStyle = function(node, style, options) {
             node.setAttributeNS(null, "width", width);
             node.setAttributeNS(null, "height", height);
 
-            //changed
+            //changed //************************************************************************************************
+            //**********************************************************************************************************
+            //**********************************************************************************************************
             if(style.externalGraphic === true && style.externalStaticGraphic){
                 if(node.href.animVal == ''){
                     node.setAttributeNS(this.xlinkns, "href", style.externalStaticGraphic);
@@ -66,7 +75,9 @@ OpenLayers.Renderer.SVG.prototype.setStyle = function(node, style, options) {
             else{
                 node.setAttributeNS(this.xlinkns, "href", style.externalGraphic);
             }
-            //------------------
+            //**********************************************************************************************************
+            //**********************************************************************************************************
+            //**********************************************************************************************************
 
             node.setAttributeNS(null, "style", "opacity: "+opacity);
             node.onclick = OpenLayers.Renderer.SVG.preventDefault;

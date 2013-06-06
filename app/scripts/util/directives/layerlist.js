@@ -1,5 +1,10 @@
 'use strict';
-
+/**
+ * Directive for the layerlist
+ * @name Directive:layerlist
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.util')
     .directive('layerlist', function () {
         return {
@@ -7,11 +12,30 @@ angular.module('udm.util')
             restrict: 'E',
             link: function postLink(scope) {
 
+                /**
+                 * Layers in the layerlist
+                 * @nameDirective:layerlist#layers
+                 * @type {Array(object)}
+                 */
                 scope.layers = [];
+
+                /**
+                 * Id of the selected feature in the list
+                 * @nameDirective:layerlist#selectedId
+                 * @type {integer}
+                 */
                 scope.selectedId = null;
 
+                //used to disable the click events
                 scope.editMode = '';
 
+                /**
+                 * select a feature in the layer list and show info in the info box
+                 * @name Directive:layerlist#selectItem
+                 * @function
+                 * @param infoEinheit {integer} Id Info-Einheit
+                 * @param feature {integer} Id Info-Feature
+                 */
                 scope.selectItem = function(infoEinheit,feature){
                     if(scope.editMode == 'lernStart') return;
 
@@ -35,6 +59,12 @@ angular.module('udm.util')
                     }
                 };
 
+                /**
+                 * show a Info-Einheit in the layerlist
+                 * @name Directive:layerlist#showLayerInList
+                 * @event
+                 * @param data {object} {data: Info-Einheit}
+                 */
                 scope.$on('showLayerInList', function(e,data) {
                     var infoEinheit = data.infoEinheit;
                     scope.editMode = data.mode;
@@ -45,6 +75,12 @@ angular.module('udm.util')
                     if(data.onlyBase) scope.toogleFeatureLayer(0);
                 });
 
+                /**
+                 * event to select a item in the layerlist
+                 * @name Directive:layerlist#selectItem
+                 * @event
+                 * @param data {object} {id: Id Info-Feature}
+                 */
                 scope.$on('selectItem', function(e,data) {
                     if(data.type == 'infoEinheit'){
                         var idFound = false;
@@ -68,6 +104,12 @@ angular.module('udm.util')
                     else scope.selectedId = data.id
                 });
 
+                /**
+                 * remove Info-Einheit from layerlist
+                 * @name Directive:layerlist#removeInfoEinheit
+                 * @function
+                 * @param index {integer} index in layers
+                 */
                 scope.removeInfoEinheit = function(index){
                     if(scope.editMode == 'lern') return;
                     var x;
@@ -82,6 +124,12 @@ angular.module('udm.util')
                     scope.layers.splice(index,1);
                 };
 
+                /**
+                 * event to remove Info-Einheit from layerlist
+                 * @name Directive:layerlist#removeInfoEinheitFromLayerList
+                 * @event
+                 * @param id {integer} Id Info-Einheit
+                 */
                 scope.$on('removeInfoEinheitFromLayerList', function(e,id) {
                     var x;
                     var index;
@@ -103,11 +151,22 @@ angular.module('udm.util')
                     scope.layers.splice(index,1);
                 });
 
+                /**
+                 * toggle the visibility of the vector layer
+                 * @name Directive:layerlist#toogleFeatureLayer
+                 * @function
+                 * @param index {integer} index of Info-Einheit in layers
+                 */
                 scope.toogleFeatureLayer = function(index){
                     scope.$emit('toogleFeatureLayer',scope.layers[index]);
                     scope.layers[index].featureLayer.visible = !scope.layers[index].featureLayer.visible;
                 };
 
+                /**
+                 * clear layerlist
+                 * @name Directive:layerlist#clearLayerList
+                 * @event
+                 */
                 scope.$on('clearLayerList', function() {
                     scope.layers = [];
                 });

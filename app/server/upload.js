@@ -1,3 +1,9 @@
+/**
+ * Servermodule for the file upload, configure the jQueryFileUploadMiddleware
+ * @name Server:upload
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 var filePaths = require('./filePaths');
 var easyimg = require('easyimage');
 var fs = require('fs');

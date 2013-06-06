@@ -1,37 +1,136 @@
 'use strict';
-
+/**
+ * Controller for the Info-EInheit edit view, the controller use the service mapEditFeature
+ * @name Controller:EditInfoEinheitCtrl
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.edit')
-    .controller('EditInfoEinheitCtrl', function ($scope,$http,mapEditFeature, util) {
+    .controller('EditInfoEinheitCtrl',
+    /**
+     * Represents a book.
+     * @constructor
+     * @param {string} title - The title of the book.
+     * @param {string} author - The author of the book.
+     */
+    function ($scope,$http,mapEditFeature, util) {
+		/**
+         * view mode (list, infoEinheit, infoFeature)
+         * @name Controller:EditInfoEinheitCtrl#mode
+         * @type {string}
+         */
         $scope.mode = 'list';
+		/**
+         * title for the view
+         * @name Controller:EditInfoEinheitCtrl#topTitle
+         * @type {string}
+         */
         $scope.topTitle = 'Übersicht';
 
+		/**
+         * next possible Id for the Info-Einheit, synced with the server at the getInfoEinheitenList resquest 
+         * @name Controller:EditInfoEinheitCtrl#nextInfoEinheitId
+         * @type {integer}
+         */
         $scope.nextInfoEinheitId = null;
+		/**
+         * next possible Id for the Info-Feature, synced with the server at the getInfoEinheitenList resquest 
+         * @name Controller:EditInfoEinheitCtrl#nextFeatureId
+         * @type {integer}
+         */
         $scope.nextFeatureId = null;
 
+		/**
+         * Array of current Info-Einheiten in list
+         * @name Controller:EditInfoEinheitCtrl#infoEinheiten
+         * @type {Array(object)}
+         */
         $scope.infoEinheiten = [];
+		/**
+         * Array of current Info-Feature
+         * @name Controller:EditInfoEinheitCtrl#features
+         * @type {Array(object)}
+         */
         $scope.features = [];
 
+		/**
+         * Info-Einheit for editing or a new one on creation
+         * @name Controller:EditInfoEinheitCtrl#editInfoEinheit
+         * @type {object}
+         */
         $scope.editInfoEinheit = {};
+		/**
+         * Title for a new Info-Einheit
+         * @name Controller:EditInfoEinheitCtrl#newInfoEinheitTitle
+         * @type {string}
+         */
         $scope.newInfoEinheitTitle = null;
+		/**
+         * Flag for creating a new Info-Einheit
+         * @name Controller:EditInfoEinheitCtrl#creatingNewInfoEinheit
+         * @type {boolean}
+         */
         $scope.creatingNewInfoEinheit = false;
-
+		/**
+         * Info-Feature for editing or a new one on creation
+         * @name Controller:EditInfoEinheitCtrl#editFeature
+         * @type {object}
+         */
         $scope.editFeature = {};
+		/**
+         * Title for a new Info-Feature
+         * @name Controller:EditInfoEinheitCtrl#newFeatureTitle
+         * @type {string}
+         */
         $scope.newFeatureTitle = null;
+		/**
+         * Flag for creating a new Info-Feature
+         * @name Controller:EditInfoEinheitCtrl#creatingNewFeature
+         * @type {boolean}
+         */
         $scope.creatingNewFeature = false;
 
+		/**
+         * Array of Info-Features to delete on the server, deletion is executed on save Info-Einheit
+         * @name Controller:EditInfoEinheitCtrl#featuresToDelete
+         * @type {Array(object)}
+         */
         $scope.featuresToDelete = [];
 
+		/**
+         * Flag for editing the baselayer feature
+         * @name Controller:EditInfoEinheitCtrl#editingBaseLayerFeature
+         * @type {boolean}
+         */
         $scope.editingBaseLayerFeature = false;
+		/**
+         * Flag for Info-Einheit with baselayer
+         * @name Controller:EditInfoEinheitCtrl#hasBaseLayer
+         * @type {boolean}
+         */
         $scope.hasBaseLayer = false;
-
+		/**
+         * Flag for adding openlayers feature in progress
+         * @name Controller:EditInfoEinheitCtrl#addProcess
+         * @type {boolean}
+         */
         $scope.addProcess = false;
+		/**
+         * Flag for modifing openlayers feature in progress
+         * @name Controller:EditInfoEinheitCtrl#modifyProcess
+         * @type {boolean}
+         */
         $scope.modifyProcess = false;
 
+		//reset mapEditFeature service
         mapEditFeature.clearAllLayer();
 
+		//initialize vector feature layer
         mapEditFeature.setFeatureLayer();
+		//initialize vector feature editing layer
         mapEditFeature.setEditFeatureLayer();
 
+		//get a list of all Info-Einheiten on the server
         $http.get('/pg/getInfoEinheitenList').
             success(function(data) {
                 $scope.nextInfoEinheitId = data.nextInfoEinheitId;
@@ -43,9 +142,15 @@ angular.module('udm.edit')
                 // or server returns response with an error status.
             });
 
-
+        /**
+         * edit a Info-Einheit from the list or create a new one (index = -1)
+         * @name  Controller:EditInfoEinheitCtrl#editInfoEinheitMode
+         * @function
+         * @param index {integer} index in infoEinheiten array
+         */
         $scope.editInfoEinheitMode = function(index){
             if(index == -1){
+				//initialize new Info-Einheit
                 $scope.editInfoEinheit = {};
                 $scope.editInfoEinheit.id = $scope.nextInfoEinheitId;
                 $scope.nextInfoEinheitId++;
@@ -58,7 +163,7 @@ angular.module('udm.edit')
                 $scope.mode = 'editInfoEinheit';
             }
             else{
-
+				//get Info-Einheit data from server
                 $http.get('/pg/getInfoEinheit/'+$scope.infoEinheiten[index].id).
                     success(function(data) {
                         $scope.nextFeatureId = data.nextId;
@@ -68,6 +173,7 @@ angular.module('udm.edit')
 
                         if(data.infoEinheit.info == 'null') data.infoEinheit.info = '';
 
+						//add features to the map
                         var attr;
                         var x;
                         for(x = 0; x < $scope.features.length; x++){
@@ -104,9 +210,14 @@ angular.module('udm.edit')
                     });
             }
         };
-
+        /**
+         * Delete a Info-Einheit from the database
+		 * @name  Controller:EditInfoEinheitCtrl#editFeatureMode
+         * @function
+         * @param index {integer} array index of the Info-Einheit in scope.infoEinheit
+         */
         $scope.deleteInfoEinheit = function(index){
-            $http.get('/pg/deleteInfoEinheit/'+$scope.infoEinheiten[index].id).
+            $http.delete('/pg/deleteInfoEinheit/'+$scope.infoEinheiten[index].id).
                 success(function() {
                     $scope.infoEinheiten.splice(index,1);
                 }).
@@ -117,12 +228,19 @@ angular.module('udm.edit')
 
         };
 
+		/**
+         * edit a Info-Feature from the list or create a new one (index = -1)
+         * @name  Controller:EditInfoEinheitCtrl#editFeatureMode
+         * @function
+         * @param index {integer} index in features array
+         */
         $scope.editFeatureMode = function(index){
 
             $scope.editFeature.planList = [];
             $scope.editingBaseLayerFeature = false;
 
             if(index == -1){
+				//initialize Info-Feature
                 $scope.editFeature = {};
                 $scope.editFeature.color = '#000000';
                 $scope.editFeature.rot = 0;
@@ -137,7 +255,7 @@ angular.module('udm.edit')
                 $scope.mode = 'editFeature';
             }
             else{
-
+				//edit feature
                 if($scope.features[index].typ == 'plan') $scope.editingBaseLayerFeature = true;
 
                 if( $scope.features[index].typ == 'plan' || $scope.features[index].typ == 'planOverlay'){
@@ -194,6 +312,12 @@ angular.module('udm.edit')
 
         };
 
+		/**
+         * Delete a Info-Feature, deleted from the database on Info-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#deleteFeature
+         * @function
+         * @param index {integer} index in features array
+         */
         $scope.deleteFeature = function(index){
             if($scope.features[index].typ == 'plan'){
                 mapEditFeature.removeBaseLayer();
@@ -209,6 +333,11 @@ angular.module('udm.edit')
             $scope.features.splice(index,1);
         };
 
+		/**
+         * Apply the type change of a Info-Feature, editFeature.typ is changed by the view
+		 * @name  Controller:EditInfoEinheitCtrl#typChange
+         * @function
+         */
         $scope.typChange = function(){
 
             if( $scope.editFeature.typ == 'plan' || $scope.editFeature.typ == 'planOverlay'){
@@ -251,6 +380,11 @@ angular.module('udm.edit')
             if($scope.editFeature.typ == 'plan') $scope.editingBaseLayerFeature = true;
         };
 
+		/**
+         * change the baseplan or the overlayplan
+		 * @name  Controller:EditInfoEinheitCtrl#changePlan
+         * @function
+         */
         $scope.changePlan = function(){
             if($scope.editFeature.plan){
                 var x;
@@ -269,6 +403,12 @@ angular.module('udm.edit')
             }
         };
 
+		/**
+         * apply colorpicker change to the Info-Feature
+		 * @name  Controller:EditInfoEinheitCtrl#colorpickerChanged
+         * @event
+		 * @param value {object} {value:value}
+         */
         $scope.$on('colorpickerChanged', function (e,value) {
             $scope.editFeature.color = value.value;
             if($scope.editFeature.feature){
@@ -277,6 +417,12 @@ angular.module('udm.edit')
             }
         });
 
+		/**
+         * apply slider change to the Info-Feature (for oriented points)
+		 * @name  Controller:EditInfoEinheitCtrl#sliderChanged
+         * @event
+		 * @param value {object} {value:value}
+         */
         $scope.$on('sliderChanged', function(e,value) {
             if(value.name == 'rot'){
                 $scope.editFeature.rot = value.value;
@@ -287,6 +433,11 @@ angular.module('udm.edit')
             }
         });
 
+		/**
+         * start add feature process
+		 * @name  Controller:EditInfoEinheitCtrl#drawFeature
+         * @function
+         */
         $scope.drawFeature = function(){
             $scope.addProcess = true;
 
@@ -308,6 +459,11 @@ angular.module('udm.edit')
 
         };
 
+		/**
+         * cancel add feature process
+		 * @name  Controller:EditInfoEinheitCtrl#cancel
+         * @function
+         */
         $scope.cancel = function(){
             if($scope.addProcess){
                 mapEditFeature.stopDrawFeature($scope.editFeature.typ);
@@ -319,6 +475,11 @@ angular.module('udm.edit')
             }
         };
 
+		/**
+         * remove openlayers feature
+		 * @name  Controller:EditInfoEinheitCtrl#removeFeature
+         * @function
+         */
         $scope.removeFeature = function(){
             mapEditFeature.removeAllEditFeature();
             mapEditFeature.stopModifyFeature();
@@ -328,6 +489,11 @@ angular.module('udm.edit')
             $scope.modifyProcess = false;
         };
 
+		/**
+         * modify openlayers feature
+		 * @name  Controller:EditInfoEinheitCtrl#modifyFeature
+         * @function
+         */
         $scope.modifyFeature = function(){
             if($scope.modifyProcess){
                 mapEditFeature.stopModifyFeature();
@@ -339,7 +505,11 @@ angular.module('udm.edit')
             }
         };
 
-
+		/**
+         * go one view back (list <- infoEinheit <- infoFeature)
+		 * @name  Controller:EditInfoEinheitCtrl#back
+         * @function
+         */
         $scope.back = function(){
 
             if($scope.mode == 'editInfoEinheit'){
@@ -389,7 +559,11 @@ angular.module('udm.edit')
             }
         };
 
-
+		/**
+         * save current Info-Einheit, send to server and delete featuresToDelete
+		 * @name  Controller:EditInfoEinheitCtrl#save
+         * @function
+         */
         $scope.save = function(){
 
             mapEditFeature.removeBaseLayer();
@@ -422,7 +596,7 @@ angular.module('udm.edit')
                 });
 
             for(x=0; x < $scope.featuresToDelete.length; x++){
-                $http.get('/pg/deleteFeature/' + $scope.editInfoEinheit.id + '/' +$scope.featuresToDelete[x]).
+                $http.delete('/pg/deleteFeature/' + $scope.editInfoEinheit.id + '/' +$scope.featuresToDelete[x]).
                     success(function(data, status, headers, config) {
 
                     }).
@@ -433,6 +607,11 @@ angular.module('udm.edit')
             }
         };
 
+		/**
+         * save current Info-Feature localy, Info-Feature is send to server on Info-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#saveFeature
+         * @function
+         */
         $scope.saveFeature = function(){
 
             mapEditFeature.stopModifyFeature();
@@ -473,13 +652,14 @@ angular.module('udm.edit')
             $scope.mode = 'editInfoEinheit';
         };
 
+		/**
+         * start image upload
+		 * @name  Controller:EditInfoEinheitCtrl#uploadImg
+         * @function
+         */
         $scope.uploadImg = function(){
             if($scope.mode == 'editInfoEinheit') $scope.setFileUploadTarget({name : 'imageUpload', target : 'imageUpload/' + $scope.editInfoEinheit.id});
             if($scope.mode == 'editFeature') $scope.setFileUploadTarget({name : 'imageUpload', target : 'imageUpload/' + $scope.editInfoEinheit.id + '/' + $scope.editFeature.id});
             $scope.showFileUpload('imageUpload');
         }
-
-
-
-
     });

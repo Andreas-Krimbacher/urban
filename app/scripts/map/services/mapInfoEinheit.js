@@ -1,16 +1,50 @@
 'use strict';
-
+/**
+ * Service for showing Info-Einheiten
+ * @name Service:mapInfoEinheit
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.map')
     .factory('mapInfoEinheit', function (OpenLayersMap,util) {
-
+		/**
+         * top container for all layer packages, one layer package contains all layers from on Info-Einheit
+         * @name Service:mapInfoEinheit#layerPackages
+         * @private
+         * @type {object}
+         */
         var layerPackages = {};
 
+		/**
+         * z-Index for the next Info-Einheit that should be shown on top
+         * @name Service:mapInfoEinheit#nextZindexTop
+         * @private
+         * @type {integer}
+         */
         var nextZindexTop = 1000;
 
+		/**
+         * openlayers map object
+         * @name Service:mapInfoEinheit#currentZoom
+         * @private
+         * @type {object}
+         */
         var OLmap = OpenLayersMap.getMap();
 
+		/**
+         * flag for animations
+         * @name Service:mapInfoEinheit#showAnimation
+         * @private
+         * @type {boolean}
+         */
         var showAnimation = false;
 
+		/**
+         * style for the vector feature
+         * @name Service:mapEditFeature#featureStyle
+         * @private
+         * @type {object}
+         */
         var featureStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style(),
             "temporary": new OpenLayers.Style(),
@@ -171,6 +205,15 @@ angular.module('udm.map')
         featureStyle.addUniqueValueRules("select", "typ", lookupSelect);
 
 
+		/**
+         * calculate the z-index for all layer in the layerPackage 
+         * @name  Service:mapEditFeature#calculateZindex
+         * @function
+         * @private
+		 * @param layerPackage {object} layer package of the Info-Einheit
+		 * @param infoEinheit {object} Info-Einheit
+		 * @param position {string} (top) only top supported yet
+         */
         var calculateZindex = function(layerPackage,infoEinheit,position){
             var adjustZindexFlag = false;
 
@@ -200,8 +243,13 @@ angular.module('udm.map')
 
         };
 
+		/**
+         * re-calculate the z-index of all layer packages
+         * @name  Service:mapEditFeature#adjustZindex
+         * @function
+         * @private
+         */
         var adjustZindex = function(){
-
             var y;
             var length = 0;
             for(var x in layerPackages){
@@ -225,6 +273,14 @@ angular.module('udm.map')
             }
         };
 
+		/**
+         * add a plan as tile layer to the map
+         * @name  Service:mapEditFeature#addTileLayer
+         * @function
+         * @private
+		 * @param metaData {object} plan metaData
+		 * @param zIndex {integer} z-Index
+         */
         var addTileLayer = function(metaData,zIndex){
 
             var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
@@ -265,8 +321,14 @@ angular.module('udm.map')
             return tileLayer;
         };
 
+		/**
+         * remove a tile layer from the map
+         * @name  Service:mapEditFeature#removeTileLayer
+         * @function
+         * @private
+		 * @param layer {object} openlayers layer object
+         */
         var removeTileLayer = function(layer){
-
             if(showAnimation){
                 var tween = new OpenLayers.Tween(OpenLayers.Easing.Quad.easeOut);
 
@@ -281,9 +343,15 @@ angular.module('udm.map')
             else{
                 OLmap.removeLayer(layer);
             }
-
         };
 
+		/**
+         * initialize a vector layer with controls
+         * @name  Service:mapEditFeature#createFeatureLayer
+         * @function
+         * @private
+		 * @param zIndex {integer} z-Index
+         */
         var createFeatureLayer = function(zIndex){
             var featureLayer = new OpenLayers.Layer.Vector("Features",{
                 styleMap: featureStyle,
@@ -326,12 +394,18 @@ angular.module('udm.map')
 
             featureLayer.selectControl = selectControl;
 
-
             featureLayer.setZIndex(zIndex);
 
             return featureLayer;
         };
 
+		/**
+         * re-initialize the select control of a vector layer
+         * @name  Service:mapEditFeature#createFeatureLayer
+         * @function
+         * @private
+		 * @param featureLayer {object} openlayers layer object
+         */
         var resetSelectControl = function(featureLayer){
 
             featureLayer.hoverControl.deactivate();
@@ -378,6 +452,13 @@ angular.module('udm.map')
 
         };
 
+		/**
+         * add vector layer to the map
+         * @name  Service:mapEditFeature#addFeatureLayer
+         * @function
+         * @private
+		 * @param layer {object} openlayers layer object
+         */
         var addFeatureLayer = function(layer){
 
             if(showAnimation) layer.setOpacity(0);
@@ -398,6 +479,13 @@ angular.module('udm.map')
 
         };
 
+		/**
+         * remove vector layer from the map
+         * @name  Service:mapEditFeature#removeFeatureLayer
+         * @function
+         * @private
+		 * @param layer {object} openlayers layer object
+         */
         var removeFeatureLayer = function(layer){
 
             if(showAnimation){
@@ -430,17 +518,38 @@ angular.module('udm.map')
             }
         };
 
+		/**
+         * add a feature to a vector layer
+         * @name  Service:mapEditFeature#addFeatureToLayer
+         * @function
+         * @private
+		 * @param feature {object} openlayers feature
+		 * @param layer {object} openlayers layer object
+         */
         var addFeatureToLayer = function(feature,layer){
             layer.addFeatures([feature]);
-
         };
 
+		/**
+         * add a tooltip to a vector feature
+         * @name  Service:mapEditFeature#addTooltip
+         * @function
+         * @private
+		 * @param feature {object} openlayers feature
+         */
         var addTooltip = function(feature){
             $('[id="'+feature.feature.geometry.id+'"]').data('powertip', feature.title).powerTip({placement:'se',
                 followMouse : true
             });
         };
 
+		/**
+         * add a label to a vector feature
+         * @name  Service:mapEditFeature#addLabel
+         * @function
+         * @private
+		 * @param feature {object} openlayers feature
+         */
         var addLabel = function(feature){
             var center = feature.feature.geometry.getBounds().getCenterLonLat();
             var position = OLmap.getLayerPxFromViewPortPx(OLmap.getViewPortPxFromLonLat(center));
@@ -448,10 +557,18 @@ angular.module('udm.map')
             $('#label_'+feature.id).css('top',position.y-15+'px').css('left',position.x-60+'px');
         };
 
+		/**
+         * set the z-index of a layer
+         * @name  Service:mapEditFeature#setZindexLayer
+         * @function
+         * @private
+		 * @param layer {object} openlayers layer object
+		 * @param zIndex {integer} z-Index
+		 * @param type {string} change type (fadeIn,fadeOut) showAnimation must be true
+         */
         var setZindexLayer = function(layer,zIndex,type){
-
             type = '';
-
+			
             if(type == 'fadeIn' && showAnimation){
                 var preOpacity = layer.opacity;
 
@@ -467,7 +584,6 @@ angular.module('udm.map')
                 layer.setZIndex(zIndex);
 
                 tween.start({opacity:0}, {opacity:preOpacity*100}, 20*preOpacity, {callbacks: callbacks});
-
             }
             else if(type == 'fadeOut' && showAnimation){
 
@@ -494,6 +610,14 @@ angular.module('udm.map')
             }
         };
 
+		/**
+         * applay the z-Index in the layer Package to the layer in the layer package
+         * @name  Service:mapEditFeature#setZindexPackage
+         * @function
+         * @private
+		 * @param layerPackage {object} layer package
+		 * @param type {string} change type (fadeIn,fadeOut) showAnimation must be true
+         */
         var setZindexPackage = function(layerPackage,type){
             var x;
             for(x in layerPackage.baseLayer){
@@ -508,6 +632,13 @@ angular.module('udm.map')
 
         };
 
+		/**
+         * remove Info-Einheit from map
+         * @name  Service:mapEditFeature#removeInfoEinheit
+         * @function
+         * @private
+		 * @param id {integer} Id Info-Einheit
+         */
         var removeInfoEinheit = function(id){
             var x;
             if(layerPackages[id]){
@@ -539,12 +670,28 @@ angular.module('udm.map')
 
         // Public API here
         return {
+			/**
+			 * reset the map
+			 * @name  Service:mapEditFeature#resetMap
+			 * @function
+			 */
             resetMap : function(){
                 OpenLayersMap.resetMap();
             },
+			/**
+			 * set the layerPackages to an empty object
+			 * @name  Service:mapEditFeature#clearAllLayers
+			 * @function
+			 */
             clearAllLayers : function(){
                 layerPackages = {};
             },
+			/**
+			 * select a feature
+			 * @name  Service:mapEditFeature#selectfeature
+			 * @function
+			 * @param feature {object} openlayers feature
+			 */
             selectfeature : function(feature){
                 for(var x in layerPackages){
                     if(layerPackages[x].featureLayer.layer){
@@ -557,6 +704,13 @@ angular.module('udm.map')
                     }
                 }
             },
+			/**
+			 * unselect a feature
+			 * @name  Service:mapEditFeature#unselectfeature
+			 * @function
+			 * @param feature {object} openlayers feature
+			 * @param preventEvent {boolean} flag, when true onUnselect callback will not be called
+			 */
             unselectfeature : function(feature,preventEvent){
                 for(var x in layerPackages){
                     if(layerPackages[x].featureLayer.layer){
@@ -570,8 +724,14 @@ angular.module('udm.map')
                     }
                 }
             },
+			/**
+			 * remove Info-EInheit at the bootom of the layer stack
+			 * @name  Service:mapEditFeature#removeBottomInfoEinheit
+			 * @function
+			 */
             removeBottomInfoEinheit : function(){
                 var id = null;
+				//position 0 is top
                 var position = 0;
 
                 var x;
@@ -585,8 +745,14 @@ angular.module('udm.map')
                 if(id) removeInfoEinheit(id);
                 return id;
             },
+			/**
+			 * add Info-Einheit to the map
+			 * @name  Service:mapEditFeature#addInfoEinheit
+			 * @function
+			 * @param infoEinheit {object} Info-Einheit
+			 * @param position {string} (top) only top supported yet
+			 */
             addInfoEinheit : function(infoEinheit,position){
-
                 if(layerPackages[infoEinheit.id]) removeInfoEinheit(infoEinheit.id);
 
                 var layerPackage = {};
@@ -678,11 +844,17 @@ angular.module('udm.map')
                     }
                 }
 
-
                 layerPackages[infoEinheit.id] = layerPackage;
 
                 if(adjustZindexFlag) adjustZindex();
             },
+			/**
+			 * change the Info-Einheit if it is already in the map, otherwise add it
+			 * @name  Service:mapEditFeature#changeInfoEinheit
+			 * @function
+			 * @param infoEinheit {object} Info-Einheit
+			 * @param position {string} (top) only top supported yet
+			 */
             changeInfoEinheit : function(infoEinheit,position){
                 var adjustZindexFlag = false;
 
@@ -871,18 +1043,45 @@ angular.module('udm.map')
 
                 if(adjustZindexFlag) adjustZindex();
             },
+			/**
+			 * remove Info-Einheit from map
+			 * @name  Service:mapEditFeature#removeInfoEinheit
+			 * @function
+			 * @param id {integer} Id Info-Einheit
+			 */
             removeInfoEinheit : function(id){
                 removeInfoEinheit(id);
             },
+			/**
+			 * remove all Info-Einheiten from map
+			 * @name  Service:mapEditFeature#removeAllInfoEinheiten
+			 * @function
+			 */
             removeAllInfoEinheiten : function(){
                 for(var id in layerPackages){
                     removeInfoEinheit(id);
                 }
             },
+			/**
+			 * set opacity of a Info-Feature
+			 * @name  Service:mapEditFeature#setOpacity
+			 * @function
+			 * @param typ {string} only 'featureLayer' at the moment
+			 * @param infoEinheitId {integer} Id Info-Einheit
+			 * @param featureId {integer} Id Info-Feature of the layer
+			 * @param value {float} opacity
+			 */
             setOpacity : function(typ,infoEinheitId,featureId,value){
                 if(layerPackages[infoEinheitId] && layerPackages[infoEinheitId][typ] && layerPackages[infoEinheitId][typ][featureId])
                     layerPackages[infoEinheitId][typ][featureId].layer.setOpacity(value);
             },
+			/**
+			 * toogle the visibility of a layer
+			 * @name  Service:mapEditFeature#toggleVisibility
+			 * @function
+			 * @param typ {string} only 'featureLayer' at the moment
+			 * @param infoEinheitId {integer} Id Info-Einheit
+			 */
             toggleVisibility : function(typ,infoEinheitId){
                 if(typ == 'featureLayer')
                     if(layerPackages[infoEinheitId] && layerPackages[infoEinheitId].featureLayer.layer){
@@ -890,6 +1089,13 @@ angular.module('udm.map')
                         layerPackages[infoEinheitId].featureLayer.visible = !layerPackages[infoEinheitId].featureLayer.visible;
                     }
             },
+			/**
+			 * change the position of a Info-Einheit in the layer stack
+			 * @name  Service:mapEditFeature#changeOrder
+			 * @function
+			 * @param id {integer} Id Info-Einheit
+			 * @param targetLevel {integer} target position in the layer stack
+			 */
             changeOrder : function(id,targetLevel){
 
                 var  adjustZindexFlag = false;
@@ -967,21 +1173,45 @@ angular.module('udm.map')
 
                 if(adjustZindexFlag) adjustZindex();
             },
+			/**
+			 * remove feature from layer
+			 * @name  Service:mapEditFeature#removeFeature
+			 * @function
+			 * @param feature {object} openlayers feature object
+			 * @param layer {object} openlayers layer object
+			 */
             removeFeature : function(feature,layer){
                 layer.removeFeatures([feature.geom]);
             },
+			/**
+			 * remove all features from a layer
+			 * @name  Service:mapEditFeature#removeAllFeatures
+			 * @function
+			 * @param layer {object} openlayers layer object
+			 */
             removeAllFeatures : function(layer){
                 layer.removeAllFeatures();
 
             },
+			/**
+			 * get the mapview
+			 * @name  Service:mapEditFeature#getMapView
+			 * @function
+			 * @returns {object} {wkt: geom as wkt sring, zoom: integer}
+			 */
             getMapView : function(){
                 var zoom = OLmap.getZoom();
                 var center = OLmap.getCenter();
                 var wkt = util.featureToWKT(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(center.lon,center.lat)));
 
                 return {zoom:zoom, wkt:wkt}
-            }
-            ,
+            },
+			/**
+			 * set mapview
+			 * @name  Service:mapEditFeature#setMapView
+			 * @function
+			 * @param mapView {object} {wkt: geom as wkt sring, zoom: integer}
+			 */
             setMapView : function(mapView){
                 var center = util.WKTToFeature(mapView.wkt);
                 OLmap.moveTo(new OpenLayers.LonLat(center.geometry.x,center.geometry.y),mapView.zoom);

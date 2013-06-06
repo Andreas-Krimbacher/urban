@@ -1,15 +1,42 @@
 'use strict';
-
+/**
+ * Controller for E-Learning view
+ * @name Controller:LernCtrl
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.lern')
     .controller('LernCtrl', function ($scope,$http,mapInfoEinheit, util) {
 
+        //reset the map
         $scope.$emit('$clearMap');
 
-        $scope.startLektion = null;
-        $scope.tip = 'Tip: Sind für eine Einheit Bilder vorhanden können diese mithilfe des Button am untern Ende des Infofensters angezeigt werden.';
-
+        //reset mapInfoEinheit service
         mapInfoEinheit.clearAllLayers();
 
+        /**
+         * Array generated from the lrn einheiten list
+         * @name Controller:LernCtrl#lernEinheiten
+         * @type {Array(object)}
+         */
+        $scope.lernEinheiten = [];
+
+        /**
+         * Start lektion
+         * @name Controller:LernCtrl#startLektion
+         * @type {object}
+         */
+        $scope.startLektion = null;
+
+        /**
+         * Tip, shown in the first infobox
+         * @name Controller:LernCtrl#tip
+         * @type {string}
+         */
+        $scope.tip = 'Tip: Sind für eine Einheit Bilder vorhanden können diese mithilfe des Button am untern Ende des Infofensters angezeigt werden.';
+
+
+        //get a list of all Lern-Einheiten
         $http.get('/pg/getLernEinheitList').
             success(function(data) {
 
@@ -33,6 +60,7 @@ angular.module('udm.lern')
                 // or server returns response with an error status.
             });
 
+        //check if a Lern-einheit was selected
         var selected = false;
         $scope.checkLernEinheitSelected = function(){
             if(!selected){
@@ -41,6 +69,12 @@ angular.module('udm.lern')
             selected = true;
         };
 
+        /**
+         * show a Lern-Einheit
+         * @name  Controller:LernCtrl#open
+         * @function
+         * @param index {intger} index in lernEinheiten
+         */
         $scope.open = function(index){
            selected = true;
 
@@ -95,13 +129,20 @@ angular.module('udm.lern')
                 });
         };
 
-
+        //true if the first Lern-Feature is shown
         $scope.first = true;
+        //true if the last Lern-Feature is shown
         $scope.last = false;
 
+        //ids of the current Lern-Lektion (-1 for start lektion) and Lern-Feature
         $scope.currentLektion = -1;
         $scope.currentFeature = 0;
 
+        /**
+         * start Lern-Einheit
+         * @name  Controller:LernCtrl#start
+         * @function
+         */
         $scope.start = function(){
             if($scope.startLektion){
                 showStartLektion();
@@ -113,6 +154,16 @@ angular.module('udm.lern')
         };
 
 
+        /**
+         * shows a Lern-Feature by showing the Info-Einheit with the defined settings
+         * @name  Controller:LernCtrl#showInfoEinheit
+         * @function
+         * @param infoEinheit {integer} Id Info-Einheit
+         * @param selectFeatureId {integer} Id Info-Feature
+         * @param visibility {object} visibility object, key: Id Info-Feature, value: true/false
+         * @param lernInfo {string} lern information
+         * @param onlyAdjust {boolean} if true the view is adjusted and not completly redrawn
+         */
         var showInfoEinheit = function(infoEinheit,selectFeatureId,visibility,lernInfo,onlyAdjust){
 
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
@@ -199,6 +250,11 @@ angular.module('udm.lern')
                 });
         };
 
+        /**
+         * show the first start lektion
+         * @name  Controller:LernCtrl#start
+         * @function
+         */
         var showStartLektion = function(){
 
             mapInfoEinheit.removeAllInfoEinheiten();
@@ -277,6 +333,13 @@ angular.module('udm.lern')
                 });
         };
 
+        /**
+         * show Lern-Feature
+         * @name  Controller:LernCtrl#showFeature
+         * @function
+         * @param lernFeature {object} Lern-Feature
+         * @param onlyAdjust {boolean} if true the view is adjusted and not completly redrawn
+         */
         var showFeature = function(lernFeature,onlyAdjust){
 
             if(!onlyAdjust) mapInfoEinheit.removeAllInfoEinheiten();
@@ -299,7 +362,11 @@ angular.module('udm.lern')
             }
         };
 
-
+        /**
+         * show previous Lern-Feature
+         * @name  Controller:LernCtrl#previous
+         * @function
+         */
         $scope.previous = function(){
             if($scope.first) return;
 
@@ -322,6 +389,11 @@ angular.module('udm.lern')
             else showFeature($scope.lernLektionen[$scope.currentLektion].lernFeature[$scope.currentFeature],onlyAdjust);
         };
 
+        /**
+         * show next Lern-Feature
+         * @name  Controller:LernCtrl#next
+         * @function
+         */
         $scope.next = function(){
             if($scope.last) return;
 
@@ -342,6 +414,12 @@ angular.module('udm.lern')
             showFeature($scope.lernLektionen[$scope.currentLektion].lernFeature[$scope.currentFeature],onlyAdjust);
         };
 
+        /**
+         * show a specific Lern-Lektion
+         * @name  Controller:LernCtrl#startAtLektion
+         * @function
+         * @param lektion {integer} position of the lektion in the Lern-Einheit
+         */
         $scope.startAtLektion = function(lektion){
             $scope.currentLektion = lektion;
             $scope.currentFeature = 0;

@@ -1,48 +1,167 @@
 'use strict';
-
+/**
+ * Cotroller for the edit Lern-Einheit view, use the mapInfoEinheit service to show Info-Einheiten
+ * @name Controller:EditLernEinheitCtrl
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.edit')
     .controller('EditLernEinheitCtrl', function ($scope,$http,$timeout,mapInfoEinheit,util) {
-
+		/**
+         * title for the view
+         * @name Controller:EditInfoEinheitCtrl#topTitle
+         * @type {string}
+         */
         $scope.topTitle = 'Übersicht';
+		/**
+         * view mode (list, lernEinheit, lernLektion, lernFeature)
+         * @name Controller:EditInfoEinheitCtrl#mode
+         * @type {string}
+         */
         $scope.mode = 'list';
 
+		/**
+         * next possible Id for the Lern-Einheit, synced with the server at the getLernEinheitList resquest 
+         * @name Controller:EditInfoEinheitCtrl#nextLernEinheitId
+         * @type {integer}
+         */
         $scope.nextLernEinheitId = null;
+		/**
+         * next possible Id for the Lern-Lektion, synced with the server at the getLernEinheitList resquest 
+         * @name Controller:EditInfoEinheitCtrl#nextLernLektionId
+         * @type {integer}
+         */
         $scope.nextLernLektionId = null;
+		/**
+         * next possible Id for the Lern-Feature, synced with the server at the getLernEinheitList resquest 
+         * @name Controller:EditInfoEinheitCtrl#nextLernFeatureId
+         * @type {integer}
+         */
         $scope.nextLernFeatureId = null;
 
-
+		/**
+         * Array of current Lern-Einheiten in list
+         * @name Controller:EditInfoEinheitCtrl#lernEinheiten
+         * @type {Array(object)}
+         */
         $scope.lernEinheiten = [];
+		/**
+         * Array of current Lern-Lektionen in list
+         * @name Controller:EditInfoEinheitCtrl#lernLektionen
+         * @type {Array(object)}
+         */
         $scope.lernLektionen = [];
 
+		/**
+         * Array of all Info-Einheiten on the server
+         * @name Controller:EditInfoEinheitCtrl#origInfoEinheiten
+         * @type {Array(object)}
+         */
         $scope.origInfoEinheiten = [];
+		/**
+         * Array of all Info-Einheiten on the server, changed during plan selection
+         * @name Controller:EditInfoEinheitCtrl#origInfoEinheiten
+         * @type {Array(object)}
+         */
         $scope.infoEinheiten = [];
+		/**
+         * Array of current Info-Feature
+         * @name Controller:EditInfoEinheitCtrl#feature
+         * @type {Array(object)}
+         */
         $scope.feature = [];
 
+		/**
+         * Lern-Einheit for editing or a new one on creation
+         * @name Controller:EditInfoEinheitCtrl#editLernEinheit
+         * @type {object}
+         */
         $scope.editLernEinheit = {};
+		/**
+         * Title for a new Lern-Einheit
+         * @name Controller:EditInfoEinheitCtrl#newLernEinheitTitle
+         * @type {string}
+         */
         $scope.newLernEinheitTitle = null;
+		/**
+         * Flag for creating a new Lern-Einheit
+         * @name Controller:EditInfoEinheitCtrl#creatingNewLernEinheit
+         * @type {boolean}
+         */
         $scope.creatingNewLernEinheit = false;
 
+		/**
+         * Lern-Lektion for editing or a new one on creation
+         * @name Controller:EditInfoEinheitCtrl#editLernLektion
+         * @type {object}
+         */
+		$scope.editLernLektion = null;
+		/**
+         * Title for a new Lern-Lektion
+         * @name Controller:EditInfoEinheitCtrl#newLernLektionTitle
+         * @type {string}
+         */
         $scope.newLernLektionTitle = null;
-        $scope.editLernLektion = null;
+		/**
+         * Flag for creating a new Lern-Lektion
+         * @name Controller:EditInfoEinheitCtrl#creatingNewLernLektion
+         * @type {boolean}
+         */
         $scope.creatingNewLernLektion = false;
 
+		/**
+         * Lern-Feature for editing or a new one on creation
+         * @name Controller:EditInfoEinheitCtrl#editLernFeature
+         * @type {object}
+         */
         $scope.editLernFeature = null;
+		/**
+         * Flag for creating a new Lern-Fature
+         * @name Controller:EditInfoEinheitCtrl#creatingNewLernFeature
+         * @type {boolean}
+         */
         $scope.creatingNewLernFeature = false;
 
+		/**
+         * Flag for Lern-Fature editing in progress
+         * @name Controller:EditInfoEinheitCtrl#featureEditing
+         * @type {boolean}
+         */
         $scope.featureEditing = false;
+		/**
+         * Flag for Lern-Fature is valid
+         * @name Controller:EditInfoEinheitCtrl#featureValid
+         * @type {boolean}
+         */
         $scope.featureValid = false;
 
+		/**
+         * Array of Lern-Features to delete on the server, deletion is executed on save Lern-Einheit
+         * @name Controller:EditInfoEinheitCtrl#featuresToDelete
+         * @type {Array(object)}
+         */
         $scope.featuresToDelete = [];
+		/**
+         * Array of Lern-Lektionen to delete on the server, deletion is executed on save Lern-Einheit
+         * @name Controller:EditInfoEinheitCtrl#lektionenToDelete
+         * @type {Array(object)}
+         */
         $scope.lektionenToDelete = [];
 
+		//reset mapEditFeature service
         mapInfoEinheit.clearAllLayers();
 
 
         //functions to show and hide features in the map -----------------------------------------------------------------
-
+		/**
+         * shows a Lern-Feature by showing the Info-Einheit with the defined settings
+         * @name  Controller:EditInfoEinheitCtrl#showInfoEinheit
+         * @function
+         * @param infoEinheit {integer} Id Info-Einheit
+         * @param selectFeatureId {integer} Id Info-Feature
+         * @param visibility {object} visibility object, key: Id Info-Feature, value: true/false
+         */
         var showInfoEinheit = function(infoEinheit,selectFeatureId, visibility){
-
-
             $http.get('/pg/getInfoEinheit/'+infoEinheit).
                 success(function(data) {
 
@@ -124,22 +243,22 @@ angular.module('udm.edit')
                 });
         };
 
+		/**
+         * remnove all Info-Feature from map
+         * @name  Controller:EditInfoEinheitCtrl#removeAllFeaturesFromMap
+         * @function
+         */
         var removeAllFeaturesFromMap = function(){
-
             mapInfoEinheit.removeAllInfoEinheiten();
-
             $scope.$broadcast('clearLayerList');
             $scope.$broadcast('toogleInfoControlVisibility',{type:'layerlist',state: false});
             $scope.$broadcast('toogleInfoControlVisibility',{type:'info',state: false});
             $scope.$broadcast('toogleInfoControlVisibility',{type:'imgslider',state: false});
-
         };
-
-
         //--------------------------------------------------------------------------------------------------------------
 
 
-
+		//get a list of all Lern-Einheiten on the server
         $http.get('/pg/getLernEinheitList').
             success(function(data) {
                 $scope.nextLernEinheitId = data.nextLernEinheitId;
@@ -152,10 +271,15 @@ angular.module('udm.edit')
                 // or server returns response with an error status.
             });
 
-
+		/**
+         * edit a Lern-Einheit from the list or create a new one (index = -1)
+         * @name  Controller:EditInfoEinheitCtrl#editLernEinheitMode
+         * @function
+         * @param index {integer} index in lernEinheiten array
+         */
         $scope.editLernEinheitMode = function(index){
-
             if(index == -1){
+				//initialize new Lern-Einheit
                 $scope.editLernEinheit = {};
                 $scope.editLernEinheit.id = $scope.nextLernEinheitId;
                 $scope.nextLernEinheitId++;
@@ -207,9 +331,14 @@ angular.module('udm.edit')
                     });
             }
         };
-
+		/**
+         * Delete a Lern-Einheit from the database
+		 * @name  Controller:EditInfoEinheitCtrl#deleteLernEinheit
+         * @function
+         * @param index {integer} index in lernEinheiten array
+         */
         $scope.deleteLernEinheit = function(index){
-            $http.get('/pg/deleteLernEinheit/'+$scope.lernEinheiten[index].id).
+            $http.delete('/pg/deleteLernEinheit/'+$scope.lernEinheiten[index].id).
                 success(function() {
                     $scope.lernEinheiten.splice(index,1);
                 }).
@@ -220,8 +349,13 @@ angular.module('udm.edit')
 
         };
 
+		/**
+         * edit a Lern-Lektion from the list or create a new one (index = -1)
+         * @name  Controller:EditInfoEinheitCtrl#editLernLektionMode
+         * @function
+         * @param index {integer} index in lernLektionen array
+         */
         $scope.editLernLektionMode = function(index){
-
             $http.get('/pg/getInfoEinheitenList').
                 success(function(data) {
                     $scope.origInfoEinheiten = data.list;
@@ -232,6 +366,7 @@ angular.module('udm.edit')
                 });
 
             if(index == -1){
+				//initialize Lern-Lektion
                 $scope.editLernLektion = {};
                 $scope.editLernLektion.id = $scope.nextLernLektionId;
                 $scope.nextLernLektionId++;
@@ -256,16 +391,28 @@ angular.module('udm.edit')
             }
         };
 
+		/**
+         * Delete a Lern-Lektion, deleted from the database on Lern-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#deleteLernLektion
+         * @function
+         * @param index {integer} index in lernLektionen array
+         */
         $scope.deleteLernLektion = function(index){
             $scope.lektionenToDelete.push($scope.lernLektionen[index].id);
             $scope.lernLektionen.splice(index,1);
         };
 
-
+		/**
+         * edit a Lern-Feature from the list or create a new one (index = -1)
+         * @name  Controller:EditInfoEinheitCtrl#editLernFeatureMode
+         * @function
+         * @param index {integer} index in lernFeature array
+         */
         $scope.editLernFeatureMode = function(index){
             angular.copy($scope.origInfoEinheiten, $scope.infoEinheiten);
             removeAllFeaturesFromMap();
             if(index == -1){
+				//initialize Lern-Feature
                 $scope.editLernFeature = {};
                 $scope.editLernFeature.id = $scope.nextLernFeatureId;
                 $scope.nextLernFeatureId++;
@@ -327,7 +474,11 @@ angular.module('udm.edit')
         };
 
 
-
+		/**
+         * Apply the type change of a Lern-Feature, editLernFeature.typ is changed by the view
+		 * @name  Controller:EditInfoEinheitCtrl#setLernFeatureTyp
+         * @function
+         */
         $scope.setLernFeatureTyp = function(){
             if(!$scope.editLernFeature.typ ||  $scope.editLernFeature.typ == ''){
                 $scope.featureValid = false;
@@ -348,6 +499,11 @@ angular.module('udm.edit')
             $scope.featureValid = false;
         };
 
+		/**
+         * set the Info-Einheit for a Lern-Feature based on editLernFeature.infoEinheit
+		 * @name  Controller:EditInfoEinheitCtrl#setLernFeatureInfoEinheit
+         * @function
+         */
         $scope.setLernFeatureInfoEinheit = function(){
             if(!$scope.editLernFeature.infoEinheit ||  $scope.editLernFeature.infoEinheit == ''){
                 $scope.featureValid = false;
@@ -398,6 +554,11 @@ angular.module('udm.edit')
                 });
         };
 
+		/**
+         * set the Info-Feature for a Lern-Feature based on editLernFeature.feature
+		 * @name  Controller:EditInfoEinheitCtrl#selectFeature
+         * @function
+         */
         $scope.selectFeature = function(){
             if(!$scope.editLernFeature.feature ||  $scope.editLernFeature.feature == ''){
                 $scope.featureValid = false;
@@ -419,12 +580,23 @@ angular.module('udm.edit')
             $scope.featureValid = true;
         };
 
+		/**
+         * change the visibility of the features in the map based on editLernFeature.visible
+		 * @name  Controller:EditInfoEinheitCtrl#changeVisibility
+         * @function
+         */
         $scope.changeVisibility = function(){
             removeAllFeaturesFromMap();
             showInfoEinheit($scope.editLernFeature.infoEinheit, $scope.editLernFeature.feature,$scope.editLernFeature.visible);
-
         };
 
+		/**
+         * check if a Info-Feature is the last visible item in the map
+		 * @name  Controller:EditInfoEinheitCtrl#checkLastVisibleItem
+         * @function
+		 * @param id {integer} Id Info-Feature
+		 * @returns {boolean} true if the Info-Feature is the last visible item in the map
+         */
         $scope.checkLastVisibleItem = function(id){
 
             if(!$scope.editLernFeature) return true;
@@ -439,6 +611,11 @@ angular.module('udm.edit')
             return ((count <= 1) && !$scope.editLernFeature.hasBaseLayer);
         };
 
+		/**
+         * set the first plan for a Lern-Feature based on editLernFeature.plan1
+		 * @name  Controller:EditLernEinheitCtrl#setLernFeaturePlan1
+         * @function
+         */
         $scope.setLernFeaturePlan1 = function(){
             if(!$scope.editLernFeature.plan1 ||  $scope.editLernFeature.plan1 == ''){
                 $scope.featureValid = false;
@@ -469,6 +646,11 @@ angular.module('udm.edit')
 
         };
 
+		/**
+         * set the second plan for a Lern-Feature based on editLernFeature.plan2
+		 * @name  Controller:EditInfoEinheitCtrl#setLernFeaturePlan2
+         * @function
+         */
         $scope.setLernFeaturePlan2 = function(){
             if(!$scope.editLernFeature.plan1 ||  $scope.editLernFeature.plan1 == ''){
                 $scope.featureValid = false;
@@ -501,6 +683,11 @@ angular.module('udm.edit')
             $scope.featureValid = true;
         };
 
+		/**
+         * set the third plan for a Lern-Feature based on editLernFeature.plan3
+		 * @name  Controller:EditInfoEinheitCtrl#setLernFeaturePlan3
+         * @function
+         */
         $scope.setLernFeaturePlan3 = function(){
             if(!$scope.editLernFeature.plan1 ||  $scope.editLernFeature.plan1 == '' || !$scope.editLernFeature.plan2 ||  $scope.editLernFeature.plan2 == '') return;
 
@@ -530,6 +717,11 @@ angular.module('udm.edit')
             $scope.featureValid = true;
         };
 
+		/**
+         * save current Lern-Feature localy, Lern-Feature is send to server on Lern-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#saveLernFeature
+         * @function
+         */
         $scope.saveLernFeature = function(){
 
             $scope.editLernFeature.mapView = mapInfoEinheit.getMapView();
@@ -553,8 +745,12 @@ angular.module('udm.edit')
             $scope.mode = 'editLernLektion';
 
         };
-
-
+		/**
+         * Delete a Lern-Feature, deleted from the database on Lern-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#deleteLernFeature
+         * @function
+         * @param index {integer} index in lernFeature array
+         */
         $scope.deleteLernFeature = function(index){
 
             if($scope.editLernFeature && ($scope.editLernLektion.lernFeature[index].id == $scope.editLernFeature.id)){
@@ -567,7 +763,11 @@ angular.module('udm.edit')
             $scope.editLernLektion.lernFeature.splice(index,1);
         };
 
-
+		/**
+         * go one view back (list <- lernEinheit <- lernLektion <- lernFeature)
+		 * @name  Controller:EditInfoEinheitCtrl#back
+         * @function
+         */
         $scope.back = function(){
             if($scope.mode == 'editLernEinheit'){
                 $scope.topTitle = 'Übersicht';
@@ -587,10 +787,12 @@ angular.module('udm.edit')
             }
         };
 
-
+		/**
+         * save current Lern-Lektion localy, Lern-Lektion is send to server on Lern-Einheit save
+		 * @name  Controller:EditInfoEinheitCtrl#saveLernLektion
+         * @function
+         */
         $scope.saveLernLektion = function(){
-
-
             $scope.editLernLektion.start = +99999999;
             $scope.editLernLektion.end = -99999999;
 
@@ -620,6 +822,11 @@ angular.module('udm.edit')
             $scope.mode = 'editLernEinheit';
         };
 
+		/**
+         * save current Lern-Einheit, send to server and delete featuresToDelete and lektionenToDelete
+		 * @name  Controller:EditInfoEinheitCtrl#save
+         * @function
+         */
         $scope.save = function(){
 
             $scope.editLernEinheit.lernLektionen =  $scope.lernLektionen;
@@ -649,7 +856,7 @@ angular.module('udm.edit')
                 });
 
             for(x = 0; x < $scope.featuresToDelete; x++){
-                $http.get('/pg/deleteLernFeature/' +$scope.featuresToDelete[x]).
+                $http.delete('/pg/deleteLernFeature/' +$scope.featuresToDelete[x]).
                     success(function(data, status, headers, config) {
 
                     }).
@@ -660,7 +867,7 @@ angular.module('udm.edit')
             }
 
             for(x = 0; x < $scope.lektionenToDelete; x++){
-                $http.get('/pg/deleteLernLektion/' +$scope.lektionenToDelete[x]).
+                $http.delete('/pg/deleteLernLektion/' +$scope.lektionenToDelete[x]).
                     success(function(data, status, headers, config) {
 
                     }).
@@ -669,9 +876,5 @@ angular.module('udm.edit')
                         // or server returns response with an error status.
                     });
             }
-
         };
-
-
-
     });

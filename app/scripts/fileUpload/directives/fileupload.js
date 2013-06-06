@@ -1,17 +1,44 @@
 'use strict';
-
+/**
+ * Directive for a file upload dialog
+ * @name Directive:fileupload
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.fileUpload')
     .directive('fileupload', function ( $dialog, $rootScope) {
         return {
             templateUrl: '../views/fileUpload/fileUploadModal.html',
             restrict: 'E',
             scope:{
+                /**
+                 * name to identifie the dialog
+                 * @name Directive:fileupload#name
+                 * @type {string}
+                 */
                 name: '@'
             },
             link: function postLink(scope) {
+                /**
+                 * true if the dialog is initialized
+                 * @name Directive:fileupload#initialized
+                 * @type {boolean}
+                 */
                 var initialized = false;
+
+                /**
+                 * target url for the file upload
+                 * @name Directive:fileupload#target
+                 * @type {string}
+                 */
                 var target = false;
 
+                /**
+                 * set the target url for the file upload
+                 * @name  Directive:fileupload#setFileUploadTarget
+                 * @event
+                 * @param value {object} {name:name,target:fileupload target}
+                 */
                 scope.$on('setFileUploadTarget', function(e,value) {
                     if(value.name != scope.name) return;
 
@@ -20,6 +47,12 @@ angular.module('udm.fileUpload')
                     if(initialized) setFileUpload();
                 });
 
+                /**
+                 * show the file upload dialog
+                 * @name  Directive:fileupload#showFileUpload
+                 * @event
+                 * @param value {string} name
+                 */
                 scope.$on('showFileUpload', function(e,value) {
                     if(value != scope.name) return;
 
@@ -33,10 +66,20 @@ angular.module('udm.fileUpload')
                     }).modal('show');
                 });
 
+                /**
+                 * close the file upload dialog
+                 * @name  Directive:fileupload#close
+                 * @function
+                 */
                 scope.close = function(){
                     $('#fu-modal-' + scope.name).modal('hide');
                 };
 
+                /**
+                 * initialize the file upload dialog
+                 * @name  Directive:fileupload#setFileUpload
+                 * @function
+                 */
                 function setFileUpload(){
                     if(initialized) $('#fileupload-' + scope.name + ' table tbody tr.template-download').remove();
 

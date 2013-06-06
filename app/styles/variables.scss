@@ -1,0 +1,10 @@
+$borderRadius: 2px;
+$black : #373737;
+$green:  #5bb75b;
+
+@mixin panel{
+  background-color: rgba(245,245,245,0.9);
+  z-index: 2500;
+  @include single-box-shadow;
+  @include border-radius($borderRadius);
+}

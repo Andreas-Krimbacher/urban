@@ -1,31 +1,137 @@
 'use strict';
-
+/**
+ * Service for georeferncing functions
+ * @name Service:mapGeoreference
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.map')
     .factory('mapGeoreference', function (OpenLayersMap) {
+        /**
+         * image layer
+         * @name Service:mapGeoreference#imgLayer
+         * @private
+         * @type {object}
+         */
         var imgLayer = null;
+        /**
+         * image point in map coordinates
+         * @name Service:mapGeoreference#imgPoint
+         * @private
+         * @type {object}
+         */
         var imgPoint = null;
+        /**
+         * image point in pixel coordinates
+         * @name Service:mapGeoreference#imgPixelPoint
+         * @private
+         * @type {object}
+         */
         var imgPixelPoint = null;
+        /**
+         * openlayers point feature for the image
+         * @name Service:mapGeoreference#imgPointFeature
+         * @private
+         * @type {object}
+         */
         var imgPointFeature = null;
 
 
+        /**
+         * refernce points layer
+         * @name Service:mapGeoreference#CPlayer
+         * @private
+         * @type {object}
+         */
         var CPlayer = null;
+        /**
+         * count for the id of the reference points
+         * @name Service:mapGeoreference#CPId
+         * @private
+         * @type {integer}
+         */
         var CPId = 0;
+        /**
+         * reference points
+         * @name Service:mapGeoreference#CP
+         * @private
+         * @type {Array(object)}
+         */
         var CP = [];
+        /**
+         * control for adding reference points
+         * @name Service:mapGeoreference#CPControl
+         * @private
+         * @type {object}
+         */
         var CPControl = null;
+        /**
+         * control fopr highlighting reference points
+         * @name Service:mapGeoreference#SelectControl
+         * @private
+         * @type {object}
+         */
         var SelectControl = null;
 
+        /**
+         * first point during the add refernce point process (image point)
+         * @name Service:mapGeoreference#firstPoint
+         * @private
+         * @type {object}
+         */
         var firstPoint = null;
+        /**
+         * second point during the add refernce point process (map point)
+         * @name Service:mapGeoreference#secondPoint
+         * @private
+         * @type {object}
+         */
         var secondPoint = null;
 
+        /**
+         * layer to show the result of the georeferncing
+         * @name Service:mapGeoreference#resultLayer
+         * @private
+         * @type {object}
+         */
         var resultLayer = null;
 
+        /**
+         * image fixed flag
+         * @name Service:mapGeoreference#fixState
+         * @private
+         * @type {boolean}
+         */
         var fixState = false;
+        /**
+         * current zoom level
+         * @name Service:mapGeoreference#currentZoom
+         * @private
+         * @type {integer}
+         */
         var currentZoom = 999;
-
-        var OLmap = OpenLayersMap.getMap();
+        /**
+         * current zoom level for the map move event
+         * @name Service:mapGeoreference#moveEventCurrentZoom
+         * @private
+         * @type {integer}
+         */
         var moveEventCurrentZoom = 999;
 
+        /**
+         * openlayers map object
+         * @name Service:mapGeoreference#currentZoom
+         * @private
+         * @type {object}
+         */
+        var OLmap = OpenLayersMap.getMap();
 
+        /**
+         * style map for the CPlayer
+         * @name Service:mapGeoreference#styleMap
+         * @private
+         * @type {object}
+         */
         var styleMap = new OpenLayers.StyleMap({
             'default': {},
             'select': {},
@@ -85,6 +191,12 @@ angular.module('udm.map')
 
         styleMap.addUniqueValueRules("select", "type", lookupSelect);
 
+        /**
+         * add a map move event to keep the image in the center of the map
+         * @name  Service:mapGeoreference#addMoveEvent
+         * @function
+         * @private
+         */
         var addMoveEvent = function(){
             OLmap.events.register('movestart', this, function(){
                 imgPixelPoint = OLmap.getLayerPxFromViewPortPx(OLmap.getViewPortPxFromLonLat(new OpenLayers.LonLat(imgPoint.x,imgPoint.y)));
@@ -102,6 +214,13 @@ angular.module('udm.map')
             });
         };
 
+
+        /**
+         * remove the move event
+         * @name  Service:mapGeoreference#removeMoveEvent
+         * @function
+         * @private
+         */
         var removeMoveEvent = function(){
             OLmap.events.remove('movestart');
             OLmap.events.remove('move');
@@ -109,11 +228,23 @@ angular.module('udm.map')
 
         // Public API here
         return {
+            /**
+             * set all layer variables to null
+             * @name  Service:mapGeoreference#clearAllLayers
+             * @function
+             */
             clearAllLayers : function(){
                 resultLayer = null;
                 CPlayer = null;
                 imgLayer = null;
             },
+            /**
+             * show image in the map
+             * @name  Service:mapGeoreference#showImageOverlay
+             * @function
+             * @param img {object} image object e.g {id:1,text:'img1', path : 'img1.png',width:1000,height:500, scale : 1,realWidth:1400,realHeight:1400, rot:0,opacity:1}
+             * @param digest {function} callback
+             */
             showImageOverlay: function(img,digest){
 
                 if(!imgLayer){
@@ -173,9 +304,19 @@ angular.module('udm.map')
                 });
 
             },
+            /**
+             * redraw the image layer
+             * @name  Service:mapGeoreference#redrawImageOverlay
+             * @function
+             */
             redrawImageOverlay: function(){
                 if(imgLayer) imgLayer.redraw();
             },
+            /**
+             * center the image in the map
+             * @name  Service:mapGeoreference#centerImg
+             * @function
+             */
             centerImg: function(){
                 if(imgPoint){
                     imgPoint.x = OLmap.getCenter().lon;
@@ -183,11 +324,22 @@ angular.module('udm.map')
                     if(imgLayer) imgLayer.redraw();
                 }
             },
+            /**
+             * remove image
+             * @name  Service:mapGeoreference#clearImgOverlay
+             * @function
+             */
             clearImgOverlay: function(){
                 if(imgPointFeature) imgPointFeature.destroy();
                 if(imgLayer) imgLayer.redraw();
 
             },
+            /**
+             * set the image fix (true/false)
+             * @name  Service:mapGeoreference#imgFix
+             * @function
+             * @param state {boolean} state
+             */
             imgFix: function(state){
                 if(state && !fixState){
                     removeMoveEvent();
@@ -201,6 +353,14 @@ angular.module('udm.map')
 
 
             },
+            /**
+             * start the add reference point process
+             * @name  Service:mapGeoreference#createCP
+             * @function
+             * @param img {object} image object
+             * @param callback {function} callback(reference point), called after the reference point pair is calculated
+             * @param digest {function} callback, called after the first point is added and after the secound point is added
+             */
             createCP: function(img,callback,digest){
 
                 if(!CPlayer){
@@ -290,6 +450,11 @@ angular.module('udm.map')
                 }
 
             },
+            /**
+             * cancel the add reference point process
+             * @name  Service:mapGeoreference#cancelCP
+             * @function
+             */
             cancelCP: function(){
                 CPlayer.events.remove('beforefeatureadded');
                 if(CPControl) CPControl.deactivate();
@@ -298,6 +463,12 @@ angular.module('udm.map')
                     firstPoint = null;
                 }
             },
+            /**
+             * remove one reference point
+             * @name  Service:mapGeoreference#cancelCP
+             * @function
+             * @param id {integer} Id reference point
+             */
             removeCP: function(id){
                 for(var x = 0; x < CP.length; x++){
                     if(CP[x].id == id){
@@ -305,10 +476,21 @@ angular.module('udm.map')
                     }
                 }
             },
+            /**
+             * remove all reference points
+             * @name  Service:mapGeoreference#clearCP
+             * @function
+             */
             clearCP: function(){
                 if(CPControl) CPControl.deactivate();
                 if(CPlayer) CPlayer.removeAllFeatures();
             },
+            /**
+             * highlight reference point in map
+             * @name  Service:mapGeoreference#highlightCP
+             * @function
+             * @param id {integer} Id reference point
+             */
             highlightCP: function(id){
                 for(var x = 0; x < CP.length; x++){
                     if(CP[x].id == id){
@@ -318,6 +500,12 @@ angular.module('udm.map')
                     }
                 }
             },
+            /**
+             * unhighlight reference point in map
+             * @name  Service:mapGeoreference#unhighlightCP
+             * @function
+             * @param id {integer} Id reference point
+             */
             unhighlightCP: function(id){
                 for(var x = 0; x < CP.length; x++){
                     if(CP[x].id == id){
@@ -327,20 +515,40 @@ angular.module('udm.map')
                     }
                 }
             },
+            /**
+             * hide CPlayer and imgLayer
+             * @name  Service:mapGeoreference#hideEditLayers
+             * @function
+             */
             hideEditLayers: function(){
                 if(CPlayer) CPlayer.setVisibility(false);
                 if(imgLayer) imgLayer.setVisibility(false);
             },
+            /**
+             * show CPlayer and imgLayer
+             * @name  Service:mapGeoreference#showEditLayers
+             * @function
+             */
             showEditLayers: function(){
                 if(CPlayer) CPlayer.setVisibility(true);
                 if(imgLayer) imgLayer.setVisibility(true);
             },
+            /**
+             * destroy CPlayer and imgLayer
+             * @name  Service:mapGeoreference#destroyEditLayers
+             * @function
+             */
             destroyEditLayers: function(){
                 if(CPlayer) OLmap.removeLayer(CPlayer);
                 CPlayer = null;
                 if(imgLayer) OLmap.removeLayer(imgLayer);
                 imgLayer = null;
             },
+            /**
+             * show the georeferncing result
+             * @name  Service:mapGeoreference#showResultLayer
+             * @function
+             */
             showResultLayer: function(metaData){
                 var bounds = new OpenLayers.Bounds(metaData.BoundingBox.miny,
                     metaData.BoundingBox.minx,
@@ -363,10 +571,21 @@ angular.module('udm.map')
                     OLmap.zoomTo(metaData.TileSet.maxZoom);
                 }
             },
+            /**
+             * delete the resultLayer
+             * @name  Service:mapGeoreference#destroyResultLayer
+             * @function
+             */
             destroyResultLayer: function(){
                 if(resultLayer)  OLmap.removeLayer(resultLayer);
                 resultLayer = null;
             },
+            /**
+             * set the opacity of the resultLayer
+             * @name  Service:mapGeoreference#setOpacityResult
+             * @function
+             * @param value {float} opacity
+             */
             setOpacityResult: function(value){
                 resultLayer.setOpacity(value);
             }

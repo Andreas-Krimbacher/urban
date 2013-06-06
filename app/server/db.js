@@ -1,3 +1,9 @@
+/**
+ * Server module to perform database tasks, the methods are directly used as middleware for specific routes
+ * @name Server:db
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 var pg = require('pg');
 var filePaths = require('./filePaths');
 var fs = require('fs');
@@ -9,8 +15,15 @@ var client = new pg.Client(conString);
 client.connect();
 
 
-// Edit Info Einheit
-
+/**
+ * delete an Info-Feature in the DB
+ * @name Server:db#deleteFeature
+ * @function
+ * @param req {object} server request object
+ * @param req.params.feature {integer} Id Info-Feature
+ * @param req.params.einheit {integer} Id Info-Einheit
+ * @param res {object} server respond object
+ */
 module.exports.deleteFeature =  function(req, res) {
     client.query('DELETE FROM "InfoFeature" WHERE "Id"='+req.params.feature+';', function(err) {
 
@@ -21,15 +34,22 @@ module.exports.deleteFeature =  function(req, res) {
         }
 
         //delete img
-        rimraf(filePaths.image.uploadDir + '/' + req.params.infoEinheit + '/' + req.params.feature,function(){});
+        rimraf(filePaths.image.uploadDir + '/' + req.params.einheit + '/' + req.params.feature,function(){});
 
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end(JSON.stringify('success'));
     });
 };
-
+/**
+ * delete an Info-Einheit in the DB
+ * @name Server:db#deleteInfoEinheit
+ * @function
+ * @param req {object} server request object
+ * @param req.params.einheit {integer} Id Info-Einheit
+ * @param res {object} server respond object
+ */
 module.exports.deleteInfoEinheit =  function(req, res) {
-    client.query('DELETE FROM "InfoEinheit" WHERE "Id"='+req.params.infoEinheit+';', function(err) {
+    client.query('DELETE FROM "InfoEinheit" WHERE "Id"='+req.params.einheit+';', function(err) {
 
         if(err) {
             console.log(err);
@@ -37,7 +57,7 @@ module.exports.deleteInfoEinheit =  function(req, res) {
             return
         }
 
-        client.query('DELETE FROM "InfoFeature" WHERE "InfoEinheit"='+req.params.infoEinheit+';', function(err) {
+        client.query('DELETE FROM "InfoFeature" WHERE "InfoEinheit"='+req.params.einheit+';', function(err) {
 
             if(err) {
                 console.log(err);
@@ -46,15 +66,22 @@ module.exports.deleteInfoEinheit =  function(req, res) {
             }
 
             //delete img
-            rimraf(filePaths.image.uploadDir + '/' + req.params.infoEinheit ,function(){});
+            rimraf(filePaths.image.uploadDir + '/' + req.params.einheit ,function(){});
 
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end(JSON.stringify('success'));
         });
     });
 };
-
+/**
+ * get a list of all Info-Einheiten
+ * @name Server:db#InfoEinheitenList
+ * @function
+ * @param req {object} server request object
+ * @param res {object} server respond object
+ */
 module.exports.InfoEinheitenList =  function(req, res) {
+    //get Info-Einheiten
     client.query('SELECT * FROM "InfoEinheit";', function(err, resultList) {
 
         var x;
@@ -64,7 +91,7 @@ module.exports.InfoEinheitenList =  function(req, res) {
             res.end(err);
             return
         }
-
+        //get next Info-Einheiten Id
         client.query('SELECT "Id" FROM "InfoEinheit" ORDER BY "Id" DESC LIMIT 1;', function(err, nextInfoEinheitId) {
 
             if(err) {
@@ -76,6 +103,7 @@ module.exports.InfoEinheitenList =  function(req, res) {
             if(nextInfoEinheitId.rows[0]) nextInfoEinheitId = nextInfoEinheitId.rows[0].Id + 1;
             else nextInfoEinheitId = 1;
 
+            //get next Info-Feature Id
             client.query('SELECT "Id" FROM "InfoFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, nextFeatureId) {
 
                 if(err) {
@@ -108,7 +136,14 @@ module.exports.InfoEinheitenList =  function(req, res) {
         });
     });
 };
-
+/**
+ * get an Info-Einheit
+ * @name Server:db#getInfoEinheit
+ * @function
+ * @param req {object} server request object
+ * @param req.params.einheit {integer} Id Info-Einheit
+ * @param res {object} server respond object
+ */
 module.exports.getInfoEinheit =  function(req, res) {
     var counter = 1;
     var x;
@@ -119,9 +154,7 @@ module.exports.getInfoEinheit =  function(req, res) {
 
 
     var finish = function(){
-
         if (!--counter) {
-
             infoEinheit.features = respondFeatures;
 
             var result = {nextId : nextFeatureId,
@@ -132,8 +165,9 @@ module.exports.getInfoEinheit =  function(req, res) {
         }
     };
 
+    //get Info-Einheit
     counter++;
-    client.query('SELECT * FROM "InfoEinheit" WHERE "Id" = '+req.params.infoEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "InfoEinheit" WHERE "Id" = '+req.params.einheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -150,11 +184,12 @@ module.exports.getInfoEinheit =  function(req, res) {
         };
 
         counter++;
-        getImgFileList('/' + req.params.infoEinheit,infoEinheit);
+        getImgFileList('/' + req.params.einheit,infoEinheit);
 
         finish();
     });
 
+    //get the next Info-Feture Id
     counter++;
     client.query('SELECT "Id" FROM "InfoFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, resultId) {
         if(err) {
@@ -169,11 +204,9 @@ module.exports.getInfoEinheit =  function(req, res) {
         finish();
     });
 
-
-
+    //get the Info-Feture to the Info-Einheit
     counter++;
-
-    client.query('SELECT * FROM "InfoFeature" WHERE "InfoEinheit" = '+req.params.infoEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "InfoFeature" WHERE "InfoEinheit" = '+req.params.einheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -204,15 +237,15 @@ module.exports.getInfoEinheit =  function(req, res) {
             }
 
             counter++;
-            getImgFileList('/' + req.params.infoEinheit + '/' + result.rows[x].Id,respondFeatures[respondFeatures.length-1]);
+            getImgFileList('/' + req.params.einheit + '/' + result.rows[x].Id,respondFeatures[respondFeatures.length-1]);
 
         }
 
         finish();
     });
 
+    //get geom for a Info-Feature
     var getGeom = function(id,typ,feature){
-
         if(typ == 'pointOri') typ = 'point';
 
         client.query('SELECT ST_AsText("geom_'+typ+'") FROM "InfoFeature" WHERE "Id"='+id+';', function(err, result) {
@@ -228,7 +261,7 @@ module.exports.getInfoEinheit =  function(req, res) {
         });
     };
 
-
+    //get metadata for a Info-Feature
     var getMetaData = function(name,feature){
 
         var file = filePaths.tiles.baseDir + '/' + name + '.json';
@@ -243,6 +276,7 @@ module.exports.getInfoEinheit =  function(req, res) {
         });
     };
 
+    //get images for a Info-Feature
     var getImgFileList = function(src,object){
         fs.exists(filePaths.image.uploadDir + src, function (exists) {
             if(exists){
@@ -271,7 +305,13 @@ module.exports.getInfoEinheit =  function(req, res) {
     finish();
 
 };
-
+/**
+ * save an Info-Einheit or update if it alredy exists
+ * @name Server:db#saveInfoEinheit
+ * @function
+ * @param req {object} server request object
+ * @param res {object} server respond object
+ */
 module.exports.saveInfoEinheit =  function(req, res) {
     var counter = 1;
     var x;
@@ -294,6 +334,7 @@ module.exports.saveInfoEinheit =  function(req, res) {
     values['EndYear'] = {value: infoEinheit.end || null, type : 'integer'};
     values['TimeLineOrder'] = {value: infoEinheit.rank, type : 'integer'};
 
+    //save Info-Einheit
     counter++;
     upsert(values,'InfoEinheit',res,finish);
 
@@ -326,22 +367,26 @@ module.exports.saveInfoEinheit =  function(req, res) {
             values['geom_'+infoEinheit.features[x].typ] = {value : infoEinheit.features[x].feature.geom, type : 'geom'};
         }
 
+        //save Info-Feature
         counter++;
         upsert(values,'InfoFeature',res,finish);
 
     }
 
     finish();
-
-
 };
 
-// Edit Lern Einheit
-
+/**
+ * get a list of all Lern-Einheiten
+ * @name Server:db#LernEinheitList
+ * @function
+ * @param req {object} server request object
+ * @param res {object} server respond object
+ */
 module.exports.LernEinheitList =  function(req, res) {
 
+    //get Lern-Einheiten
     var x;
-
     client.query('SELECT * FROM "LernEinheit";', function(err, resultList) {
 
         if(err) {
@@ -350,6 +395,7 @@ module.exports.LernEinheitList =  function(req, res) {
             return
         }
 
+        //get next Lern-Einheiten Id
         client.query('SELECT "Id" FROM "LernEinheit" ORDER BY "Id" DESC LIMIT 1;', function(err, nextLernEinheitId) {
 
             if(err) {
@@ -361,6 +407,7 @@ module.exports.LernEinheitList =  function(req, res) {
             if(nextLernEinheitId.rows[0]) nextLernEinheitId = nextLernEinheitId.rows[0].Id + 1;
             else nextLernEinheitId = 1;
 
+            //get next Lern-Lektion Id
             client.query('SELECT "Id" FROM "LernLektion" ORDER BY "Id" DESC LIMIT 1;', function(err, nextLernLektionId) {
 
                 if(err) {
@@ -372,6 +419,7 @@ module.exports.LernEinheitList =  function(req, res) {
                 if(nextLernLektionId.rows[0]) nextLernLektionId = nextLernLektionId.rows[0].Id + 1;
                 else nextLernLektionId = 1;
 
+                //get next Lern-Feature Id
                 client.query('SELECT "Id" FROM "LernFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, nextLernFeatureId) {
 
                     if(err) {
@@ -407,7 +455,13 @@ module.exports.LernEinheitList =  function(req, res) {
         });
     });
 };
-
+/**
+ * save an Lern-Einheit or update if it alredy exists
+ * @name Server:db#saveLernEinheit
+ * @function
+ * @param req {object} server request object
+ * @param res {object} server respond object
+ */
 module.exports.saveLernEinheit =  function(req, res) {
     var counter = 1;
     var x;
@@ -430,10 +484,12 @@ module.exports.saveLernEinheit =  function(req, res) {
     values['StartYear'] = {value: lernEinheit.start, type : 'integer'};
     values['EndYear'] = {value: lernEinheit.end, type : 'integer'};
 
+    //save Lern-Einheit
     counter++;
     upsert(values,'LernEinheit',res,finish);
 
 
+    //function to save the visibility object
     var saveVisibility = function(lernFeature,visible){
         client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature" = '+lernFeature+';', function(err) {
             if(err) {
@@ -451,6 +507,7 @@ module.exports.saveLernEinheit =  function(req, res) {
         });
     };
 
+    //save one key/value pair of the visibility object
     var addVisibilityRecord = function(lernFeature,infoFeature,visibility){
         client.query('INSERT INTO "LernFeatureVisibility"("LernFeature", "InfoFeature", "Visibility") VALUES ('+lernFeature+','+infoFeature+','+visibility+');', function(err) {
             if(err) {
@@ -464,7 +521,6 @@ module.exports.saveLernEinheit =  function(req, res) {
     };
 
     for(x = 0; x < lernEinheit.lernLektionen.length; x++){
-
         values = {};
 
         values['Id'] = {value: lernEinheit.lernLektionen[x].id, type : 'integer'};
@@ -474,7 +530,7 @@ module.exports.saveLernEinheit =  function(req, res) {
         values['EndYear'] = {value: lernEinheit.lernLektionen[x].end, type : 'integer'};
         values['Order'] = {value: lernEinheit.lernLektionen[x].order, type : 'integer'};
 
-
+        //save Lern-Lektion
         counter++;
         upsert(values,'LernLektion',res,finish);
 
@@ -512,6 +568,7 @@ module.exports.saveLernEinheit =  function(req, res) {
                 saveVisibility(lernEinheit.lernLektionen[x].lernFeature[y].id,lernEinheit.lernLektionen[x].lernFeature[y].visible);
             }
 
+            //save Lern-Feature
             counter++;
             upsert(values,'LernFeature',res,finish);
 
@@ -519,10 +576,15 @@ module.exports.saveLernEinheit =  function(req, res) {
     }
 
     finish();
-
-
 };
-
+/**
+ * get an Lern-Einheit
+ * @name Server:db#getLernEinheit
+ * @function
+ * @param req {object} server request object
+ * @param req.params.einheit {integer} Id Lern-Einheit
+ * @param res {object} server respond object
+ */
 module.exports.getLernEinheit =  function(req, res) {
     var counter = 1;
     var x;
@@ -558,8 +620,9 @@ module.exports.getLernEinheit =  function(req, res) {
         }
     };
 
+    //get Lern-Einheit
     counter++;
-    client.query('SELECT * FROM "LernEinheit" WHERE "Id" = '+req.params.lernEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "LernEinheit" WHERE "Id" = '+req.params.einheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -577,6 +640,7 @@ module.exports.getLernEinheit =  function(req, res) {
         finish();
     });
 
+    //get next Lern-Feature Id
     counter++;
     client.query('SELECT "Id" FROM "LernFeature" ORDER BY "Id" DESC LIMIT 1;', function(err, resultId) {
         if(err) {
@@ -591,6 +655,7 @@ module.exports.getLernEinheit =  function(req, res) {
         finish();
     });
 
+    //get next Lern-Lektion Id
     counter++;
     client.query('SELECT "Id" FROM "LernLektion" ORDER BY "Id" DESC LIMIT 1;', function(err, resultId) {
         if(err) {
@@ -605,11 +670,9 @@ module.exports.getLernEinheit =  function(req, res) {
         finish();
     });
 
-
-
+    //get Lern-Lektion
     counter++;
-
-    client.query('SELECT * FROM "LernLektion" WHERE "LernEinheit" = '+req.params.lernEinheit+';', function(err, result) {
+    client.query('SELECT * FROM "LernLektion" WHERE "LernEinheit" = '+req.params.einheit+';', function(err, result) {
         if(err) {
             console.log(err);
             res.end(err);
@@ -635,6 +698,7 @@ module.exports.getLernEinheit =  function(req, res) {
         finish();
     });
 
+    //get Lern-Feature
     var getLernFeature = function(id,lektion){
 
         client.query('SELECT * FROM "LernFeature" WHERE "LernLektion" = '+ id +';', function(err, result) {
@@ -686,6 +750,7 @@ module.exports.getLernEinheit =  function(req, res) {
         });
     };
 
+    //get geometry forthe Lern-feature mapview
     var getGeom = function(feature){
         client.query('SELECT ST_AsText("geom_center") FROM "LernFeature" WHERE "Id"='+feature.id+';', function(err, result) {
             if(err) {
@@ -700,6 +765,7 @@ module.exports.getLernEinheit =  function(req, res) {
         });
     };
 
+    //get titel of the Info-Feature in the Lern-Feature
     var getFeatureTitle = function(feature){
 
         if(feature.typ == 'infoEinheit'){
@@ -761,6 +827,7 @@ module.exports.getLernEinheit =  function(req, res) {
         }
     };
 
+    //get visibility object
     var getVisible = function(feature){
         client.query('SELECT * FROM "LernFeatureVisibility" WHERE "LernFeature" = '+ feature.id +';', function(err, result) {
             if(err) {
@@ -783,7 +850,14 @@ module.exports.getLernEinheit =  function(req, res) {
     finish();
 
 };
-
+/**
+ * delete a Lern-Feature
+ * @name Server:db#deleteLernFeature
+ * @function
+ * @param req {object} server request object
+ * @param req.params.feature {integer} Id Lern-Feature
+ * @param res {object} server respond object
+ */
 module.exports.deleteLernFeature =  function(req, res) {
     client.query('DELETE FROM "LernFeature" WHERE "Id"='+req.params.feature+';', function(err) {
 
@@ -793,6 +867,7 @@ module.exports.deleteLernFeature =  function(req, res) {
             return
         }
 
+        //delete visibility entries
         client.query('DELETE FROM "LernFeatureVisibility" WHERE "LernFeature" = '+req.params.feature+';', function(err) {
             if(err) {
                 console.log(err);
@@ -805,7 +880,14 @@ module.exports.deleteLernFeature =  function(req, res) {
         });
     });
 };
-
+/**
+ * delete Lern-Lektion
+ * @name Server:db#deleteLernLektion
+ * @function
+ * @param req {object} server request object
+ * @param req.params.lektion {integer} Id Lern-Lektion
+ * @param res {object} server respond object
+ */
 module.exports.deleteLernLektion =  function(req, res) {
     var counter = 1;
     var x;
@@ -817,6 +899,7 @@ module.exports.deleteLernLektion =  function(req, res) {
         }
     };
 
+    //delete Lern-Feature and visibility entries
     var deleteFeature = function(id){
         client.query('DELETE FROM "LernFeature" WHERE "Id"='+id+';', function(err) {
 
@@ -840,7 +923,7 @@ module.exports.deleteLernLektion =  function(req, res) {
         });
     };
 
-
+    //delete Lern-Lektion
     client.query('DELETE FROM "LernLektion" WHERE "Id"='+req.params.lektion+';', function(err) {
 
         if(err) {
@@ -866,7 +949,14 @@ module.exports.deleteLernLektion =  function(req, res) {
         });
     });
 };
-
+/**
+ * delete Lern-Einheit
+ * @name Server:db#deleteLernEinheit
+ * @function
+ * @param req {object} server request object
+ * @param req.params.einheit {integer} Id Lern-Einheit
+ * @param res {object} server respond object
+ */
 module.exports.deleteLernEinheit =  function(req, res) {
     var counter = 1;
     var x;
@@ -878,6 +968,7 @@ module.exports.deleteLernEinheit =  function(req, res) {
         }
     };
 
+    //delete Lern-Lektion
     var deleteLektion = function(id){
         client.query('DELETE FROM "LernLektion" WHERE "Id"='+ id + ';', function(err) {
 
@@ -905,6 +996,7 @@ module.exports.deleteLernEinheit =  function(req, res) {
         });
     };
 
+    //delete Lern-Feature and visibility entries
     var deleteFeature = function(id){
         client.query('DELETE FROM "LernFeature" WHERE "Id"='+id+';', function(err) {
 
@@ -928,6 +1020,7 @@ module.exports.deleteLernEinheit =  function(req, res) {
         });
     };
 
+    //delete Lern-Einheit
     client.query('DELETE FROM "LernEinheit" WHERE "Id"='+req.params.einheit+';', function(err) {
 
         if(err) {
@@ -956,8 +1049,17 @@ module.exports.deleteLernEinheit =  function(req, res) {
 
 
 
-// Utils
-
+/**
+ * Utility function, insert into DB or update if it already exists
+ * @name Server:db#upsert
+ * @function
+ * @param values {object} values to insert, object keys = attribute names
+ * @param values.type {string} (geom,string,integer)
+ * @param values.value {value} the value depending on the type
+ * @param tableName {string} table name
+ * @param res {object} server respond object
+ * @param finish {function} callback
+ */
 var upsert = function(values,tableName,res,finish){
 
     var x;

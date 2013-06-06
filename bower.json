@@ -18,10 +18,8 @@
     "json3": "~3.2.4",
     "jquery-file-upload": "~7.4.1",
     "jquery-miniColors": "~2.0.4",
-    "wmuSlider-master": "~undefined",
     "timeline_2.3.0": "~undefined",
-    "OpenLayers-2.12": "~undefined",
-    "tipsy": "~1.0.0a"
+    "OpenLayers-2.12": "~undefined"
   },
   "ignore": [
     "**/.*",

@@ -1,15 +1,28 @@
 'use strict';
-
+/**
+ * Controller for open world view
+ * @name Controller:OpenWorldCtrl
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.openWorld')
     .controller('OpenWorldCtrl', function ($scope,$http,mapInfoEinheit, util) {
 
+        //reset the map
         $scope.$emit('$clearMap');
 
+        //reset mapInfoEinheit service
         mapInfoEinheit.clearAllLayers();
 
+        /**
+         * Array of all Info-Einheiten in the map
+         * @name Controller:OpenWorldCtrl#infoEinheitenInMap
+         * @type {Array(object)}
+         */
         var infoEinheitenInMap = [];
         var showOnlyBaseLayer = true;
 
+        //get a list of all Info-Einheiten
         $http.get('/pg/getInfoEinheitenList').
             success(function(data) {
 
@@ -18,12 +31,12 @@ angular.module('udm.openWorld')
                         data.list.splice(x,1);
 
                     }
-                        (function( infoEinheit ) {
-                            infoEinheit.onClick = function(){
+                    (function( infoEinheit ) {
+                        infoEinheit.onClick = function(){
 
-                                showInfoEinheit(infoEinheit.id);
-                            }
-                        })( data.list[x] );
+                            showInfoEinheit(infoEinheit.id);
+                        }
+                    })( data.list[x] );
                 }
 
 
@@ -35,6 +48,12 @@ angular.module('udm.openWorld')
                 // or server returns response with an error status.
             });
 
+        /**
+         * show a Info-Einheit in the map
+         * @name  Controller:OpenWorldCtrl#showInfoEinheit
+         * @function
+         * @param infoEinheit {intger} Id Info-Einheit
+         */
         var showInfoEinheit = function(infoEinheit){
             var x;
             for(x=0; x < infoEinheitenInMap.length ; x++){
@@ -120,12 +139,15 @@ angular.module('udm.openWorld')
                 });
         };
 
+        /**
+         * remove Info-Einheit from infoEinheitenInMap
+         * @name  Controller:OpenWorldCtrl#infoEinheitRemoved
+         * @event
+         * @param id {intger} Id Info-Einheit
+         */
         $scope.$on('infoEinheitRemoved', function(e,id) {
             for(var x=0; x < infoEinheitenInMap.length ; x++){
                 if(infoEinheitenInMap[x].id == id) infoEinheitenInMap.splice(x,1);
             }
         });
-
-
-
     });

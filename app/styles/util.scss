@@ -1,0 +1,261 @@
+@import "compass/css3";
+@import "variables";
+
+#timeline{
+  width: 100%;
+  height: 100px;
+  position: absolute;
+  top: 610px;
+  z-index:2500;
+  .timeline-event-tape{
+    @include border-radius($borderRadius);
+  }
+  .timeline-event-label{
+    font-weight: 700;
+  }
+  .timeline-band-1{
+    .timeline-date-label{
+      color: $black;
+      font-weight: 700;
+    }
+  }
+  .timeline-band-inner{
+    .timeline-date-label{
+      color: $black;
+      font-weight: 700;
+    }
+  }
+}
+
+#layerswitcher{
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  z-index: 2400;
+  a{
+    display: inline-block;
+    cursor: pointer;
+    &:hover{
+      background: $black;
+    }
+  }
+}
+
+
+#image-gallery{
+  position: absolute;
+  top:120px;
+  left: 280px;
+  width: 650px;
+  height: 400px;
+  @include panel;
+  img{
+    max-height: 100%;
+    max-width: 100%;
+    margin: auto;
+  }
+  .close-btn{
+    position: absolute;
+    right: 3px;
+    z-index: 2501;
+  }
+  .carousel-caption{
+    display: none;
+  }
+  .carousel-control{
+    top: 200px;
+    width: 36px;
+    line-height: 33px;
+    cursor: pointer;
+  }
+  .left{
+    padding-right: 4px;
+  }
+  .right{
+    padding-left: 4px;
+  }
+  .carousel-indicators{
+    position: absolute;
+    top: 10px;
+    z-index: 2501;
+    li{
+      display: block;
+      float: left;
+      width: 10px;
+      height: 10px;
+      margin-left: 5px;
+      text-indent: -999px;
+      background-color: #808080;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .active{
+      background-color: #000000;
+    }
+  }
+}
+
+
+
+//fix
+.dropdown-menu .disabled > a:hover {
+  background-image: none;
+  cursor: default !important;
+}
+
+.sortableArea{
+  position: absolute;
+  top: 40px;
+  right: 0px;
+  height: 670px;
+  width: 100%;
+  overflow: hidden;
+}
+#layerlist{
+  .selectedItem{
+    border: solid 2px #008000;
+    margin-left: -2px;
+  }
+  width: 250px;
+  height: 100px;
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  z-index: 2500;
+  .overlay{
+    .layerListItem{
+      width: 210px;
+      margin-left: 30px;
+      height: 16px;
+      line-height: 16px;
+      .list-title{
+        width: 110px;
+        line-height: 16px;
+        font-size: 0.95em;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .ui-slider-handle{
+        height: 1em;
+      }
+    }
+  }
+  .layerListItem{
+    width: 250px;
+    height: 20px;
+    margin-top: 5px;
+    cursor: pointer;
+    @include panel;
+    .list-title{
+      white-space: nowrap;
+      width: 115px;
+      line-height: 20px;
+    }
+    .withoutSlider{
+      width: 200px;
+    }
+    .placeholder{
+      display: inline-block;
+      width: 16px;
+    }
+  }
+  .slider{
+    width: 70px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-left: 5px;
+    height: 2px;
+    .ui-slider-handle{
+      top: -.6em;
+      width: 3px;
+      margin-left: -.2em;
+    }
+    .ui-state-hover{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-active{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-focus{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+  }
+}
+
+#infobox{
+  width: 250px;
+  height: 370px;
+  position: absolute;
+  top: 210px;
+  right: 20px;
+  @include panel;
+  .text{
+    height: 295px;
+    overflow: auto;
+    width: 250px;
+  }
+  .lerntext{
+    max-height: 90px;
+    background-color: #5bb75b;
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(91, 183, 91, 0.6)), to(rgba(59, 119, 59, 0.8)));
+    font-weight: 700;
+    line-height: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    overflow: auto;
+  }
+  .infotext{
+    line-height: 17px;
+    font-size: 1.1em;
+  }
+  .year{
+    display: inline-block;
+    font-weight: 700;
+  }
+  h3{
+    display: inline-block;
+    width: 170px;
+    white-space: nowrap;
+  }
+  .bottomEnabled{
+    height: 32px;
+    &:hover{
+      background-color: $green; // Old browsers
+      @include filter-gradient($green, #3b773b, vertical); // IE6-9
+      @include background-image(linear-gradient(top, $green 0%,#3b773b 100%));
+    }
+    cursor: pointer;
+    .glyph-big-picture{
+      margin-left: 113px;
+      margin-top: 2px;
+    }
+  }
+  .bottomDisabled{
+    height: 32px;
+    .glyph-big-picture{
+      margin-left: 113px;
+      margin-top: 2px;
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+}
+
+
+#lernInfo{
+  @include panel;
+  width:350px;
+  height: 100px;
+  position: absolute;
+  bottom: 150px;
+  left:20px;
+  font-weight: 700;
+  font-size: 1.3em;
+  padding: 5px;
+  overflow: auto;
+}

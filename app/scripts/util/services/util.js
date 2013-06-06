@@ -1,5 +1,10 @@
 'use strict';
-
+/**
+ * collection of different utility functions
+ * @name Service:util
+ * @namespace
+ * @author Andreas Krimbacher
+ */
 angular.module('udm.util')
   .factory('util', function () {
     // Service logic
@@ -8,6 +13,14 @@ angular.module('udm.util')
 
     // Public API here
     return {
+        /**
+         * generate a openlayers feature from wkt
+         * @name Service:util#WKTToFeature
+         * @function
+         * @param wkt {object} wkt string in wkt.geom
+         * @param attr {object} attributes object
+         * @returns {object} openlayers feature
+         */
         WKTToFeature : function(wkt,attr){
             var WKTParser = new OpenLayers.Format.WKT();
 
@@ -18,6 +31,13 @@ angular.module('udm.util')
 
             return feature;
         },
+        /**
+         * generates an object with a wkt string and attributes from an openlayers feature
+         * @name Service:util#featureToWKT
+         * @function
+         * @param feature {object} feature
+         * @returns {object} wkt and attributes
+         */
         featureToWKT : function(feature){
             var WKTParser = new OpenLayers.Format.WKT();
 

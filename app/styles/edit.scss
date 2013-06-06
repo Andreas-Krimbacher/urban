@@ -1,0 +1,587 @@
+@import "compass/css3";
+@import "variables";
+
+#editNav{
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  z-index: 2500;
+}
+
+#editView{
+  #layerlist{
+    right: 350px;
+  }
+  #infobox{
+    right: 350px;
+  }
+}
+
+#editInfoEinheit{
+  @include panel;
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  z-index: 2500;
+  width: 283px;
+  height: 600px;
+  overflow: hidden;
+  .topBarText{
+    display: inline-block;
+    width: 210px;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-align: center;
+    height: 40px;
+    position: absolute;
+    top: 12px;
+    left: 40px;
+  }
+  .back{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  .img{
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+  .infoEinheitTable{
+    font-weight: 700;
+    overflow: auto;
+    input{
+      margin-bottom: 0px;
+      height: 16px;
+    }
+    .trash{
+      margin-top: 10px;
+    }
+    .edit{
+      margin-top: 18px;
+    }
+    .icon-tags{
+      margin-top: 10px;
+      margin-left: 5px;
+    }
+  }
+  .label{
+    margin-right: 10px;
+    width: 40px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+  .heading{
+    width: 250px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .elementLabel{
+    width: 60px;
+    margin-top: 7px !important;
+  }
+  .title{
+    width: 180px;
+  }
+  .imgGallery{
+    margin-left: 10px;
+  }
+  .start{
+    width: 40px;
+    margin-right: 20px;
+  }
+  .end{
+    width: 40px;
+  }
+  .info{
+    width: 180px;
+    height: 150px;
+  }
+  .typ{
+    width: 150px;
+    &:focus{
+      color: black;
+    }
+  }
+  .editPlan{
+    margin-bottom: 10px;
+  }
+  .editControls{
+    width: 258px;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: solid;
+    .colorDiv{
+      display: inline-block;
+      float: right;
+    }
+    .sliderDiv{
+      display: inline-block;
+      margin-left: 60px;
+    }
+    .slider{
+      width: 110px;
+      display: inline-block;
+      margin-left: 5px;
+      height: 2px;
+      .ui-slider-handle{
+        top: -.7em;
+        width: 3px;
+        margin-left: -.2em;
+      }
+      .ui-state-hover{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+      .ui-state-active{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+      .ui-state-focus{
+        border: 1px solid #666666;
+        background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+      }
+    }
+  }
+  .colorpickerInput{
+    width: 60px;
+  }
+  colorpicker{
+    float: right;
+    margin-right: 10px;
+  }
+  #editFeatureForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .trash{
+      margin-top: 5px;
+    }
+    .addFeature{
+      margin-left: 20px;
+    }
+    .heading{
+      margin-bottom: 10px;
+    }
+    #select2{
+      width: 160px;
+      display: none;
+    }
+  }
+  #editInfoEinheitForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .rank{
+      width: 60px;
+    }
+    .edit{
+      margin-top: 10px;
+    }
+    .featureTable{
+      font-weight: 700;
+      width: 272px;
+      max-height: 180px;
+      overflow: auto;
+      table{
+        width: 257px;
+      }
+      .trash{
+        margin-top: 10px;
+      }
+      td{
+        line-height: 16px;
+        padding: 3px;
+      }
+      input{
+        width:205px;
+        margin-bottom: 0px;
+      }
+      .icon{
+        margin-top: 7px;
+        margin-left: 5px;
+      }
+      .new{
+        margin-top: 5px;
+      }
+      .button-icon{
+        margin-right: 5px;
+      }
+    }
+  }
+  .infotext{
+    overflow: hidden;
+    width: 175px;
+    padding: 0px;
+  }
+  .date{
+    display: inline-block;
+  }
+  #editInfoEinheitTop{
+    height: 40px;
+    border-bottom: solid;
+  }
+  .send{
+    float: right;
+    margin-right: 15px;
+    margin-top: 10px;
+  }
+
+}
+
+#editLernEinheit{
+  @include panel;
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  z-index: 2500;
+  width: 283px;
+  height: 600px;
+  overflow: hidden;
+  .topBarText{
+    display: inline-block;
+    width: 210px;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-align: center;
+    height: 40px;
+    position: absolute;
+    top: 12px;
+    left: 40px;
+  }
+  .back{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  #editLernEinheitTop{
+    height: 40px;
+    border-bottom: solid;
+  }
+  .lernEinheitTable{
+    font-weight: 700;
+    overflow: auto;
+    input{
+      margin-bottom: 0px;
+      height: 16px;
+    }
+    .trash{
+      margin-top: 10px;
+      margin-right: 5px;
+    }
+    .edit{
+      margin-top: 13px;
+    }
+    .date{
+      display: inline-block;
+    }
+    td{
+      padding: 3px;
+      padding-left: 10px;
+    }
+    .infotext{
+      padding: 0px;
+      width: 180px;
+      overflow: hidden;
+    }
+    .icon-book{
+      margin-top: 10px;
+    }
+
+  }
+  .label{
+    margin-right: 10px;
+    width: 40px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+  .heading{
+    width: 250px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .title{
+    width: 180px;
+  }
+  .info{
+    width: 180px;
+    height: 150px;
+  }
+  #editLernEinheitForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .lektionenTable{
+      font-weight: 700;
+      width: 272px;
+      max-height: 260px;
+      overflow: auto;
+      table{
+        width: 257px;
+      }
+      .trash{
+        margin-top: 10px;
+      }
+      .edit{
+        margin-top: 10px;
+      }
+      td{
+        line-height: 16px;
+        padding: 3px;
+      }
+      input{
+        width:205px;
+        margin-bottom: 0px;
+      }
+      .icon{
+        margin-top: 7px;
+        margin-left: 5px;
+      }
+      .new{
+        margin-top: 5px;
+      }
+      .button-icon{
+        margin-right: 5px;
+      }
+      .date{
+        display: inline-block;
+      }
+      .infotext{
+        padding: 0px;
+        width: 150px;
+        overflow: hidden;
+      }
+    }
+  }
+  #editLernLektionForm{
+    margin-bottom: 0px;
+    margin-top: 10px;
+    margin-left: 10px;
+    .heading{
+      margin-bottom: 10px;
+    }
+    .sendLektion{
+      margin-top: 20px;
+    }
+  }
+  .addLernFeature{
+    margin-bottom: 10px;
+    margin-left: 20px;
+    .button-icon{
+      margin-right: 5px;
+    }
+    i{
+      margin-top: -2px;
+    }
+    span{
+      font-weight: 700;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  }
+  #editLernFeatureForm{
+    margin-left: 10px;
+    margin-top: 10px;
+    .heading{
+      margin-top: 0px;
+    }
+    .info{
+      width: 184px;
+      height: 80px;
+    }
+    .select2Label{
+      width: 70px;
+      margin-top: 5px;
+    }
+    .select2-container{
+      margin-top: 5px;
+    }
+    .send{
+      margin-top: 20px;
+    }
+    #select2InfoEinheit{
+      display: none;
+    }
+    #select2Feature{
+      display: none;
+    }
+    #select2Plan1{
+      display: none;
+    }
+    #select2Plan2{
+      display: none;
+    }
+    #select2Plan3{
+      display: none;
+    }
+    .selectFeatureTable{
+      clear: both;
+      .firstRow{
+        margin-left: 5px;
+      }
+    }
+    .featureLabel{
+      margin-top: 20px;
+      margin-bottom: 5px;
+      display: inline-block;
+      float: left;
+    }
+    .visibility{
+      display: inline-block;
+      float: right;
+      margin-right: 8px;
+    }
+    .selectedFeature{
+      display: inline-block;
+      float: right;
+      margin-right: 6px;
+    }
+    .placeholder{
+      float: right;
+      margin-right: 15px;
+      margin-top: 25px;
+      display: inline-block;
+    }
+  }
+  .featureTable{
+    border-top: solid;
+    border-bottom: solid;
+    width: 260px;
+    max-height: 370px;
+    overflow: auto;
+    clear: right;
+    .noFeature{
+      font-weight: 700;
+      font-size: 1.2em;
+      padding: 10px;
+      display: inline-block;
+    }
+    td{
+      padding: 2px;
+      height: 22px;
+    }
+    .infotext{
+      padding: 0px;
+      font-weight: 700;
+      overflow: hidden;
+      width: 140px;
+    }
+    .typIcon{
+      margin-left: 5px;
+    }
+    .table{
+      margin-bottom: 0px;
+      min-height: 30px;
+    }
+  }
+  .typ{
+    width: 198px;
+    &:focus{
+      color: black;
+    }
+  }
+  .send{
+    float: right;
+    margin-right: 15px;
+    margin-top: 10px;
+  }
+}
+
+#georeference{
+  width: 263px;
+  height: 580px;
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  padding: 10px;
+  @include panel;
+  overflow: hidden;
+  #select2{
+    width: 160px;
+    display: none;
+  }
+  .resize{
+    display: inline-block;
+    margin-left: 5px;
+  }
+  ul{
+    margin-left: 10px;
+  }
+  .label{
+    width: 95px;
+    display: inline-block;
+    margin-right: 20px;
+  }
+  .cpTable{
+    overflow: auto;
+    width: 262px;
+    max-height: 300px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
+  tr{
+    background-color: white;
+    @include border-radius($borderRadius);
+    border-top: solid ;
+    border-bottom: solid ;
+  }
+  .addGCP{
+    margin-left: 5px;
+  }
+  .send{
+    margin-left: 5px;
+  }
+  .deleteAll{
+    margin-left: 172px;
+  }
+  .buttonFix{
+    margin-left: 75px;
+  }
+  .heading2{
+    display: inline-block;
+  }
+  .placeholder{
+    display: inline-block;
+    width: 16px;
+  }
+  .infotext{
+    font-weight: 700;
+    font-size: 1.2em;
+    width: 30px;
+  }
+  .coord{
+    font-weight: 700;
+  }
+  .world{
+    color: #00b000;
+    width: 100px;
+  }
+  .image{
+    color: #1267bb;
+    width: 70px;
+  }
+  .delete{
+    margin-right: 5px;
+  }
+  .slider{
+    width: 110px;
+    display: inline-block;
+    margin-left: 5px;
+    height: 2px;
+    .ui-slider-handle{
+      top: -.7em;
+      width: 3px;
+      margin-left: -.2em;
+    }
+    .ui-state-hover{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-active{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+    .ui-state-focus{
+      border: 1px solid #666666;
+      background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('udm', ['ui','ngSanitize','udm.map','udm.openWorld','udm.edit','udm.lern'])
+angular.module('udm', ['ngSanitize','udm.map','udm.openWorld','udm.edit','udm.lern'])
     .config(function ($routeProvider) {
         $routeProvider
             .when('/', {
